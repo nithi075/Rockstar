@@ -75,7 +75,7 @@ export default function Shop() {
 
             try {
                 // Build the base URL with pagination
-                let url = `http://localhost:8000/api/v1/products?page=${currentPage}&limit=${productsPerPage}`;
+                let url = `https://backend-puaq.onrender.com/api/v1/products?page=${currentPage}&limit=${productsPerPage}`;
 
                 // Add category filter if present
                 if (currentCategory) {
