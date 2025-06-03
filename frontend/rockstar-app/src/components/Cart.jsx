@@ -143,7 +143,7 @@ export default function Cart({ cart, setCart }) {
         try {
             loadingToastId = toast.loading("Processing your order...");
 
-            const response = await fetch('http://localhost:8000/api/v1/order/new', {
+            const response = await fetch('https://backend-puaq.onrender.com/api/v1/order/new', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
