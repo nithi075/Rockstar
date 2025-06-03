@@ -1,0 +1,2349 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+
+
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+*{
+  font-family: 'Lato', sans-serif;
+
+
+}
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%; /* Ensure they take full width */
+   /* Prevent horizontal scroll for overflowing content */
+}
+/* Css for the app */
+h1 {
+    font-size: 50px;
+    line-height: 64px;
+    color: #222;
+}
+
+h2 {
+    font-size: 46px;
+    line-height: 54px;
+    color: #222;
+}
+
+h3 {
+    font-size: 40px;
+    line-height: 44px;
+    color: #222;
+}
+
+h4 {
+    font-size: 36px;
+    line-height: 34px;
+    color: #222;
+}
+
+h6 {
+    font-size: 15px;
+    line-height: 20px;
+    color: #222;
+}
+
+p {
+    font-size: 16px;
+    color: #465b52;
+    margin: 15px 0 20px 0;
+}
+
+/* Section Padding */
+#section-p1 {
+    padding: 40px 80px;
+}
+
+.section-m1 {
+    padding: 40px 0;
+}
+.normal{
+    font-size: 14px;
+    font-weight: 600;
+    padding: 15px 30px;
+    column-rule: #000;
+    background-color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    transition: 0.2s;
+}
+
+body {
+    width: 100%;
+}
+
+/* Logo */
+.logo {
+    width: 40%;
+  
+}
+.logo img{
+    width: 70%;
+
+}
+
+/* Header */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 80px;
+    background: #FDF4DC;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    z-index: 999;
+    position: sticky;
+    top: 0;
+    left: 0;
+}
+.navBar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 13px;  
+}
+#close{
+    display: none;
+}
+.navBar li {
+    list-style: none;
+    padding: 0 20px;
+    position: relative;
+    transition: right 0.3s ease-in-out;
+}
+
+.navBar li a {
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+    transition: 0.03s;
+}
+
+.navBar li a:hover,
+.navBar li a.active {
+    color: #35396d;
+}
+
+.navBar li a.active::after {
+    content: "";
+    width: 30%;
+    height: 2px;
+    background: #35396d;
+    position: absolute;
+    bottom: -4px;
+    left: 20px;
+    
+}
+
+
+/* Add this to your existing CSS file */
+
+.cart-icon-container {
+  position: relative;
+  display: inline-block; 
+  /* To allow positioning of the badge */
+}
+
+.cart-badge {
+  position: absolute;
+  top: -2px; /* Adjust as needed */
+  right: 11px;/* Adjust as needed */
+  background-color: #35396d; /* Or any color you prefer */
+  color: white;
+  border-radius: 50%;
+ 
+  font-size: 0.6em;
+  line-height: 1; /* Ensures text is centered vertically */
+  min-width: 10px; /* Ensures badge is round for single digits */
+  text-align: center;
+  padding: 2px
+}
+
+/* Mobile Navigation */
+.mobile {
+    display: none;
+    text-align: center;
+}
+
+
+
+/* Products Section */
+.products{
+    text-align: center;
+     background-color:#F7B08C ;
+}
+
+.products .pro-container{
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    padding-top: 20px;
+    text-align: center;
+    flex-wrap: wrap;
+    padding-left: 5px;
+    padding-right: 5px;
+   
+}
+
+
+.products .pro{
+    width :23%;
+    min-width: 250px;
+    padding: 12px 12px;
+    border: 1px solid #cce7d0;
+    background-color: #FDF4DC;
+    border-radius: 25px;
+    cursor: pointer;
+    box-shadow: 20px 20px 30px rgba(0,0,0,0.02);
+    margin: 15px 0;
+    transition: 0.2s ease;
+    
+    position: relative;
+}
+.products .pro:hover{
+    box-shadow: 20px 20px 30px rgba(0, 0, 0, 0.06);
+
+
+} 
+
+.pro-detail {
+    display: flex;
+   
+    background-color: #F7B08C;
+    
+
+    
+   
+  }
+.pro-detail .single-pro-image {
+    width: 40%;
+    margin-right: 50px;
+    border: 1px solid black;
+}
+
+.products .pro .h4{
+    margin-top: 5px;
+}
+.products .pro img{
+    width: 100%;
+    height: 250px; 
+    object-fit: cover; 
+    border-radius: 20px;  
+}
+.pro-detail {
+    display: flex; /* Changed to flex */
+    flex-direction: row; /* Arranges children side-by-side */
+    justify-content: center; /* Centers the main image and details block */
+    padding: 50px 0; /* Add overall padding for spacing, adjust as needed */
+    background-color: #F7B08C; /* Keep your background color */
+    /* Remove max-width and margin auto here as children will have specific widths */
+}
+.pro-detail .single-pro-image {
+    width: 100%; /* Sets the width for the image container on desktop */
+ /* Space between image and details on desktop */
+    border: 1px solid black; /* Added border as per your snippet */
+    
+    
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    margin-left: 50px;
+    
+}
+
+
+.pro-detail #MainImg,
+.pro-detail .single-pro-image img#MainImg {
+    width: 100%; /* **Image takes full width of its container** */
+    height: 100%; /* **Image takes full height of its container** */
+    object-fit: contain; /* **Scales the image to fit without cropping or stretching** */
+    display: block;
+    max-width: none;
+}
+
+.single-pro-details {
+    width: 50%; /* For desktop, as per previous discussion */
+    padding: 20px 25px; /* Increased general padding inside the details box */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+    
+    margin-top: 10px;
+}
+
+.pro-detail .single-pro-details h6,
+.pro-detail .single-pro-details h4,
+.pro-detail .single-pro-details h2 {
+    text-align: center;
+    margin-bottom: 5px;
+    padding: 0;
+}
+
+.pro-detail .single-pro-details h4 {
+      font-size: 28px;
+    padding: 20px 0 10px 0;
+    margin-top: 0px;
+}
+
+.pro-detail .single-pro-details h2 {
+   font-size: 32px;
+   margin-top: 5px;
+   margin-bottom: 10px;
+}
+
+.pro-detail .single-pro-details h6 {
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.pro-detail .single-pro-details select {
+    width: fit-content;
+    font-size: 16px;
+    padding: 10px 20px;
+    border: 1px solid #cce7d0;
+    border-radius: 5px;
+    margin-bottom: 18px;
+    text-align: center;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13%205.4L146.2%20202.7%2018.8%2074.8c-2.9-3-6.4-4.6-10.4-4.6-3.9%200-7.5%201.7-10.4%204.6l-13%2013c-5.8%205.8-5.8%2015.1%200%2020.9l127.8%20127.9c5.8%205.8%2015.1%205.8%2020.9%200l127.8-127.9c5.7-5.8%205.7-15.1%200-20.9l-13-13c-2.9-3-6.4-4.6-10.4-4.6z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 10px top 50%;
+    background-size: 12px auto;
+}
+
+.pro-detail .single-pro-details input[type="number"] {
+    width: 60px;
+    height: 50px;
+    padding: 8px 10px;
+    font-size: 18px;
+    text-align: center;
+    border: 1px solid #cce7d0;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    margin-left: 7px;
+}
+
+.pro-detail .single-pro-details button.normal {
+     padding: 15px 30px;
+    background-color: #35396d;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+.pro-detail .single-pro-details span {
+    line-height: 1.6;
+    text-align: center;
+    margin-bottom: 15px;
+    padding-top: 20px;
+}
+.products .pro .des {
+    text-align: start;
+    padding: 10px;
+    display: flex; /* Make description a flex container */
+    flex-direction: column; /* Stack elements vertically */
+    flex-grow: 1; /* Allow it to take up available space */
+}
+.products .pro .h3{
+    font-size: 10px;
+}
+.products .pro .des span{
+    color: #35396d;
+    font-size: 12px;
+}
+.products .pro .des h3{
+    padding-top: 7px;
+    color: #1a1a1a;
+   
+}
+.products .pro .des h5 { /* Make sure your JSX actually uses h5 here for product name */
+    padding-top: 7px;
+    color: #1a1a1a;
+    white-space: nowrap; /* Prevent text from wrapping */
+    overflow: hidden; /* Hide overflow content */
+    text-overflow: ellipsis; /* Add ellipsis for overflow */
+    margin-bottom: 5px; /* Add some space below the name */
+}
+.products .pro .des h4{
+    padding-top: 7px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #35396d;
+}
+.products .pro .des i{
+    font-size: 12px;
+    color: rgb(243,181,25);
+
+}
+.pro-link-wrapper {
+    text-decoration: none; /* Remove underline from link */
+    color: inherit; /* Inherit color from parent */
+    width: 23%; /* Default to 4 items per row on large screens */
+    min-width: 250px; /* Minimum width for each product card */
+    flex-grow: 1; /* Allows items to grow if space permits */
+    display: flex; /* Make it a flex container */
+    flex-direction: column; /* Stack content vertically */
+    /* No margin here, use gap on the container */
+}
+.products .pro .cart{
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    border-radius: 50px;
+    background-color:#e8f6ea ;
+   
+    color: #35396d;
+    border: 1px solid #cce7d0;
+    position:absolute;
+    bottom: 20px;
+    right: 10px;
+}
+.more-colors-section {
+    margin-top: 30px; /* Space from the main product image gallery */
+    padding-top: 20px;
+    border-top: 1px solid #eee; /* Separator line */
+}
+
+.more-colors-section h4 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: #333;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.color-options-group {
+    display: flex;
+    flex-wrap: wrap; /* Allow items to wrap to next line */
+    gap: 15px; /* Space between color thumbnails */
+    justify-content: flex-start; /* Align items to the start */
+}
+
+.color-option-thumbnail {
+    width: 80px; /* Fixed width for color thumbnails */
+    height: 80px; /* Fixed height to make them square */
+    border: 2px solid #ccc; /* Default border */
+    border-radius: 8px; /* Slightly rounded corners */
+    overflow: hidden; /* Hide overflow if image isn't perfectly square */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0; /* Prevent shrinking when space is limited */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* subtle shadow */
+}
+
+.color-option-thumbnail:hover {
+    border-color: #F7B08C; /* Highlight on hover */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* more pronounced shadow on hover */
+    transform: translateY(-2px); /* slight lift */
+}
+
+.color-option-thumbnail.active-color {
+    border-color: #F7B08C; /* Active color border */
+    box-shadow: 0 0 0 3px rgba(8, 129, 120, 0.3); /* Stronger indicator for active */
+    transform: scale(1.05); /* Slightly larger when active */
+}
+
+.color-option-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures image fills the square thumbnail area */
+    display: block;
+}
+
+.color-option-thumbnail {
+    /* Existing styles for your color thumbnails */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease-in-out;
+}
+
+.color-option-thumbnail:hover {
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+}
+
+.color-option-thumbnail.active-color-current-product {
+    border: 2px solid #F7B08C; /* A distinct border color for the active product */
+    box-shadow: 0 0 8px rgba(8, 129, 120, 0.6); /* A subtle shadow to make it pop */
+    transform: scale(1.05); /* Slightly enlarge to emphasize */
+}
+
+/* Ensure images within the thumbnails fit well */
+.color-option-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures the image covers the area without distortion */
+}
+
+/* Optional: Styles for the small image group if you want to display current product's other images */
+.small-img-group {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.small-img-col {
+    flex-basis: 24%; /* Adjust as needed for spacing */
+    cursor: pointer;
+    border: 1px solid transparent; /* Default transparent border */
+    transition: border-color 0.2s ease;
+}
+
+.small-img-col .small-img.active-thumbnail {
+    border: 2px solid #F7B08C; /* Highlight active small image */
+}
+
+.small-img-col img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.pro-detail {
+    display: flex;
+    margin-top: 30px;
+    
+   
+  }
+  
+  .pro-detail .single-pro-image {
+    width: 40%;
+    margin-right: 50px;
+  }
+  
+   .small-img-group {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .small-img-col {
+    flex-basis: 24%;
+    cursor: pointer;
+  }
+  
+  
+  
+  .pro-detail .single-pro-details h2 {
+    font-size: 26px;
+  }
+  
+  
+  
+  .pro-detail .single-pro-details select {
+    display: block;
+    padding: 5px 15px;
+   
+    
+  }
+  
+  .pro-detail .single-pro-details input {
+    width: 50px;
+    height: 47px;
+    padding-left: 10px;
+    font-size: 16px;
+    margin-right: 10px;
+  }
+  
+  .pro-detail .single-pro-details input:focus {
+    outline: none;
+  }
+  
+  .pro-detail .single-pro-details button {
+    background: #35396d;
+    color: #fff;
+  }
+  .pro-detail .single-pro-details span{
+    line-height: 25px;
+  }
+
+
+
+/* Banner Section */
+.banner div{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width:auto;
+    height: 40vh;
+    background-size: cover;
+    background-position: center;
+    text-align: center;
+    padding: 10px;
+   
+}
+/* In your CSS file (e.g., src/index.css or ProductDetail.css) */
+
+.banner img {
+    width: 90%;
+    height: 50vh;
+    position: cover;
+}
+
+.banner h5 {
+    color: white;
+    font-size: 16px;
+}
+
+.banner h2 {
+    color: white;
+    font-size: 30px;
+    padding: 10px 0;
+}
+
+.banner h2 span {
+    color: crimson;
+}
+
+.banner button {
+    font-size: 14px;
+    font-weight: 600;
+    padding: 15px 30px;
+    color: #000;
+    background-color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    transition: 0.2s;
+}
+
+.banner button:hover {
+    background-color: #35396d;
+    color: #fff;
+}
+/* Insta Reels */
+.Insta{
+    background-color: #F7B08C;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    padding: 20px;
+    box-sizing: border-box;
+    min-height: 80vh;
+
+}
+.Insta video{
+  height: 75vh;
+  width: auto;
+  max-width: 400px;
+  object-fit: cover;
+  border: 3px solid #35396d;
+  border-radius: 15px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.03);
+}
+.connect {
+    text-align: center; /* Centers inline/inline-block content like the h2 and button */
+    background-color: #F7B08C; /* Example background color */
+}
+
+.connect h2 {
+    font-size: 2.5em; /* Larger heading */
+    color: #333;
+}
+
+.connect button {
+    padding: 10px 25px; /* Adjust padding for better button appearance */
+    font-size: 20px; /* Slightly adjusted font size */
+    border-radius: 8px; /* Slightly more rounded corners */
+    border: none;
+    background-color: #35396d; /* Your defined background color */
+    color: white;
+    cursor: pointer; /* Indicate it's clickable */
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+    display: inline-block; /* Ensure button behaves like inline-block for text-align to work */
+}
+
+.connect button:hover {
+    background-color: #2a2d54; /* Darken on hover */
+}
+
+.connect button a {
+    text-decoration: none; /* Remove underline from the link */
+    color: inherit; /* Inherit color from the button */
+    display: block; /* Make the link fill the entire button area */
+}
+.Instagram {
+    background-color: #FDF4DC;
+}
+/* Footer page */
+
+footer {
+   
+   
+     display: flex; /* Make .col a flex container */
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally within the flex container */
+    justify-content: center; /* Center items vertically if .col has a defined height */
+    text-align: center;
+     /* Keeps your original space-between */
+
+    background-color: #F7B08C;
+    
+    
+}
+
+footer .col {
+  
+    background-color: #FDF4DC;
+    padding: 15px;
+   
+ 
+
+    /* New properties to center content inside .col */
+    /* Still useful for text wrapping, or if align-items isn't used for some reason */
+}
+
+footer .logo {
+    margin-bottom: 30px;
+    /* No need for extra centering here if .col is a flex container with align-items: center */
+}
+footer h4{
+    font-size: 14px;
+   
+
+}
+footer .follow h4{
+     padding-bottom: 0;
+
+}
+footer #icons{
+      padding: 5px;
+}
+footer a{
+    font-size: 12px;
+    margin-bottom: 10px;
+    text-decoration: none;
+    color: #222;
+
+}
+.container {
+    max-width: 1200px; /* This needs to be overridden on mobile */
+    margin: 0 auto;
+    padding: 0 15px; /* This padding also needs to be removed or adjusted */
+}
+.pro-detail .single-pro-image {
+  width: 40%;
+  margin-right: 50px;
+  border: 1px solid black;
+}
+@media (max-width :477px) {
+    #section-p1 {
+        padding: 0;
+    }
+
+    .pro-detail {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .pro-detail .single-pro-image {
+        width: 100%;
+        box-sizing: border-box;
+        margin-left: 0 !important;   /* <--- Make margin-left explicitly 0 !important */
+        margin-right: 0 !important;  /* <--- Make margin-right explicitly 0 !important */
+        margin-top: 0 !important;    /* <--- Add these for full reset safety */
+        margin-bottom: 0 !important; /* <--- */
+        border: none;
+    }
+
+    .pro-detail .single-pro-image .image-wrapper {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .pro-detail #MainImg,
+    .pro-detail .single-pro-image img#MainImg {
+        width: 100%;
+        height: auto;
+        display: block;
+        max-width: none;
+    }
+
+    .single-pro-details {
+        width: 100%;
+        padding: 10px 15px;
+    }
+
+    /* ... rest of your other @media 477px styles ... */
+}
+
+@media (max-width: 768px) {
+    /* ... (keep your other styles for 768px breakpoint) ... */
+
+    /* --- Product Detail Page Specific Styles (Adjusted for 100% image width) --- */
+    .pro-detail {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+    }
+    .pro-detail .single-pro-image {
+        width: 100%; /* Explicitly set to 100% for mobile */
+        height: 350px;
+        box-sizing: border-box;
+        margin-left: 0 !important;   /* <--- CRITICAL FIX: Explicitly 0 !important */
+        margin-right: 0 !important;  /* <--- CRITICAL FIX: Explicitly 0 !important */
+        margin-top: 0 !important;    /* <--- Add these for full reset safety */
+        margin-bottom: 0 !important; /* <--- */
+        padding: 0;
+        background-color: transparent;
+        border: none;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .pro-detail .single-pro-image .image-wrapper {
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0;
+        margin: 0;
+        background-color: transparent;
+    }
+
+    .pro-detail #MainImg,
+    .pro-detail .single-pro-image img#MainImg {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
+        max-width: none;
+    }
+
+    .pro-detail .single-pro-details {
+        width: 100%;
+        padding: 20px 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        box-sizing: border-box;
+        text-align: center;
+    }
+
+    /* ... rest of the .pro-detail .single-pro-details styles and other sections ... */
+}
+@media (max-width: 768px) {
+    body, html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+       
+    }
+    .container {
+        max-width: 100%;
+        padding: 0;
+        margin: 0;
+    }
+    .main-content-wrapper { /* Replace with your actual main content wrapper class/ID */
+        width: 100%;
+        max-width: 100%;
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    #section-p1 {
+        padding: 15px 0; /* Keep this if you want vertical padding for the section */
+        /* If you want the product image to go truly edge-to-edge on mobile,
+           you might need to remove this padding, or set it to 0 for left/right:
+           padding: 15px 0; */
+    }
+    #page-header h2 {
+        font-size: 28px;
+    }
+
+    /* Header adjustments for this breakpoint */
+    .header {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 5px;
+        flex-wrap: nowrap;
+        box-sizing: border-box;
+        height: 60px;
+    }
+
+    .logo {
+        margin-top: 5px;
+        width: 65%;
+        padding-left: 15px;
+        z-index: 2;
+    }
+
+    .logo img {
+        max-width: 95px;
+        height: auto;
+    }
+
+    header > div:first-of-type {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        width: auto;
+        flex-grow: 0;
+        flex-shrink: 0;
+        margin-left: auto;
+        z-index: 2;
+    }
+
+    .search-container {
+        position: absolute;
+        left: 45%;
+        transform: translate(-50%, -50%);
+        top: 50%;
+        width: calc(100% - 170px);
+        max-width: 300px;
+        display: flex;
+        align-items: center;
+        border: 1px solid #ccc;
+        border-radius: 50px;
+        box-sizing: border-box;
+        z-index: 1;
+    }
+    .search-container input {
+        border: none;
+        outline: none;
+        flex-grow: 1;
+        padding: 10px;
+        font-size: 14px;
+        line-height: 1.2;
+    }
+    
+
+    .mobile {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        flex-shrink: 0;
+        padding-right: 14px;
+        padding-left: 15px;
+        gap: 10px;
+    }
+
+    .mobile i,
+    .mobile .cart-icon-container {
+        color: #1a1a1a;
+        font-size: 18px;
+        margin-left: 0;
+        padding: 3px;
+        cursor: pointer;
+        transition: color 0.3s ease, transform 0.2s ease;
+    }
+
+    .mobile i:hover,
+    .mobile .cart-icon-container:hover {
+        color: #35396d;
+        transform: scale(1.1);
+    }
+
+    .mobile .cart-icon-container {
+        position: relative;
+    }
+    .mobile .cart-icon-container .cart-badge {
+        position: absolute;
+        top: -3px;
+        right: -6px;
+        background-color: #35396d;
+        color: white;
+        border-radius: 50%;
+        padding: 4px;
+        font-size: 7px;
+        line-height: 1;
+        min-width: 10px;
+        text-align: center;
+    }
+
+    .navBar {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        position: fixed;
+        top: 0;
+        right: -400px;
+        height: 100vh;
+        width: 300px;
+        background-color: #FDF4DC;
+        box-shadow: 0 40px 60px rgba(0, 0, 0, 0.01);
+        padding: 80px 0 0 20px;
+        transition: 0.3s ease;
+        z-index: 1000;
+    }
+
+    .navBar.active {
+        right: 0;
+    }
+
+    .navBar ul {
+        display: block;
+        padding-top: 10px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .navBar li {
+        margin-bottom: 25px;
+    }
+
+    #close {
+        position: absolute;
+        top: 30px;
+        left: 30px;
+        color: #222;
+        font-size: 24px;
+        display: block;
+    }
+
+    #lg-bag {
+        display: none;
+    }
+
+    h1 {
+        font-size: 38px;
+    }
+
+    h2 {
+        font-size: 32px;
+    }
+
+    .hero {
+        padding: 0 20px;
+        background-position: 55%;
+    }
+
+    .products .pro-container {
+        justify-content: center;
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .banner div {
+        height: 40vh;
+        width: auto;
+        padding: 0;
+    }
+    .banner h5 {
+        margin-bottom: 0;
+    }
+    .banner h2 {
+        font-size: 24px;
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+
+    footer .copyright {
+        text-align: center;
+    }
+    footer {
+        padding: 5px;
+    }
+    footer .col {
+        padding: 15px;
+        margin: 5px;
+    }
+    footer .logo {
+        width: 50%;
+        margin-bottom: 0;
+        margin-left: 0;
+    }
+    footer h4 {
+        padding-bottom: 0;
+    }
+     .Insta {
+        /* Keep as flex-row (default for display: flex) */
+        /* justify-content: center; and align-items: center; remain to keep them centered */
+        gap: 20px; /* Significantly reduce gap between videos to save horizontal space */
+        min-height: auto; /* Allow height to be determined by content */
+        padding: 10px; /* Reduce padding even further */
+        overflow-x: auto; /* In case they still don't fit, allow scrolling */
+        flex-wrap: nowrap; /* PREVENT wrapping, force them into a single line */
+        margin-top: 10px;
+    }
+
+    .Insta video {
+        height: 40vh; /* Significantly reduce video height */
+        /* Width will be primarily controlled by flex-basis/flex-shrink if needed,
+           or simply by max-width */
+        max-width: 45%; /* Each video takes up almost half the container width (plus gap) */
+        min-width: 150px; /* Ensure a minimum readable width for each video */
+        flex-shrink: 0; /* Prevent videos from shrinking below their content size */
+        border-width: 2px;
+        border-radius: 8px; /* Slightly less rounded */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.07); /* Even lighter shadow */
+    }
+
+    /* Connect Section (Heading and Button) - These remain the same as previous suggestion */
+    .connect {
+        padding: 30px 15px;
+       
+    }
+
+    .connect h2 {
+        font-size: 1.8em;
+        margin-bottom: 15px;
+    }
+
+    .connect button {
+        padding: 8px 20px;
+        font-size: 18px;
+        border-radius: 6px;
+    }
+
+    /* --- Product Detail Page Specific Styles (Adjusted for 100% image width) --- */
+    .pro-detail {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+    }
+    .pro-detail .single-pro-image {
+        width: 100%; /* Explicitly set to 100% for mobile */
+        height: 350px;
+        box-sizing: border-box;
+        margin: 0 !important; /* <--- CRITICAL FIX: Ensure no margins are pushing it */
+        padding: 0; /* Ensure no internal padding that shrinks the content */
+        background-color: transparent;
+        border: none;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .pro-detail .single-pro-image .image-wrapper {
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0;
+        margin: 0;
+        background-color: transparent;
+    }
+
+    .pro-detail #MainImg,
+    .pro-detail .single-pro-image img#MainImg {
+        width: 100%;
+        height: 100%; /* Keep 100% height for the image itself */
+        object-fit: contain; /* Good for keeping the whole image visible */
+        display: block;
+        max-width: none;
+    }
+
+    .pro-detail .single-pro-details {
+        width: 100%;
+        padding: 20px 15px; /* Consistent horizontal padding */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        box-sizing: border-box;
+        text-align: center;
+    }
+
+    .pro-detail .single-pro-details h4 {
+        font-size: 24px;
+        padding: 15px 0;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+    .pro-detail .single-pro-details h2 {
+        font-size: 26px;
+        margin-top: 5px;
+        margin-bottom: 10px;
+        padding: 0;
+    }
+    .pro-detail .single-pro-details h6 {
+        font-size: 14px;
+        margin-bottom: 8px;
+        padding: 0;
+    }
+
+    .pro-detail .single-pro-details select {
+        width: fit-content;
+        padding: 8px 15px;
+        border: 1px solid #cce7d0;
+        border-radius: 5px;
+        margin-bottom: 18px;
+        text-align: center;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13%205.4L146.2%20202.7%2018.8%2074.8c-2.9-3-6.4-4.6-10.4-4.6-3.9%200-7.5%201.7-10.4%204.6l-13%2013c-5.8%205.8-5.8%2015.1%200%2020.9l127.8%20127.9c5.8%205.8%2015.1%205.8%2020.9%200l127.8-127.9c5.7-5.8%205.7-15.1%200-20.9l-13-13c-2.9-3-6.4-4.6-10.4-4.6z%22%2F%3E%3C%2Fsvg%3E');
+        background-repeat: no-repeat;
+        background-position: right 10px top 50%;
+        background-size: 12px auto;
+    }
+
+    .pro-detail .single-pro-details input[type="number"] {
+        width: 50px;
+        padding: 5px 5px;
+        text-align: center;
+        border: 1px solid #cce7d0;
+        border-radius: 5px;
+        margin-bottom: 15px;
+        margin-left: 7px;
+    }
+
+    .pro-detail .single-pro-details button.normal {
+        padding: 12px 20px;
+        background-color: #35396d;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-bottom: 25px;
+    }
+
+    .pro-detail .single-pro-details span {
+        text-align: center;
+        margin-bottom: 15px;
+        padding-top: 20px;
+    }
+
+    .contact-details {
+        flex-direction: column;
+        padding: 20px;
+    }
+
+    .contact-details .details {
+        width: 100%;
+        padding-right: 0;
+        margin-bottom: 30px;
+        
+    }
+
+    .contact-details .details h2 {
+        font-size: 26px;
+    }
+
+    .contact-details .details h3 {
+        font-size: 18px;
+    }
+
+    .contact-details .details li {
+        margin-bottom: 12px;
+    }
+
+    .contact-details .map {
+        width: 100%;
+        height: 300px;
+    }
+
+    .form-details {
+        margin: 10px;
+        padding: 30px 10px;
+        flex-wrap: wrap;
+    }
+
+    .form-details form {
+        width: 100%;
+        margin-bottom: 30px;
+    }
+
+    .form-details .people {
+        margin-left: 0px;
+        padding-left: 0px;
+    }
+
+    .cart-add {
+        flex-direction: column;
+    }
+
+    .coupon {
+        width: auto;
+    }
+
+    .subtotal {
+        width: 100%;
+    }
+}
+/*shop page */
+
+#page-header {
+    background-color: #F7B08C;
+    text-align: center;
+    padding-top: 15px;
+}
+/* Pagination Container */
+.pagination {
+    background-color: #F7B08C; /* Your background color */
+    padding: 20px; /* Add some padding around the entire pagination block */
+    display: flex; /* Make it a flex container */
+    justify-content: center; /* Center the items horizontally */
+    align-items: center; /* Vertically align items in the middle */
+    gap: 20px; /* THIS IS THE KEY for spacing between items */
+   
+}
+
+/* Styles for the pagination links (your buttons) */
+.pagination a {
+    text-decoration: none;
+    background-color: #35396d; /* Your button background color */
+    color: white; /* Text color for the buttons */
+    padding: 15px 25px; /* Adjust padding as needed */
+    border-radius: 4px;
+    font-weight: 600;
+    white-space: nowrap; /* Prevents text from wrapping */
+    display: flex; /* Make links flex containers too to align text/icon if they have separate elements */
+    align-items: center; /* Vertically center content within the link */
+    justify-content: center; /* Horizontally center content within the link */
+}
+
+/* Styles for the icons within the links */
+.pagination a i {
+    font-size: 16px;
+    font-weight: 600;
+    /* Add margin to icons if they are directly adjacent to text and need space */
+    margin: 0 5px; /* Adjust as needed for space around the arrow icons */
+}
+
+/* Style for the current page number text */
+.pagination span {
+    color: #35396d; /* Choose a visible color for the page number */
+    font-weight: bold;
+    font-size: 1.1em; /* Adjust font size for visibility */
+    /* No need for margin here if using flex gap on the parent */
+}
+
+/* Optional: Style for the actual buttons if you are still using them inside links or for specific actions */
+.pagination button {
+    background-color: transparent; /* Keep transparent for buttons inside <a> tags */
+    border: none;
+    color: white;
+    padding: 0; /* Remove default button padding if it's inside an <a> */
+    cursor: pointer;
+}
+/* Search page */
+/* You might have other global styles or styles for .input-group */
+
+.input-group {
+  display: flex; /* To align input and button side-by-side */
+   /* Optional border for the group */
+  border-radius: 4px; /* Optional rounded corners */
+  overflow: hidden;
+  
+  width: 72%; 
+  margin-left: 70px;/* To contain rounded corners of inner elements */
+}
+
+.form-control {
+  flex-grow: 1; /* Allows the input to take up available space */
+  padding: 0.75rem; /* Standard padding */
+  border: 0.5px solid #35396d;
+  border-right: none; /* Remove right border to connect with button */
+  border-radius: 50px; /* Rounded left corners */
+  font-size: 1rem;
+  line-height: 1.5;
+
+  
+  background-color: #fff;
+  background-clip: padding-box;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+  color: #495057;
+  background-color: #fff;
+
+  outline: 0;
+  border-right: none; /* Keep right border removed on focus */
+}
+
+.input-group-append {
+  display: flex;
+}
+
+.btn {
+  display: inline-block;
+  font-weight: 400;
+  color: #fff;
+  text-align: center;
+  vertical-align: middle;
+  user-select: none;
+  /* Example button border color */
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: 0 4px 4px 0; /* Rounded right corners */
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  cursor: pointer;
+}
+
+.btn:hover {
+  color: #fff;
+  background-color: #0056b3; /* Darker shade on hover */
+  border-color: #0056b3;
+}
+
+.btn:focus {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5);
+}
+
+.btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.btn i.fa {
+  /* Styles for the Font Awesome search icon */
+  font-size: 1.2rem; /* Adjust icon size as needed */
+}
+
+/* Optional: Style for the visually hidden label (for accessibility) */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+
+/* Single Product: Related Products Section (Horizontal Scroll) */
+/* Single Product: Related Products Section (Horizontal Scroll) */
+.related-products {
+    padding: 40px 80px; /* Adjust padding as needed */
+    text-align: center;
+    overflow: visible; /* Ensure no hidden overflow from parents */
+    margin-bottom: 0px;
+    margin-left: 7px;
+}
+
+.related-products h2 {
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+    color: #222;
+}
+
+.related-products p {
+    font-style: italic;
+    color: #555;
+ 
+}
+
+.related-products .pro-container {
+    display: flex;
+    justify-content: flex-start;
+    gap: 20px;
+    
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 15px;
+    scroll-snap-type: x mandatory;
+
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.related-products .pro {
+     background-color: #FDF4DC;
+    width: auto;
+    min-width: 270px;
+    flex-shrink: 0;
+    flex-grow: 0;
+
+    scroll-snap-align: start;
+
+    border: 1px solid black;
+    padding: 15px;
+    border-radius: 20px;
+    text-align: left;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    
+}
+
+.related-products .pro:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
+    
+}
+
+/* --- ADDED: Padding around the image within the product card --- */
+.related-products .pro .image-wrapper { 
+    border: 0.1px solid grey;/* New wrapper for the image */
+    background-color: #f7f7f7; /* Light background for the padding area */
+    border-radius: 15px; /* Match product card border-radius */
+    padding: 15px; /* More padding around the image */
+    margin-bottom: 5px; /* Space below the image wrapper */
+    display: flex; /* Use flex to center image if it doesn't fill wrapper */
+    justify-content: center;
+    padding-right: 25px;
+    align-items: center;
+    overflow: hidden; /* Ensure padding doesn't cause overflow issues */
+    margin-left: 5px;
+    /* Added for consistent sizing of the wrapper */
+    /* Or whatever fixed width you desire */
+    height: 200px; /* Or whatever fixed height you desire */
+}
+
+.related-products .pro img {
+    
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Ensures the whole image is visible and scaled within its container */
+    border-radius: 0; /* Image itself might not need border-radius if wrapper has it */
+    margin-bottom: 0; /* Remove margin as wrapper handles spacing */
+    display: block;
+}
+
+.related-products .pro .des {
+   
+    padding: 10px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.related-products .pro .des span {
+    color: #606063;
+    font-size: 13px;
+    text-transform: uppercase;
+    
+}
+
+.related-products .pro .des h5 {
+    padding-top: 5px;
+    color: #1a1a1a;
+    font-size: 16px;
+    line-height: 1.3;
+    margin-bottom: px;
+}
+
+.related-products .pro .des .star {
+    margin: 10px 0 8px 0;
+    display: flex;
+    gap: 3px;
+    color: rgb(243, 181, 25);
+}
+
+.related-products .pro .des .star i {
+    font-size: 14px;
+    color: inherit;
+}
+
+.related-products .pro .des h4 {
+    padding-top: 7px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #35396d;
+    margin-top: auto;
+}
+
+.related-products .pro .cart {
+    width: 20px;
+    height: 20px;
+    line-height: 45px;
+    border-radius: 50%;
+    background-color: #FDF4DC;
+    font-weight: 500;
+    color: #35396d;
+    border: 1px solid #cce7d0;
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    padding: 10px;
+}
+
+.related-products .pro .cart:hover {
+    background-color: #35396d;
+    color: #fff;
+    transform: scale(1.1);
+}
+
+/* --- ADDED: Remove text decoration from all links within a product card --- */
+.related-products .pro-link-wrapper { /* Assuming this is your <Link> component's class */
+    text-decoration: none !important; /* Force no underline */
+    color: inherit; /* Ensure text color isn't changed by default link styles */
+    display: block; /* Important if it's wrapping the whole card */
+}
+
+/* Also ensure general links have no decoration if not already global */
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* --- Optional: Scrollbar Styling for Webkit browsers (Chrome, Safari) --- */
+.related-products .pro-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.related-products .pro-container::-webkit-scrollbar-track {
+    background: #FDF4DC;
+    border-radius: 10px;
+}
+
+.related-products .pro-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+.related-products .pro-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+.product-detail-page {
+    background-color: #F7B08C;
+    padding-top: 5px;
+}
+
+/* --- Responsive Adjustments for Related Products --- */
+@media (max-width: 991px) {
+    .related-products {
+        padding: 30px 40px;
+    }
+}
+
+@media (max-width: 767px) {
+    .related-products {
+         padding-left: 10px;
+    }
+    .related-products .pro {
+        width: 250px;
+        min-width: 250px;
+    }
+    .related-products .pro img {
+        object-fit: cover;
+        padding-left:8px ;
+        width: 100%;
+        height: auto;
+    }
+    
+     h4 {
+    font-size: 36px;
+    line-height: 34px;
+    color: #222;
+
+    .main-header {
+    flex-wrap: wrap; /* Allow items to wrap to a new line */
+    padding: 10px 15px;
+  }
+
+  .main-header .logo {
+    flex-grow: 1; /* Allow logo to take available space */
+    margin-right: auto; /* Push subsequent items to the right */
+  }
+
+  .main-header .main-nav {
+    /* Hide navigation on smaller screens.
+       You'd typically have a separate burger menu toggle for this. */
+    display: none;
+  }
+
+  .search-container {
+    order: 3; /* Push search container to the next line or end */
+    width: 100%; /* Take full width on smaller screens */
+    justify-content: flex-end; /* Align icon to the right */
+    margin-top: 10px; /* Space from logo/other header elements */
+  }
+
+  .search-input {
+    width: 0; /* Initially hide the search input by setting width to 0 */
+    padding: 0; /* Remove padding */
+    border: none; /* Remove border */
+    opacity: 0; /* Make it completely transparent */
+    visibility: hidden; /* Hide it from screen readers and pointer events */
+    margin-left: 0; /* Remove any default margin */
+    box-shadow: none; /* Remove any default shadow */
+  }
+
+  .search-icon {
+    display: block; /* Show the search icon on mobile */
+    font-size: 26px; /* Larger icon for better tap target */
+    margin-left: 0; /* No margin on the icon itself if it's alone */
+  }
+
+ 
+}
+.related-products .pro .des {
+    padding: 10px 0; 
+    /* display: flex; */
+    /* flex-direction: column; */
+    /* align-items: flex-start; */
+}
+}
+
+@media (max-width: 477px) {
+    .related-products {
+        padding: 15px 10px;
+    }
+    .related-products .pro {
+        width: 220px;
+        min-width: 220px;
+    }
+}
+
+.pro-detail {
+    display: flex;
+    margin-top: 30px;
+    
+   
+  }
+  
+ 
+  
+   .small-img-group {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .small-img-col {
+    flex-basis: 24%;
+    cursor: pointer;
+  }
+  
+  
+  
+  .pro-detail .single-pro-details h2 {
+    font-size: 26px;
+  }
+  
+  
+  
+  .pro-detail .single-pro-details select {
+    display: block;
+    padding: 5px 15px;
+   
+    
+  }
+  
+  .pro-detail .single-pro-details input {
+    width: 50px;
+    height: 47px;
+    padding-left: 10px;
+    font-size: 16px;
+    margin-right: 10px;
+  }
+  
+  .pro-detail .single-pro-details input:focus {
+    outline: none;
+  }
+  
+  .pro-detail .single-pro-details button {
+    background: #35396d;
+    color: #fff;
+  }
+  .pro-detail .single-pro-details span{
+    line-height: 25px;
+  }
+  /* Blog page */
+
+.about-header{
+    background-image: url(banner/b21.png);
+   
+    width: 100%;
+    height: 40vh;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    flex-direction: column;
+    padding: 14px;
+    
+}
+
+.about-header h2{
+    color: #fff;
+}
+.about-header p{
+    color: grey;
+}
+.about-head img{
+    width: 50%;
+    height: auto;
+}
+.about-head{
+    display: flex;
+    align-items: center;
+
+}
+.about-head div{
+    padding-left: 50px;
+   
+}
+.about-app{
+    text-align: center;
+}
+.about-app .video{
+    width: 70%;
+    height: 100%;
+    margin: 30px auto 0 auto;
+
+
+}
+.about-app .video video{
+
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+   
+
+}
+
+/* Contact page */
+.contact-details{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #F7B08C;
+  
+}
+.contact-details .details{
+    width: 40%;
+   
+    
+}
+/* --- Styles for larger screens (default) --- */
+.contact-details {
+    display: flex; /* Assuming a row layout on desktop */
+    justify-content: space-between;
+    /* ... other desktop specific styles for .contact-details ... */
+}
+
+.contact-details .details {
+    width: 40%; 
+      padding-left: 25px;/* Example width for desktop */
+    /* ... other desktop specific styles for .details ... */
+}
+
+.contact-details .map {
+    width: 55%; /* Example width for desktop */
+    height: 450px; /* Example height for desktop */
+    /* ... other desktop specific styles for .map ... */
+}
+
+/* --- MEDIA QUERY FOR SMALLER SCREENS (THIS IS WHERE YOUR CODE NEEDS TO BE) --- */
+@media (max-width: 768px) {
+    .contact-details {
+        flex-direction: column; /* Stack details and map vertically */
+        padding: 20px; /* Reduce padding for smaller screens */
+    }
+
+    .contact-details .details {
+        width: 100%; /* Full width for details */
+        padding-right: 0; /* Remove right padding */
+        margin-bottom: 30px; /* Space between details and map when stacked */
+    }
+
+    .contact-details .details h2 {
+        font-size: 26px; /* Slightly smaller heading for mobile */
+    }
+
+    .contact-details .details h3 {
+        font-size: 18px;
+    }
+
+    .contact-details .details li {
+        margin-bottom: 12px; /* Slightly less space between list items */
+    }
+
+    .contact-details .map {
+        width: 100%; /* Full width for map */
+        height: 300px; /* Make map a bit shorter on mobile */
+    }
+    .customer-details{
+        flex: 1;
+        margin-left:10px ;
+        margin-right: 10px;
+
+      
+    }
+    .subtotal{
+         margin-left:10px ;
+        margin-right: 10px;
+
+    }
+}
+/* --- END OF MEDIA QUERY --- */
+.contact-details .details span,
+.form-details form span
+{
+    font-size: 12px;
+   
+}
+.contact-details .rock-details{
+    margin-bottom: 5px;
+    margin-top: 0px;
+   
+}
+.contact-details .details i{
+    color: #35396d;
+
+}
+.contact-details .details p{
+    color:black;
+    padding-left:5px ;
+}
+.contact-details .details h2,
+.form-details form h2{
+      font-size: 26px;
+      line-height: 35px;
+      
+
+}
+.contact-details .details h3{
+    font-size: 16px;
+    
+}
+.contact-details .details li{
+    list-style: none;
+    display: flex;
+    padding: 10px 0;
+
+
+}
+.contact-details .details li i{
+    font-size: 14px;
+    padding-right: 23px;
+}
+.contact-details .details li p{
+    margin: 0;
+    font-size: 14px;
+}
+.contact-details .map{
+    width: 50%;
+    height: 400px;
+}
+.contact-details .map iframe{
+    width: 100%;
+    height: 100%;
+}
+.form-details{
+    display: flex;
+    justify-content: space-between;
+    margin: 30px;
+    padding: 80px;
+    border:1px solid #e1e1e1 ;
+}
+.form-details form{
+    width: 65%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+}
+.form-details form input,
+.form-details form textarea{
+    width: 100%;
+    padding:12px 15px;
+    outline: none;
+    margin-bottom:20px ;
+    border: 1px solid #e1e1e1;
+}
+.form-details button{
+    font-size: 14px;
+    font-weight: 600;
+    padding: 15px 30px;
+    column-rule: #000;
+    background-color: #35396d;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    transition: 0.2s;
+
+}
+.form-details .people div{
+    padding-bottom: 25px;
+    display: flex;
+    align-items: flex-start;
+}
+.form-details .people div img{
+    width: 65px;
+    height: 65px;
+    object-fit: cover;
+    margin-right: 15px;
+}
+.form-details .people div p{
+    margin: 0;
+    font-size: 13px;
+    line-height: 25px;
+
+}
+.form-details .people div p span{
+    display :block;
+    font-size: 16px;
+    font-weight: 600;
+    color: #000;
+
+}
+/* Cart Page */
+.cart {
+    overflow-x: auto;
+    background-color: #F7B08C;
+    padding-bottom: 15px;
+}
+
+.cart table tr{
+    border: 1px solid grey;
+}
+.cart table{
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    white-space: nowrap;
+    border:1px solid grey;
+}
+
+.cart table img{
+    width: 70px;
+}
+.cart table td:nth-child(1){
+    width: 100px;
+    text-align: center;
+}
+
+.cart table td:nth-child(2){
+    width: 150px;
+    text-align: center;
+}
+.cart table td:nth-child(3){
+    width: 250px;
+    text-align: center;
+}
+.cart table td:nth-child(4),.cart table td:nth-child(5),
+.cart table td:nth-child(6){
+    
+    width: 150px;
+    text-align: center;
+}
+.cart table td:nth-child(5) input{
+    width: 70px;
+    padding: 10px 5px 10px 15px;
+
+
+}
+.cart table thead{
+    border: 1px solid #e2e9e1;
+    border-left: none;
+    border-right: none;
+
+}
+.cart table thead td{
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 13px;
+    padding: 18px 0;
+
+}
+.cart table tbody tr td{
+    padding-top: 15px;
+}
+.cart table tbody tr td{
+    font-size: 13px;
+}
+
+.cart-button{
+    font-size: 14px;
+    font-weight: 600;
+    padding: 15px 30px;
+    column-rule: #000;
+    background-color: #35396d;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    transition: 0.2s;
+}
+.cart-add{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+ .coupon{
+    width: 50%;
+    margin-bottom: 30px;
+ }
+  .coupon h3,
+  .subtotal h3{
+    padding-bottom: 15px;
+    
+
+ }
+ .coupon input{
+    padding: 10px 20px ;
+    outline: none;
+    width: 60%;
+    margin-right: 10px;
+    border: 1px solid #e2e9e1;
+
+ }
+ .coupon button{
+    background-color: #35396d;
+    color: #fff;
+    padding: 12px 20px;
+
+ }
+ .subtotal {
+    width: 50%;
+    margin-bottom :30px;
+    border: 1px solid #e2e9e1;
+    padding: 30px;
+ }
+ .subtotal table{
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 20px;
+
+ }
+ .subtotal table td{
+    width: 50%;
+    border: 1px solid #e2e9e1;
+    padding: 10px;
+    font-size: 13px;
+ }
+.tot-button{
+    font-size: 14px;
+    font-weight: 600;
+    padding: 15px 30px;
+    column-rule: #000;
+    background-color: #35396d;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    transition: 0.2s;
+}
+
+ /* ======================================= */
+/* Cart Page - Customer Information Styling */
+/* ======================================= */
+
+/* Container for both customer details and subtotal, to arrange them side-by-side */
+.cart-add {
+    padding-top:35px ;
+    background-color: #F7B08C;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap; /* Allows sections to wrap onto a new line on smaller screens */
+    margin-top: 30px;
+    padding: 20px;
+    border-top: 1px solid #e2e2e2; /* Separator from the cart table */
+    gap: 30px; /* Space between the customer details and subtotal sections */
+}
+
+/* Wrapper to control the layout of customer details and subtotal */
+.customer-details-and-subtotal-wrapper {
+   
+    display: flex;
+    width: 100%; /* Take full width of its parent */
+    justify-content: space-between; /* Pushes customer details left, subtotal right */
+    flex-wrap: wrap; /* Allows columns to stack on smaller screens */
+    gap: 30px; /* Gap between the two major columns */
+}
+
+/* Styling for the Customer Details section */
+.customer-details {
+    flex: 2; /* Allows this section to take proportionally more space (e.g., 60-70%) */
+    min-width: 300px; /* Ensures the form doesn't get too narrow before wrapping */
+    padding: 20px; /* Inner padding */
+    border: 1px solid #e2e2e2; /* Subtle border */
+    border-radius: 8px; /* Rounded corners */
+    background-color: #FDF4DC; /* Slightly off-white background */
+}
+
+.customer-details h3 {
+    margin-bottom: 25px; /* Space below the heading */
+    font-size: 24px; /* Larger heading */
+    color: #333; /* Darker text for heading */
+    text-align: center; /* Center align the heading */
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee; /* Separator under heading */
+}
+
+.customer-details .form-group {
+    margin-bottom: 20px; /* Space between form groups */
+}
+
+.customer-details label {
+    display: block; /* Make labels take full width */
+    margin-bottom: 8px; /* Space between label and input */
+    font-weight: 600; /* Bolder label text */
+    color: #555; /* Slightly lighter text for labels */
+    font-size: 16px;
+}
+
+.customer-details input[type="text"],
+.customer-details input[type="tel"],
+.customer-details textarea {
+    width: 100%; /* Make inputs take full width of their container */
+    padding: 12px; /* Comfortable inner padding */
+    border: 1px solid #ccc; /* Default border color */
+    border-radius: 5px; /* Slightly rounded input corners */
+    box-sizing: border-box; /* Ensures padding and border are included in the element's total width and height */
+    font-size: 16px;
+    color: #333;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions for focus effects */
+}
+
+.customer-details textarea {
+    resize: vertical; /* Allow vertical resizing of the textarea */
+    min-height: 80px; /* Minimum height for textarea */
+}
+
+.customer-details input[type="text"]:focus,
+.customer-details input[type="tel"]:focus,
+.customer-details textarea:focus {
+    outline: none; /* Remove default outline */
+    border-color: #35396d; /* Highlight border on focus */
+    box-shadow: 0 0 8px rgba(8, 129, 120, 0.2); /* Subtle shadow on focus */
+}
+
+
+/* Styling for the Cart Totals section */
+.subtotal {
+    flex: 1; /* Allows this section to take proportionally less space (e.g., 30-40%) */
+    min-width: 280px; /* Ensures the subtotal doesn't get too narrow before wrapping */
+ 
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #FDF4DC;
+    display: flex; /* Use flexbox to organize content inside */
+    flex-direction: column; /* Stack items vertically */
+    justify-content: space-between; /* Push button to the bottom */
+}
+
+.subtotal h3 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #35396d;
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.subtotal table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 25px; /* Space between table and button */
+}
+
+.subtotal table td {
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 16px;
+    color: #666;
+}
+
+.subtotal table td:last-child {
+   
+    font-weight: 500;
+    color: #444; /* Slightly darker for values */
+}
+
+.subtotal table tr:last-child td {
+    border-bottom: none;
+    font-size: 18px;
+    font-weight: bold;
+    color: #35396d; /* Highlight total amount */
+}
+
+.subtotal .tot-button {
+    background-color: #35396d;
+    color: white;
+    padding: 15px 25px; /* Larger padding for button */
+    border: none;
+    border-radius: 5px; /* Slightly more rounded button */
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 600; /* Bolder button text */
+    width: 100%; /* Full width button */
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-transform: uppercase; /* Uppercase text */
+    letter-spacing: 0.5px;
+}
+
+.subtotal .tot-button:hover {
+    background-color: #065f57;
+    transform: translateY(-2px); /* Slight lift effect on hover */
+}
+
+.subtotal .tot-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    transform: translateY(0); /* No lift when disabled */
+    opacity: 0.8;
+}
+
+
+/* ======================================= */
+/* Responsive Adjustments */
+/* ======================================= */
+
+
+@media (max-width: 480px) {
+    .customer-details,
+    .subtotal {
+        padding: 15px; /* Further reduce padding */
+    }
+    .customer-details h3,
+    .subtotal h3 {
+        font-size: 20px; /* Even smaller headings */
+    }
+    .customer-details label,
+    .customer-details input[type="text"],
+    .customer-details input[type="tel"],
+    .customer-details textarea,
+    .subtotal table td {
+        font-size: 14px; /* Smaller font for inputs and table text */
+    }
+}
