@@ -20,7 +20,7 @@ export default function Arrivals() {
         // You can optionally add `&limit=X` if you want to explicitly request
         // a certain number of the latest products from the backend,
         // e.g., `?limit=12` if you want to ensure enough for 8 unique.
-        const response = await fetch(`https://backend-puaq.onrender.com/products?limit=12&timestamp=${new Date().getTime()}`);
+        const response = await fetch(`https://backend-puaq.onrender.com/api/v1/products?limit=12&timestamp=${new Date().getTime()}`);
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
