@@ -16,7 +16,7 @@ export default function CategoryProductList() {
             try {
                 // Adjust this API endpoint to match your backend's filtering capability
                 // It's crucial your backend supports filtering by category name
-                const response = await fetch(`http://localhost:8000/api/v1/products?category=${categoryName}`);
+                const response = await fetch(`https://backend-puaq.onrender.com/products?category=${categoryName}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
