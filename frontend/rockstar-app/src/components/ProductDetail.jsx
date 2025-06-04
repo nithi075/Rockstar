@@ -1,13 +1,10 @@
-// E:\Rockstar\rockstar-app-nextjs\src\app\product\[id]\page.jsx
-
 "use client"; // This component uses client-side hooks
 
 import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-// Removed: import Image from 'next/image'; // NO LONGER USED
 
-import { useParams } from 'react-router-dom';
+import { useParams } from 'next/navigation'; // To get the dynamic ID from URL
 
 // Import Font Awesome icons
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -344,7 +341,7 @@ export default function ProductDetailPage({ cart, setCart }) { // Added cart and
         }
 
         const frontendBaseUrl = 'https://rockstar-fcga.onrender.com'; // **IMPORTANT: Replace with your actual deployed frontend URL**
-        const productShareUrl = `${frontendBaseUrl}/api/v1/product/${id}`;
+        const productShareUrl = `${frontendBaseUrl}/product/${id}`;
 
         try {
             if (navigator.share) {
@@ -371,11 +368,11 @@ export default function ProductDetailPage({ cart, setCart }) { // Added cart and
     };
 
     if (loading) {
-        return <div style={{ textAlign: 'center', padding: '50px' }}>Loading product...</div>;
+        return <div className="loading-message">Loading product...</div>;
     }
 
     if (error || !product) {
-        return <div style={{ textAlign: 'center', padding: '50px', color: 'red' }}>Error: {error || "Product not found."}</div>;
+        return <div className="error-message">Error: {error || "Product not found."}</div>;
     }
 
     const currentProductBaseIdForRelated = getBaseCustomId(product.customId);
@@ -392,306 +389,163 @@ export default function ProductDetailPage({ cart, setCart }) { // Added cart and
     // Randomly select products from the filtered list to fill the desired count
     const productsToDisplay = [...unrelatedProducts].sort(() => 0.5 - Math.random()).slice(0, desiredCount);
 
-     return (
-
-        <div className="product-detail-page">
-
-            <section className="pro-detail" id="section-p1">
-
-                <div className="single-pro-image">
-
-                    <div className="image-wrapper">
-
-                        <img src={mainImg} alt={product.name} id="MainImg"
-
-                        width="100%" />
-
-                    </div>
-
-                    {product.images && product.images.length > 1 && (
-
-                        <div className="small-img-group">
-
-                            {product.images.map((image, index) => (
-
-                                <div className="small-img-col" key={index}>
-
-                                    <img
-
-                                        src={`/${image.url}`}
-
-                                        width="100%"
-
-                                        className={`small-img ${mainImg === `/${image.url}` ? 'active-thumbnail' : ''}`}
-
-                                        alt={`${product.name} thumbnail ${index + 1}`}
-
-                                        onClick={() => handleSmallImgClick(`/${image.url}`)}
-
-                                    />
-
-                                </div>
-
-                            ))}
-
-                        </div>
-
-                    )}
-
-                </div>
-
-
-
-                <div className="single-pro-details">
-
-                    <h6>Home / {product.category || 'T-Shirt'}</h6>
-
-                    <h4>{product.name}</h4>
-
-                    <h2>₹{product.price}</h2>
-
-                    <select
-
-                        value={selectedSize}
-
-                        onChange={(e) => setSelectedSize(e.target.value)}
-
-                        disabled={!product.sizes || product.sizes.length === 0}
-
-                    >
-
-                        {(!selectedSize || !product.sizes || product.sizes.length === 0) && (
-
-                            <option value="">Select Size</option>
-
-                        )}
-
-                        {product.sizes && product.sizes.map((sizeOption) => (
-
-                            <option
-
-                                key={sizeOption.size}
-
-                                value={sizeOption.size}
-
-                                disabled={sizeOption.stock === 0}
-
-                            >
-
-                                {sizeOption.size} {sizeOption.stock === 0 ? '(Out of Stock)' : `(${sizeOption.stock} in stock)`}
-
-                            </option>
-
-                        ))}
-
-                    </select>
-
-                    <input
-
-                        type="number"
-
-                        value={qty}
-
-                        onChange={(e) => setQty(Number(e.target.value))}
-
-                        min="1"
-
-                        max={currentSizeStock}
-
-                        disabled={currentSizeStock === 0 || !selectedSize || qty === 0}
-
-                    />
-
-                    <button className="normal" onClick={addToCart}
-
-                        disabled={currentSizeStock === 0 || !selectedSize || qty === 0 || qty > currentSizeStock}>
-
-                        Add to Cart
-
-                    </button>
-
-
-
-                    <h4 style={{paddingTop:"5px" ,fontSize:"25px",paddingBottom:"0px"}}>Product Details</h4>
-
-                    <span>{product.description}</span>
-
-                    <button className="share-btn" onClick={handleShareProduct} style={{
-
-                        marginTop: '10px',
-
-                        padding: '10px 15px',
-
-                        backgroundColor: '#35396d',
-
-                        color: 'white',
-
-                        border: 'none',
-
-                        borderRadius: '5px',
-
-                        cursor: 'pointer',
-
-
-
-                        fontSize: '16px',
-
-                        display: 'flex',
-
-                        alignItems: 'center',
-
-                        gap: '8px',
-
-                        justifyContent: 'center',
-
-                        transition: 'background-color 0.3s ease'
-
-                    }}>
-
-                        Share <FontAwesomeIcon icon={faShareAlt} />
-
-                    </button>
-
-                </div>
-
-
-
-            </section>
-
-
-
-            <section>
-
-                {sameCustomIdProducts.length > 1 && (
-
-                    <div className="same-color" style={{ margin: '20px 0', borderTop: '1px solid #eee' }}>
-
-                        <h4 style={{ marginBottom: '25px', textAlign: 'center', fontSize: '24px' }}>More Colors</h4>
-
-                        <div className="color-group" style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', justifyContent: 'center' }}>
-
-                            {sameCustomIdProducts.map(colorProduct => (
-
-                                <div
-
-                                    key={getProductId(colorProduct)}
-
-                                    className={`color-option-thumbnail ${getProductId(colorProduct) === getProductId(product) ? 'active-color-current-product' : ''}`}
-
-                                    onClick={() => handleColorThumbnailClick(colorProduct)}
-
-                                    title={colorProduct.name}
-
-                                    style={{
-
-                                        width: '80px',
-
-                                        height: '80px',
-
-                                        border: getProductId(colorProduct) === getProductId(product) ? '2px solid #F7B08C' : '1px solid #ccc',
-
-                                        borderRadius: '5px',
-
-                                        overflow: 'hidden',
-
-                                        cursor: 'pointer',
-
-                                        display: 'flex',
-
-                                        alignItems: 'center',
-
-                                        justifyContent: 'center',
-
-                                        boxShadow: getProductId(colorProduct) === getProductId(product) ? '0 0 5px rgba(247, 176, 140, 0.5)' : 'none',
-
-                                        transition: 'all 0.2s ease-in-out',
-
-                                        flexShrink: 0
-
-                                    }}
-
-                                >
-
-                                    <img
-
-                                        src={colorProduct.images && colorProduct.images.length > 0 ? `/${colorProduct.images[0].url}` : '/products/f1.jpg'}
-
-                                        alt={colorProduct.name}
-
-                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-
-                                    />
-
-                                </div>
-
-                            ))}
-
-                        </div>
-
-                    </div>
-
-                )}
-
-
-
-            </section>
-
-
-
-            {loadingAll && <div>Loading related products...</div>}
-
-            {errorAll && <div>Error loading related products: {errorAll}</div>}
-
-
-
-            {!loadingAll && !errorAll && finalProductsToDisplay.length > 0 && (
-
-                <section className="feature" id="section-p1" style={{paddingTop:"5px"}}>
-
-                    <h2 style={{paddingBottom:"0", lineHeight:"0px" ,fontSize:"25px"}}>You might also like</h2>
-
-
-
-                    <div className="pro-container" style={{paddingTop:"5px"}}>
-
-                        {finalProductsToDisplay.map(relatedProduct => (
-
-                            <Link to={`/product/${getProductId(relatedProduct)}`} key={getProductId(relatedProduct)} className="pro-link-wrapper">
-
-                                <div className="pro">
-
-                                    <div className="image-wrapper">
-
-                                        <img src={relatedProduct.images && relatedProduct.images.length > 0 ? `/${relatedProduct.images[0].url}` : 'img/products/f1.jpg'} alt={relatedProduct.name} />
-
-                                    </div>
-
-                                    <div className="des">
-
-                                        {relatedProduct.brand && <span>{relatedProduct.brand}</span>}
-
-                                        <h5 style={{paddingTop:"5px"}}>{relatedProduct.name}</h5>
-
-
-
-                                        <h4>₹{(parseFloat(relatedProduct.price) || 0).toFixed(2)}</h4>
-
-                                    </div>
-
-                                </div>
-
-                            </Link>
-
-                        ))}
-
-                    </div>
-
-                </section>
-
-            )}
-
-        </div>
-
-    );
-
+    return (
+        <div className="product-detail-page">
+            <section className="pro-detail" id="section-p1">
+                <div className="single-pro-image">
+                    <div className="image-wrapper">
+                        {mainImage && (
+                            <img
+                                src={mainImage}
+                                alt={product.name}
+                                id="MainImg"
+                                width={500} // Recommended to provide explicit width
+                                height={500} // Recommended to provide explicit height
+                                className="main-product-image"
+                            />
+                        )}
+                    </div>
+                    {/* Only show small images if there's more than one */}
+                    {smallImages && smallImages.length > 1 && (
+                        <div className="small-img-group">
+                            {smallImages.map((imgUrl, index) => (
+                                <div className="small-img-col" key={index}>
+                                    <img
+                                        src={imgUrl}
+                                        width={80} // Recommended to provide explicit width
+                                        height={80} // Recommended to provide explicit height
+                                        className={`small-img ${mainImage === imgUrl ? 'active-thumbnail' : ''}`}
+                                        alt={`${product.name} thumbnail ${index + 1}`}
+                                        onClick={() => handleSmallImgClick(imgUrl)}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                <div className="single-pro-details">
+                    <h6>Home / {product.category || 'T-Shirt'}</h6>
+                    <h4>{product.name}</h4>
+                    <h2>₹{product.price}</h2>
+
+                    {/* Size Selection */}
+                    <select
+                        value={selectedSize}
+                        onChange={(e) => setSelectedSize(e.target.value)}
+                        disabled={!product.sizes || product.sizes.length === 0}
+                        className="size-selector"
+                    >
+                        {(!selectedSize || !product.sizes || product.sizes.length === 0) && (
+                            <option value="">Select Size</option>
+                        )}
+                        {product.sizes && product.sizes.map((sizeOption) => (
+                            <option
+                                key={sizeOption.size}
+                                value={sizeOption.size}
+                                disabled={sizeOption.stock === 0}
+                            >
+                                {sizeOption.size} {sizeOption.stock === 0 ? '(Out of Stock)' : `(${sizeOption.stock} in stock)`}
+                            </option>
+                        ))}
+                    </select>
+
+                    {/* Quantity Input */}
+                    <input
+                        type="number"
+                        value={quantity}
+                        onChange={(e) => setQuantity(Number(e.target.value))}
+                        min="1"
+                        max={currentSizeStock}
+                        disabled={currentSizeStock === 0 || !selectedSize || quantity === 0}
+                        className="quantity-input"
+                    />
+
+                    {/* Add to Cart Button */}
+                    <button
+                        className="normal add-to-cart-btn"
+                        onClick={addToCart}
+                        disabled={currentSizeStock === 0 || !selectedSize || quantity === 0 || quantity > currentSizeStock}
+                    >
+                        Add to Cart
+                    </button>
+
+                    {/* Product Description */}
+                    <h4 className="product-details-heading">Product Details</h4>
+                    <span className="product-description-text">{product.description}</span>
+
+                    {/* Share Button */}
+                    <button className="share-btn" onClick={handleShareProduct}>
+                        Share <FontAwesomeIcon icon={faShareAlt} />
+                    </button>
+                </div>
+            </section>
+
+            {/* --- More Colors Section --- */}
+            <section>
+                {sameCustomIdProducts.length > 1 && (
+                    <div className="same-color">
+                        <h4 className="more-colors-heading">More Colors</h4>
+                        <div className="color-group">
+                            {sameCustomIdProducts.map(colorProduct => (
+                                <div
+                                    key={getProductId(colorProduct)}
+                                    className={`color-option-thumbnail ${getProductId(colorProduct) === getProductId(product) ? 'active-color-current-product' : ''}`}
+                                    onClick={() => handleColorThumbnailClick(colorProduct)}
+                                    title={colorProduct.name}
+                                >
+                                    <img
+                                        src={colorProduct.images && colorProduct.images.length > 0 ? `/${colorProduct.images[0].url}` : '/products/f1.jpg'}
+                                        alt={colorProduct.name}
+                                        width={80} // Recommended to provide explicit width
+                                        height={80} // Recommended to provide explicit height
+                                        className="color-thumbnail-image"
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </section>
+
+            {/* --- You Might Also Like Section --- */}
+            {loadingAll && <div className="loading-related-products">Loading related products...</div>}
+            {errorAll && <div className="error-related-products">Error loading related products: {errorAll}</div>}
+
+            {!loadingAll && !errorAll && productsToDisplay.length > 0 && (
+                <section id="product1" className="section-p1">
+                    <h2 className="you-might-also-like-heading">You Might Also Like</h2>
+                    <div className="pro-container">
+                        {productsToDisplay.map((p) => (
+                            <div className="pro" key={getProductId(p)} onClick={() => handleColorThumbnailClick(p)}>
+                                <img
+                                    src={p.images && p.images.length > 0 ? `/${p.images[0].url}` : '/products/f1.jpg'}
+                                    alt={p.name}
+                                    width={200} // Recommended to provide explicit width
+                                    height={200} // Recommended to provide explicit height
+                                    className="related-product-image"
+                                />
+                                <div className="des">
+                                    <span className="related-product-brand">{p.brand || 'ROCKSTAR'}</span>
+                                    <h5 className="related-product-name">{p.name}</h5>
+                                    <div className="star">
+                                        {Array.from({ length: p.ratings || 0 }, (_, i) => (
+                                            <FontAwesomeIcon icon={faStar} key={i} />
+                                        ))}
+                                    </div>
+                                    <h4 className="related-product-price">₹{p.price}</h4>
+                                </div>
+                                {/* The cart icon on the product card */}
+                                <a href="#" className="cart">
+                                    <FontAwesomeIcon icon={faShoppingCart} />
+                                </a>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            )}
+
+            <ToastContainer />
+        </div>
+    );
 }
