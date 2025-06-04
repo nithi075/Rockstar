@@ -18,7 +18,7 @@ const getProductId = (productData) => {
     if (typeof productData._id === 'object' && productData._id.$oid) return productData._id.$oid;
     if (typeof productData._id === 'string') return productData._id;
     return null;
-=======
+
 import { useState, useEffect } from 'react';
 
 import { useParams, Link, useNavigate } from 'react-router-dom';
