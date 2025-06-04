@@ -55,11 +55,11 @@ const getProductId = (productData) => {
 
     return null;
 
->>>>>>> 96b5298483175fecd7d0d1831144e485acc1fa5c
-};
-// --- End Utility function ---
 
-<<<<<<< HEAD
+};
+
+
+
 // --- Your Backend API Base URL ---
 const BACKEND_URL = 'https://backend-puaq.onrender.com'; // Use your actual backend URL
 // --- End Backend API Base URL ---
@@ -281,7 +281,7 @@ export default function ProductDetailPage() {
         </div>
     );
 }
-=======
+
 
 
 export default function ProductDetail({ cart, setCart }) {
@@ -1187,4 +1187,4 @@ export default function ProductDetail({ cart, setCart }) {
     );
 
 }
->>>>>>> 96b5298483175fecd7d0d1831144e485acc1fa5c
+
