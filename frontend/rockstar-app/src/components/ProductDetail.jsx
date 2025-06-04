@@ -104,7 +104,7 @@ export default function ProductDetail({ cart, setCart }) {
             setLoading(true);
             setError(null);
             try {
-                const response = await fetch(`http://localhost:8000/api/v1/product/${productId}`);
+                const response = await fetch(`https://backend-puaq.onrender.com/api/v1/product/${productId}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -178,7 +178,7 @@ export default function ProductDetail({ cart, setCart }) {
             setLoadingAll(true);
             setErrorAll(null);
             try {
-                const response = await fetch('http://localhost:8000/api/v1/products');
+                const response = await fetch('https://backend-puaq.onrender.com/api/v1/products');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
