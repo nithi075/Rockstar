@@ -7,7 +7,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 // Removed: import Image from 'next/image'; // NO LONGER USED
 
-import { useParams } from 'next/navigation'; // To get the dynamic ID from URL
+import { useParams } from 'react-router-dom';
 
 // Import Font Awesome icons
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
