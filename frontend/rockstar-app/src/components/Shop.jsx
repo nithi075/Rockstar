@@ -67,7 +67,7 @@ export default function Shop() {
             setError(null);
 
             try {
-                let url = `http://localhost:8000/api/v1/products?page=${currentPage}&limit=${productsPerPage}`;
+                let url = `https://backend-puaq.onrender.com/api/v1/products?page=${currentPage}&limit=${productsPerPage}`;
 
                 if (currentCategory) {
                     url += `&category=${currentCategory}`;
