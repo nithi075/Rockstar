@@ -26,7 +26,7 @@ export default function Features(){
     };
 
     return(
-        <section className="products" id="section-p1" >
+        <section className="feature" id="section-p1" >
             <h2>Featured Products</h2>
             <p>Various Collection With New Modern Design</p>
             <div className="pro-container">

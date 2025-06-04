@@ -20,7 +20,7 @@ export default function Arrivals() {
         // You can optionally add `&limit=X` if you want to explicitly request
         // a certain number of the latest products from the backend,
         // e.g., `?limit=12` if you want to ensure enough for 8 unique.
-        const response = await fetch(`https://backend-puaq.onrender.com/products?limit=12&timestamp=${new Date().getTime()}`);
+        const response = await fetch(`http://localhost:8000/api/v1/products?limit=12&timestamp=${new Date().getTime()}`);
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -84,9 +84,9 @@ export default function Arrivals() {
   }
 
   return (
-    <section className="products py-8 text-center bg-orange-200" id="section-p1">
+    <section className="feature" id="section-p1">
       <h2 className="text-4xl font-bold mb-2">New Arrivals</h2>
-      <p className="text-lg text-gray-700 mb-8">Summer Collection New Modern Design</p>
+      <p className="text-lg text-gray-700 mb-8"> Collections with New Modern Design</p>
       <div className="pro-container flex flex-wrap justify-center gap-6 px-4">
         {newArrivals.map((product) => (
           <div

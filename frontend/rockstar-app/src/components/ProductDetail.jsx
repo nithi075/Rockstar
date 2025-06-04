@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingCart, faStar, faShareAlt } from '@fortawesome/free-solid-svg-icons'; // Import faShareAlt
+import { faShoppingCart, faStar, faShareAlt } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'react-toastify';
 
 const getProductId = (productData) => {
@@ -104,7 +104,7 @@ export default function ProductDetail({ cart, setCart }) {
             setLoading(true);
             setError(null);
             try {
-                const response = await fetch(`https://backend-puaq.onrender.com/api/v1/product/${productId}`);
+                const response = await fetch(`http://localhost:8000/api/v1/product/${productId}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -178,7 +178,7 @@ export default function ProductDetail({ cart, setCart }) {
             setLoadingAll(true);
             setErrorAll(null);
             try {
-                const response = await fetch('https://backend-puaq.onrender.com/api/v1/products');
+                const response = await fetch('http://localhost:8000/api/v1/products');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -241,19 +241,15 @@ export default function ProductDetail({ cart, setCart }) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // --- NEW SHARE FUNCTION ---
     const handleShareProduct = async () => {
         if (!product || !id) {
             toast.error("Product information not available to share.");
             return;
         }
 
-        // Construct the full URL of the product detail page
-        // Use window.location.origin to get the base URL (e.g., http://localhost:3000)
         const productShareUrl = `${window.location.origin}/product/${id}`;
 
         try {
-            // Use the Web Share API if available (for native sharing dialog)
             if (navigator.share) {
                 await navigator.share({
                     title: product.name,
@@ -262,11 +258,9 @@ export default function ProductDetail({ cart, setCart }) {
                 });
                 toast.success("Product shared successfully!");
             } else if (navigator.clipboard) {
-                // Fallback to clipboard API if Web Share API is not available
                 await navigator.clipboard.writeText(productShareUrl);
                 toast.success("Product link copied to clipboard!");
             } else {
-                // Last resort: alert the user
                 prompt("Copy this link to share:", productShareUrl);
             }
         } catch (error) {
@@ -274,8 +268,6 @@ export default function ProductDetail({ cart, setCart }) {
             toast.error("Failed to share product.");
         }
     };
-    // --- END NEW SHARE FUNCTION ---
-
 
     if (loading) {
         return <div>Loading product details...</div>;
@@ -290,24 +282,28 @@ export default function ProductDetail({ cart, setCart }) {
     const currentProductBaseIdForRelated = getBaseCustomId(product.customId);
     let productsToDisplay = [];
 
-    if (currentProductBaseIdForRelated) {
-        const relatedByCustomId = allProducts.filter(p =>
-            p.customId &&
-            getBaseCustomId(p.customId) === currentProductBaseIdForRelated &&
-            getProductId(p) !== getProductId(product)
-        );
-        productsToDisplay = [...relatedByCustomId];
-    }
+    // Set the desired count for "You might also like"
+    const desiredCount = 8;
 
-    const desiredCount = 4;
-    if (productsToDisplay.length < desiredCount) {
-        const remainingProducts = allProducts.filter(p =>
-            getProductId(p) !== getProductId(product) &&
-            !productsToDisplay.some(rp => getProductId(rp) === getProductId(p))
-        );
-        const randomFill = [...remainingProducts].sort(() => 0.5 - Math.random()).slice(0, desiredCount - productsToDisplay.length);
-        productsToDisplay.push(...randomFill);
-    }
+    // Filter out the current product and any product that shares its baseCustomId
+    const unrelatedProducts = allProducts.filter(p => {
+        const pId = getProductId(p);
+        const currentId = getProductId(product);
+        const pBaseCustomId = getBaseCustomId(p.customId);
+
+        // Exclude the current product itself
+        // Exclude any product that shares the same base custom ID as the current product
+        return pId !== currentId && pBaseCustomId !== currentProductBaseIdForRelated;
+    });
+
+    // Randomly select products from the filtered list to fill the desired count
+    // Shuffle the unrelatedProducts array and take the first `desiredCount` elements
+    const randomFill = [...unrelatedProducts].sort(() => 0.5 - Math.random()).slice(0, desiredCount);
+    productsToDisplay = randomFill;
+
+
+    // Although productsToDisplay is already sliced to desiredCount,
+    // this line ensures it strictly adheres to the desiredCount just in case.
     const finalProductsToDisplay = productsToDisplay.slice(0, desiredCount);
 
     return (
@@ -369,20 +365,18 @@ export default function ProductDetail({ cart, setCart }) {
                         disabled={currentSizeStock === 0 || !selectedSize || qty === 0 || qty > currentSizeStock}>
                         Add to Cart
                     </button>
-                    {/* Share Button/Icon */}
-                   
 
-                    <h4>Product Details</h4>
+                    <h4 style={{paddingTop:"5px" ,fontSize:"25px",paddingBottom:"0px"}}>Product Details</h4>
                     <span>{product.description}</span>
-                     <button className="share-btn" onClick={handleShareProduct} style={{
+                    <button className="share-btn" onClick={handleShareProduct} style={{
                         marginTop: '10px',
                         padding: '10px 15px',
-                        backgroundColor: '#35396d', /* Using your preferred color */
+                        backgroundColor: '#35396d',
                         color: 'white',
                         border: 'none',
                         borderRadius: '5px',
                         cursor: 'pointer',
-                      
+
                         fontSize: '16px',
                         display: 'flex',
                         alignItems: 'center',
@@ -390,16 +384,16 @@ export default function ProductDetail({ cart, setCart }) {
                         justifyContent: 'center',
                         transition: 'background-color 0.3s ease'
                     }}>
-                        Share <FontAwesomeIcon icon={faShareAlt} /> 
+                        Share <FontAwesomeIcon icon={faShareAlt} />
                     </button>
                 </div>
-                
+
             </section>
 
             <section>
                 {sameCustomIdProducts.length > 1 && (
                     <div className="same-color" style={{ margin: '20px 0', borderTop: '1px solid #eee' }}>
-                        <h4 style={{ marginBottom: '15px', textAlign: 'center', fontSize: '24px' }}>MORE COLORS</h4>
+                        <h4 style={{ marginBottom: '25px', textAlign: 'center', fontSize: '24px' }}>More Colors</h4>
                         <div className="color-group" style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', justifyContent: 'center' }}>
                             {sameCustomIdProducts.map(colorProduct => (
                                 <div
@@ -432,16 +426,17 @@ export default function ProductDetail({ cart, setCart }) {
                         </div>
                     </div>
                 )}
-                
+
             </section>
 
             {loadingAll && <div>Loading related products...</div>}
             {errorAll && <div>Error loading related products: {errorAll}</div>}
 
             {!loadingAll && !errorAll && finalProductsToDisplay.length > 0 && (
-                <section className="related-products" id="section-p1">
-                    <h2>You might also like</h2>
-                    <div className="pro-container">
+                <section className="feature" id="section-p1" style={{paddingTop:"5px"}}>
+                    <h2 style={{paddingBottom:"0", lineHeight:"0px" ,fontSize:"25px"}}>You might also like</h2>
+
+                    <div className="pro-container" style={{paddingTop:"5px"}}>
                         {finalProductsToDisplay.map(relatedProduct => (
                             <Link to={`/product/${getProductId(relatedProduct)}`} key={getProductId(relatedProduct)} className="pro-link-wrapper">
                                 <div className="pro">
@@ -450,12 +445,8 @@ export default function ProductDetail({ cart, setCart }) {
                                     </div>
                                     <div className="des">
                                         {relatedProduct.brand && <span>{relatedProduct.brand}</span>}
-                                        <h5>{relatedProduct.name}</h5>
-                                        <div className="star">
-                                            {Array.from({ length: Number(relatedProduct.rating) || 0 }).map((_, index) => (
-                                                <FontAwesomeIcon icon={faStar} key={index} />
-                                            ))}
-                                        </div>
+                                        <h5 style={{paddingTop:"5px"}}>{relatedProduct.name}</h5>
+
                                         <h4>₹{(parseFloat(relatedProduct.price) || 0).toFixed(2)}</h4>
                                     </div>
                                 </div>

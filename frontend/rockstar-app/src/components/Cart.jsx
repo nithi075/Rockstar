@@ -241,7 +241,7 @@ export default function Cart({ cart, setCart }) {
 
     return (
         <>
-           <div style={{backgroundColor:"#F7B08C", paddingTop:"15px" ,textAlign:"center"}} id='section-p1'>
+           <div style={{backgroundColor:"#F7B08C", paddingTop:"15px" ,textAlign:"center"}} className="placeing" id='section-p1'>
             <h2>Place your order, Get your Product!</h2>
              <section className="cart" id="section-p1">
                

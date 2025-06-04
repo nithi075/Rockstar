@@ -33,7 +33,7 @@ exports.getAllProducts = async (req, res, next) => {
         // Default limit for products per page. This will determine how many
         // products are sent from the backend. For "New Arrivals", you might
         // want to ensure you get enough for your frontend's display (e.g., 8 to 12).
-        const productsPerPage = parseInt(req.query.limit) || 12; // Default 12 products per page
+        const productsPerPage = parseInt(req.query.limit) || 20; // Default 12 products per page
         const skip = (currentPage - 1) * productsPerPage;
 
         // Count total products matching the current filter (before pagination)

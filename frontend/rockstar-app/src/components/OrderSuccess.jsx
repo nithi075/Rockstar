@@ -65,21 +65,20 @@ export default function OrderSuccess() {
             <p>Your order has been successfully placed.</p>
 
             <div style={{ maxWidth: '600px', margin: '30px auto', padding: '20px', border: '1px solid #ddd', borderRadius: '8px', backgroundColor: '#fdf4dc' }}>
-                <p style={{ fontSize: '1.1em', fontWeight: 'bold' }}>Order ID: <strong>{orderId}</strong></p>
+                <p style={{ fontSize: '0.9em', fontWeight: 'bold' }}>Order ID: <strong>{orderId}</strong></p>
                 <p style={{paddingBottom :"5px"}}>Order Placed On: <strong>{formatUtcToIST(createdAt)}</strong></p>
 
-                <h4 style={{ marginTop: '10px', borderBottom: '1px solid #eee' }}>Ordered Products</h4>
+                <h4 style={{ marginTop: '10px',lineHeight:"0px" ,borderBottom: '1px solid #eee' ,paddingTop:"25px"}}>Ordered Summary</h4>
                 <ul style={{ listStyle: 'none', padding: 0 }}>
                     {orderedItems.map((item, index) => (
                         <li key={index} style={{ marginBottom: '10px', paddingBottom: '10px', borderBottom: '1px dotted #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontWeight: '500' }}>{item.name}</span>
-                            {item.size && <span style={{ marginLeft: '10px', fontSize: '0.9em', color: '#666' }}>(Size: {item.size})</span>}
+                            <span style={{ fontWeight: '400' }}>{item.name}</span>
+                            {item.size && <span style={{ marginLeft: '10px',marginRight:"10px", fontSize: '0.9em', color: '#666' }}>(Size: {item.size})</span>}
                             <span style={{ fontWeight: 'bold' }}>${(item.qty * parseFloat(item.price)).toFixed(2)}</span>
                         </li>
                     ))}
                 </ul>
 
-                <h3 style={{ marginTop: '20px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>Order Summary</h3>
                 <p style={{ fontSize: '1.2em', fontWeight: 'bold' }}>Total Amount: <span style={{ color:"#35396d" }}>${totalAmount.toFixed(2)}</span></p>
 
                 

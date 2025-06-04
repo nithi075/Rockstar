@@ -1,16 +1,14 @@
 // src/components/Search.jsx
 import React, { useState } from 'react';
-// Removed useNavigate as it's not needed here.
-// The navigation will be handled by the parent component (Header).
 
-export default function Search({ onSearch }) { // Accept onSearch prop
+export default function Search({ onSearch }) {
     const [keyword, setKeyword] = useState("");
 
     const handleSearch = () => {
-        // Call the onSearch prop with the current keyword
         if (onSearch) {
-            onSearch(keyword.trim()); // Trim whitespace
+            onSearch(keyword.trim()); // Call the onSearch prop with the current keyword
         }
+        setKeyword(""); // <--- ADD THIS LINE: Clear the input field after search
     };
 
     const handleKeyPress = (e) => {
@@ -26,12 +24,19 @@ export default function Search({ onSearch }) { // Accept onSearch prop
                 type="text"
                 id="search_field"
                 onChange={(e) => setKeyword(e.target.value)}
-                onKeyDown={handleKeyPress} // Use onKeyDown for Enter key
+                onKeyDown={handleKeyPress}
                 value={keyword} // Control the input value
                 className="form-control"
                 placeholder="Enter Product Name ..."
+                
             />
-    
+            {/* If you have a search button inside this component, you'd add it here */}
+            {/* For example: */}
+            {/* <div className="input-group-append">
+                <button className="btn" type="button" onClick={handleSearch}>
+                    <i className="fa fa-search"></i>
+                </button>
+            </div> */}
         </div>
     );
 }

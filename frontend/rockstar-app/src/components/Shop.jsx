@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
-import ProductCard from "../components/ProductList"; // Assuming ProductList.jsx exports a component named ProductCard as default
-import { useSearchParams, Link, useLocation } from "react-router-dom"; // Removed useParams as we use searchParams
+import ProductCard from "../components/ProductList";
+import { useSearchParams, Link, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLongArrowAltRight, faLongArrowAltLeft } from '@fortawesome/free-solid-svg-icons';
 
@@ -11,21 +11,19 @@ export default function Shop() {
     const [searchParams, setSearchParams] = useSearchParams();
     const location = useLocation();
 
-    // Get current category and keyword from URL search parameters
     const currentCategory = searchParams.get('category');
     const currentKeyword = searchParams.get('keyword');
 
-    // Use refs to keep track of previous category and keyword for page reset logic
     const prevCategoryRef = useRef(currentCategory);
     const prevKeywordRef = useRef(currentKeyword);
 
     // Initialize currentPage from URL search param, or default to 1
+    // This state will be updated by the useEffect when URL changes
     const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page')) || 1);
 
     const [totalPages, setTotalPages] = useState(1);
     const productsPerPage = 12;
 
-    // Helper function to safely get the product ID string
     const getProductId = (productData) => {
         if (!productData || !productData._id) {
             return null;
@@ -43,30 +41,25 @@ export default function Shop() {
     useEffect(() => {
         const pageFromUrl = parseInt(searchParams.get('page')) || 1;
 
-        // Check if category or keyword has changed (navigating to a new filter)
         const isNewCategory = currentCategory !== prevCategoryRef.current;
         const isNewKeyword = currentKeyword !== prevKeywordRef.current;
 
         if (isNewCategory || isNewKeyword) {
-            // If a new category or keyword is applied, always reset to page 1
             console.log("Shop.jsx: New category or keyword detected. Resetting to page 1.");
-            setCurrentPage(1);
-            // Also ensure the URL reflects page 1 if it's not already there
+            // If category/keyword changed, we need to update the URL to page 1
             const newSearchParams = new URLSearchParams(searchParams);
-            if (newSearchParams.get('page') !== '1') {
-                newSearchParams.set('page', '1');
-                setSearchParams(newSearchParams); // Update URL to page=1
-            }
+            newSearchParams.set('page', '1');
+            setSearchParams(newSearchParams); // This will cause a re-render and trigger the fetch
+            setCurrentPage(1); // Also update internal state immediately
         } else if (currentPage !== pageFromUrl) {
-            // Otherwise, update page state if URL page param has changed (e.g., from direct URL entry or back/forward)
+            // Only update currentPage state if it doesn't match the URL (e.g., from browser back/forward, or direct URL entry)
             setCurrentPage(pageFromUrl);
         }
 
-        // Update refs for the next render
         prevCategoryRef.current = currentCategory;
         prevKeywordRef.current = currentKeyword;
 
-    }, [location.search, searchParams, currentCategory, currentKeyword]); // Depend on relevant search params
+    }, [location.search, searchParams, currentCategory, currentKeyword, setCurrentPage, setSearchParams]); // Depend on setCurrentPage and setSearchParams if they were defined outside
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -74,26 +67,19 @@ export default function Shop() {
             setError(null);
 
             try {
-                // Build the base URL with pagination
-                let url = `https://backend-puaq.onrender.com/api/v1/products?page=${currentPage}&limit=${productsPerPage}`;
+                let url = `http://localhost:8000/api/v1/products?page=${currentPage}&limit=${productsPerPage}`;
 
-                // Add category filter if present
                 if (currentCategory) {
                     url += `&category=${currentCategory}`;
                     console.log(`Shop.jsx: Fetching by category: "${currentCategory}", Page: ${currentPage}`);
-                }
-                // Add keyword filter if present (and no category filter, or if you want both)
-                // Assuming keyword takes precedence if both are present from a search bar,
-                // or if you want to allow searching within a category.
-                // For simplicity, let's prioritize category if it exists.
-                else if (currentKeyword) { // Only apply keyword if no category is present
+                } else if (currentKeyword) {
                     url += `&keyword=${currentKeyword}`;
                     console.log(`Shop.jsx: Fetching by search keyword: "${currentKeyword}", Page: ${currentPage}`);
                 } else {
                     console.log(`Shop.jsx: Fetching all products, Page: ${currentPage}`);
                 }
 
-                console.log("Shop.jsx: Final API URL:", url); // Crucial log
+                console.log("Shop.jsx: Final API URL:", url);
 
                 const response = await fetch(url);
                 const data = await response.json();
@@ -102,8 +88,11 @@ export default function Shop() {
                     setProducts(data.products);
                     setTotalPages(Math.ceil(data.totalProducts / productsPerPage));
                 } else {
+                    // If backend returns an error or no success, treat it as no products found for that filter/page
                     setError(data.message || 'Failed to fetch products.');
                     setProducts([]);
+                    // IMPORTANT: If products are 0, totalPages should still reflect actual total if available,
+                    // but if it's an error from the API, we reset to 1 as we don't know the true total.
                     setTotalPages(1);
                 }
             } catch (err) {
@@ -119,7 +108,7 @@ export default function Shop() {
         fetchProducts();
         // Depend on currentPage, currentCategory, and currentKeyword
         // These are the actual values used to build the fetch URL.
-    }, [currentPage, currentCategory, currentKeyword]);
+    }, [currentPage, currentCategory, currentKeyword, productsPerPage]); // Added productsPerPage for completeness
 
     // Helper to generate correct pagination links based on current filter state
     const getPaginationLink = (page) => {
@@ -133,33 +122,15 @@ export default function Shop() {
         return `/shop?${params.toString()}`;
     };
 
-    // Handle next page click
-    const handleNextPage = () => {
-        if (currentPage < totalPages) {
-            const nextPage = currentPage + 1;
-            // No need to setCurrentPage here, as the Link component or setSearchParams will update the URL
-            // and the useEffect will react to it.
-            // For programmatic navigation, you'd do:
-            // const params = new URLSearchParams(searchParams);
-            // params.set('page', nextPage.toString());
-            // setSearchParams(params);
-            window.scrollTo(0, 0); // Scroll to top on page change for better UX
+    // Effect to scroll to top whenever the products change (after fetch)
+    useEffect(() => {
+        if (!loading && products.length > 0) { // Only scroll when products are loaded and available
+            window.scrollTo(0, 0);
         }
-    };
+    }, [products, loading]); // Depend on products and loading state
 
-    // Handle previous page click
-    const handlePrevPage = () => {
-        if (currentPage > 1) {
-            const prevPage = currentPage - 1;
-            // Similar to next page, rely on Link or setSearchParams
-            // const params = new URLSearchParams(searchParams);
-            // params.set('page', prevPage.toString());
-            // setSearchParams(params);
-            window.scrollTo(0, 0); // Scroll to top on page change for better UX
-        }
-    };
+    const currentFilterTerm = currentCategory || currentKeyword;
 
-    // --- Conditional Rendering Logic ---
     if (loading) {
         return (
             <section id="shop-products" className="section-p1">
@@ -183,27 +154,20 @@ export default function Shop() {
         );
     }
 
-    // Determine the current filter term for display in "no products found" message
-    const currentFilterTerm = currentCategory || currentKeyword; // Prioritize category for display
-
     if (products.length === 0) {
         return (
             <>
-                <section id="page-header" className="page-header-shop">
-                    <h2>#Explore</h2>
-                    <p>Discover amazing styles!</p>
-                </section>
                 <section className="products" id="section-p1">
-                    <div style={{ textAlign: 'center', padding: '50px 0' }}>
-                        <p style={{ fontSize: '1.5em', fontWeight: 'bold', color: '#333' }}>
+                    <div style={{ textAlign: 'center', padding: '60px 20px', marginBottom: "95px", marginTop: "95px" }}>
+                        <p style={{ fontSize: '1.7em', fontWeight: 'bold', color: '#333', lineHeight: "35px" }}>
                             No products found
                             {currentFilterTerm && (
-                                <> for "<span style={{ color: '#088178' }}>{currentFilterTerm}</span>"</>
+                                <> for "<span style={{ color: '#35396d' }}>{currentFilterTerm}</span>"</>
                             )}
                             .
                         </p>
-                        <p style={{ fontSize: '1em', color: '#666', marginTop: '10px' }}>
-                            Please try a different {currentFilterTerm ? 'filter' : 'search term'} or browse our <Link to="/shop" style={{ color: '#088178', textDecoration: 'underline' }}>entire collection</Link>.
+                        <p style={{ fontSize: '1.2em', color: '#666', marginTop: '15px', lineHeight: "30px" }}>
+                            Please try a different {currentFilterTerm ? 'filter' : 'search term'} or browse our <Link to="/shop" style={{ color: '#35396d', textDecoration: 'underline', textDecoration: "none" }}>Entire collection</Link>.
                         </p>
                     </div>
                 </section>
@@ -211,11 +175,9 @@ export default function Shop() {
         );
     }
 
-    // Determine the header title based on the active filter
     const headerTitle = currentCategory
         ? currentCategory.toUpperCase()
         : (currentKeyword ? `SEARCH RESULTS FOR "${currentKeyword.toUpperCase()}"` : 'EXPLORE OUR COLLECTION');
-
 
     return (
         <>
@@ -234,23 +196,39 @@ export default function Shop() {
 
             <section className="pagination" id="section-p1">
                 {/* Previous Page Button */}
-                <Link
-                    to={getPaginationLink(currentPage - 1)}
-                    className={`pagination-link ${currentPage === 1 ? 'disabled' : ''}`}
-                    onClick={handlePrevPage}
-                >
-                    <FontAwesomeIcon icon={faLongArrowAltLeft} />
-                </Link>
+                {currentPage > 1 ? (
+                    <Link
+                        to={getPaginationLink(currentPage - 1)}
+                        className="pagination-link"
+                        // Added onClick here to ensure immediate scroll
+                        onClick={() => window.scrollTo(0, 0)}
+                    >
+                        <FontAwesomeIcon icon={faLongArrowAltLeft} />
+                    </Link>
+                ) : (
+                    <span className="pagination-link disabled">
+                        <FontAwesomeIcon icon={faLongArrowAltLeft} />
+                    </span>
+                )}
 
-                
+                <span className="current-page-display">{currentPage} / {totalPages}</span>
+
+
                 {/* Next Page Button */}
-                <Link
-                    to={getPaginationLink(currentPage + 1)}
-                    className={`pagination-link ${currentPage === totalPages ? 'disabled' : ''}`}
-                    onClick={handleNextPage}
-                >
-                    <FontAwesomeIcon icon={faLongArrowAltRight} />
-                </Link>
+                {currentPage < totalPages ? (
+                    <Link
+                        to={getPaginationLink(currentPage + 1)}
+                        className="pagination-link"
+                        // Added onClick here to ensure immediate scroll
+                        onClick={() => window.scrollTo(0, 0)}
+                    >
+                        <FontAwesomeIcon icon={faLongArrowAltRight} />
+                    </Link>
+                ) : (
+                    <span className="pagination-link disabled">
+                        <FontAwesomeIcon icon={faLongArrowAltRight} />
+                    </span>
+                )}
             </section>
         </>
     );
