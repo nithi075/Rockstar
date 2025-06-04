@@ -255,7 +255,7 @@ const handleShareProduct = async () => {
         // --- CHANGE STARTS HERE ---
         // You need to replace 'https://your-frontend-domain.onrender.com'
         // with the actual URL of your deployed frontend application.
-        const frontendBaseUrl = 'https://rockstar-app.onrender.com'; // <--- **IMPORTANT: Replace with your actual frontend URL**
+        const frontendBaseUrl = 'https://rockstar-fcga.onrender.com'; // <--- **IMPORTANT: Replace with your actual frontend URL**
         const productShareUrl = `${frontendBaseUrl}/product/${id}`;
         // --- CHANGE ENDS HERE ---
 
