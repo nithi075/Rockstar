@@ -246,14 +246,8 @@ export default function ProductDetail({ cart, setCart }) {
             toast.error("Product information not available to share.");
             return;
         }
-const handleShareProduct = async () => {
-        if (!product || !id) {
-            toast.error("Product information not available to share.");
-            return;
-        }
 
-        // --- CHANGE STARTS HERE ---
-        // You need to replace 'https://your-frontend-domain.onrender.com'
+           // You need to replace 'https://your-frontend-domain.onrender.com'
         // with the actual URL of your deployed frontend application.
         const frontendBaseUrl = 'https://rockstar-fcga.onrender.com'; // <--- **IMPORTANT: Replace with your actual frontend URL**
         const productShareUrl = `${frontendBaseUrl}/product/${id}`;
