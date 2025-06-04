@@ -68,7 +68,7 @@ export default function OrderSuccess() {
                 <p style={{ fontSize: '0.9em', fontWeight: 'bold' }}>Order ID: <strong>{orderId}</strong></p>
                 <p style={{paddingBottom :"5px"}}>Order Placed On: <strong>{formatUtcToIST(createdAt)}</strong></p>
 
-                <h4 style={{ marginTop: '10px',lineHeight:"0px" ,borderBottom: '1px solid #eee' ,paddingTop:"25px"}}>Ordered Summary</h4>
+                <h4 style={{ marginTop: '10px',lineHeight:"0px" ,borderBottom: '1px solid #eee' ,paddingTop:"25px"}}>Summary</h4>
                 <ul style={{ listStyle: 'none', padding: 0 }}>
                     {orderedItems.map((item, index) => (
                         <li key={index} style={{ marginBottom: '10px', paddingBottom: '10px', borderBottom: '1px dotted #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
