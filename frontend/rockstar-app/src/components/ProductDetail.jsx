@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 // E:\Rockstar\rockstar-app-nextjs\src\app\product\[id]\page.jsx
 
 // IMPORTANT: Add "use client" if you use client-side hooks like useState, useEffect, etc.
