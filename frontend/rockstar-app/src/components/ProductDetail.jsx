@@ -246,14 +246,24 @@ export default function ProductDetail({ cart, setCart }) {
             toast.error("Product information not available to share.");
             return;
         }
+const handleShareProduct = async () => {
+        if (!product || !id) {
+            toast.error("Product information not available to share.");
+            return;
+        }
 
-        const productShareUrl = `https://backend-puaq.onrender.com/api/v1/product/${id}`;
+        // --- CHANGE STARTS HERE ---
+        // You need to replace 'https://your-frontend-domain.onrender.com'
+        // with the actual URL of your deployed frontend application.
+        const frontendBaseUrl = 'https://rockstar-app.onrender.com'; // <--- **IMPORTANT: Replace with your actual frontend URL**
+        const productShareUrl = `${frontendBaseUrl}/product/${id}`;
+        // --- CHANGE ENDS HERE ---
 
         try {
             if (navigator.share) {
                 await navigator.share({
                     title: product.name,
-                    text: `Check out this amazing product: ${product.name}`,
+                    text: `Check out this amazing product: ${product.name} - ${product.description}`, // Added description for better share text
                     url: productShareUrl,
                 });
                 toast.success("Product shared successfully!");
@@ -261,11 +271,20 @@ export default function ProductDetail({ cart, setCart }) {
                 await navigator.clipboard.writeText(productShareUrl);
                 toast.success("Product link copied to clipboard!");
             } else {
+                // Fallback for browsers that don't support navigator.share or navigator.clipboard
+                // Uses a prompt to let the user manually copy the link.
+                // Make sure to show the actual URL in the prompt.
                 prompt("Copy this link to share:", productShareUrl);
             }
         } catch (error) {
             console.error("Error sharing product:", error);
-            toast.error("Failed to share product.");
+            // Check for user aborting share (e.g., clicking 'Cancel')
+            if (error.name !== 'AbortError') {
+                toast.error("Failed to share product.");
+            } else {
+                // User cancelled the share operation, no need for an error toast.
+                console.log("Product sharing aborted by user.");
+            }
         }
     };
 
