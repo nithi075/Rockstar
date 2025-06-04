@@ -344,7 +344,7 @@ export default function ProductDetailPage({ cart, setCart }) { // Added cart and
         }
 
         const frontendBaseUrl = 'https://rockstar-fcga.onrender.com'; // **IMPORTANT: Replace with your actual deployed frontend URL**
-        const productShareUrl = `${frontendBaseUrl}/product/${id}`;
+        const productShareUrl = `${frontendBaseUrl}/api/v1/product/${id}`;
 
         try {
             if (navigator.share) {
@@ -528,7 +528,7 @@ export default function ProductDetailPage({ cart, setCart }) { // Added cart and
                                         alt={colorProduct.name}
                                         width={80} // Recommended to provide explicit width
                                         height={80} // Recommended to provide explicit height
-                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        style={{  height: '100%', objectFit: 'cover' }}
                                     />
                                 </div>
                             ))}
@@ -563,7 +563,7 @@ export default function ProductDetailPage({ cart, setCart }) { // Added cart and
                                     alt={p.name}
                                     width={200} // Recommended to provide explicit width
                                     height={200} // Recommended to provide explicit height
-                                    style={{ width: '100%', borderRadius: '20px', objectFit: 'cover' }}
+                                    style={{  borderRadius: '20px', objectFit: 'cover' }}
                                 />
                                 <div className="des" style={{ textAlign: 'start', padding: '10px 0' }}>
                                     <span style={{ color: '#606063', fontSize: '12px' }}>{p.brand || 'ROCKSTAR'}</span>
