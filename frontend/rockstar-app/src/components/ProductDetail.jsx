@@ -247,7 +247,7 @@ export default function ProductDetail({ cart, setCart }) {
             return;
         }
 
-        const productShareUrl = `${window.location.origin}/product/${id}`;
+        const productShareUrl = `https://backend-puaq.onrender.com/api/v1/product/${id}`;
 
         try {
             if (navigator.share) {
