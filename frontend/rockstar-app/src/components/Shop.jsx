@@ -167,7 +167,7 @@ export default function Shop() {
                             .
                         </p>
                         <p style={{ fontSize: '1.2em', color: '#666', marginTop: '15px', lineHeight: "30px" }}>
-                            Please try a different {currentFilterTerm ? 'filter' : 'search term'} or browse our <Link to="/shop" style={{ color: '#35396d', textDecoration: 'underline', textDecoration: "none" }}>Entire collection</Link>.
+                            Please try a different {currentFilterTerm ? 'filter' : 'search term'} or browse our <Link to="/shop" style={{ color: '#35396d', textDecoration: "none" }}>Entire collection</Link>.
                         </p>
                     </div>
                 </section>
