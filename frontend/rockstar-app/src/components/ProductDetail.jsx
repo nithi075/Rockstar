@@ -5,7 +5,8 @@
 import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Image from 'next/image'; // For optimized images in Next.js
+// Removed: import Image from 'next/image'; // NO LONGER USED
+
 import { useParams } from 'next/navigation'; // To get the dynamic ID from URL
 
 // Import Font Awesome icons
@@ -25,17 +26,16 @@ const BACKEND_URL = 'https://backend-puaq.onrender.com'; // Use your actual back
 // --- End Backend API Base URL ---
 
 // --- generateMetadata function (for SEO and Social Media Previews) ---
-// NOTE: This runs on the server. If this component is entirely 'use client',
-// Next.js will ignore this generateMetadata function in this file.
-// For true server-side metadata generation, this typically resides in a layout.js
-// or a parent server component that then passes data to the client component.
-// However, for simplicity and to include it as per your original structure,
-// we'll keep it here, noting that Next.js might process it differently
-// if the whole file is marked as "use client".
-// A better approach for client components needing dynamic metadata is to
-// fetch it on the server in a parent component and pass it down, or
-// use client-side approaches like React Helmet (though not ideal for Next.js app router).
-
+// IMPORTANT NOTE: Since this entire file is marked "use client",
+// the `generateMetadata` function defined here will NOT run on the server
+// for SEO purposes in Next.js App Router.
+// For server-rendered metadata, this function needs to be in a server component
+// (e.g., a parent layout.js or a product page that is a server component).
+// For a fully client-side rendered page, you'd typically handle metadata
+// client-side using libraries like React Helmet or similar approaches,
+// or manage static metadata in your layout.js.
+// Keeping it here for reference from your original code, but be aware
+// of its limited effect when "use client" is at the top.
 export async function generateMetadata({ params }) {
     const id = params.id; // Get the product ID from the URL
 
@@ -329,9 +329,9 @@ export default function ProductDetailPage({ cart, setCart }) { // Added cart and
             return;
         }
 
-        // In Next.js App Router, you'd typically use `router.push()` from `next/navigation`
-        // For simplicity and immediate effect in a client component, we'll use window.location.href.
-        // If you were using `pages` router, you'd use `useRouter().push()`.
+        // Using window.location.href for client-side navigation.
+        // For Next.js App Router, in a client component, this is a viable but simple approach.
+        // If you had `useRouter` from `next/navigation` imported, you could use `router.push()`.
         window.location.href = `/product/${clickedProductId}`; // Navigates to the new product page
         window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top after navigation
     };
@@ -398,14 +398,13 @@ export default function ProductDetailPage({ cart, setCart }) { // Added cart and
                 <div className="single-pro-image">
                     <div className="image-wrapper">
                         {mainImage && (
-                            <Image
+                            <img
                                 src={mainImage}
                                 alt={product.name}
                                 id="MainImg"
-                                width={500} // Set appropriate width for larger image
-                                height={500} // Set appropriate height for larger image
+                                width={500} // Recommended to provide explicit width
+                                height={500} // Recommended to provide explicit height
                                 style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
-                                priority // Prioritize loading for LCP
                             />
                         )}
                     </div>
@@ -414,10 +413,10 @@ export default function ProductDetailPage({ cart, setCart }) { // Added cart and
                         <div className="small-img-group">
                             {smallImages.map((imgUrl, index) => (
                                 <div className="small-img-col" key={index}>
-                                    <Image
+                                    <img
                                         src={imgUrl}
-                                        width={80} // Set appropriate width for thumbnails
-                                        height={80} // Set appropriate height for thumbnails
+                                        width={80} // Recommended to provide explicit width
+                                        height={80} // Recommended to provide explicit height
                                         className={`small-img ${mainImage === imgUrl ? 'active-thumbnail' : ''}`}
                                         alt={`${product.name} thumbnail ${index + 1}`}
                                         onClick={() => handleSmallImgClick(imgUrl)}
@@ -524,11 +523,11 @@ export default function ProductDetailPage({ cart, setCart }) { // Added cart and
                                         flexShrink: 0
                                     }}
                                 >
-                                    <Image
+                                    <img
                                         src={colorProduct.images && colorProduct.images.length > 0 ? `/${colorProduct.images[0].url}` : '/products/f1.jpg'}
                                         alt={colorProduct.name}
-                                        width={80}
-                                        height={80}
+                                        width={80} // Recommended to provide explicit width
+                                        height={80} // Recommended to provide explicit height
                                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                     />
                                 </div>
@@ -559,11 +558,11 @@ export default function ProductDetailPage({ cart, setCart }) { // Added cart and
                                 transition: '0.2s ease',
                                 position: 'relative'
                             }}>
-                                <Image
+                                <img
                                     src={p.images && p.images.length > 0 ? `/${p.images[0].url}` : '/products/f1.jpg'}
                                     alt={p.name}
-                                    width={200}
-                                    height={200}
+                                    width={200} // Recommended to provide explicit width
+                                    height={200} // Recommended to provide explicit height
                                     style={{ width: '100%', borderRadius: '20px', objectFit: 'cover' }}
                                 />
                                 <div className="des" style={{ textAlign: 'start', padding: '10px 0' }}>
