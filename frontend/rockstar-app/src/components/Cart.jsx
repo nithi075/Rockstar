@@ -289,7 +289,7 @@ export default function Cart({ cart, setCart }) {
                                             />
                                         </td>
                                         <td>{item.product.name} {item.size ? `(Size: ${item.size})` : ''}</td>
-                                        <td>${productPrice.toFixed(2)}</td>
+                                        <td>₹{productPrice.toFixed(2)}</td>
                                         <td>
                                             <input
                                                 type="number"
@@ -298,7 +298,7 @@ export default function Cart({ cart, setCart }) {
                                                 min="0"
                                             />
                                         </td>
-                                        <td>${itemSubtotal.toFixed(2)}</td>
+                                        <td>₹{itemSubtotal.toFixed(2)}</td>
                                     </tr>
                                 );
                             }).filter(Boolean) // Filter out any nulls from rendering
@@ -354,15 +354,15 @@ export default function Cart({ cart, setCart }) {
                             <tbody>
                                 <tr>
                                     <td>Cart Subtotal</td>
-                                    <td>${subtotal.toFixed(2)}</td>
+                                    <td>₹{subtotal.toFixed(2)}</td>
                                 </tr>
                                 <tr>
                                     <td>Shipping</td>
-                                    <td>${shipping.toFixed(2)}</td>
+                                    <td>₹{shipping.toFixed(2)}</td>
                                 </tr>
                                 <tr>
                                     <td><strong>Total</strong></td>
-                                    <td><strong>${total.toFixed(2)}</strong></td>
+                                    <td><strong>₹{total.toFixed(2)}</strong></td>
                                 </tr>
                             </tbody>
                         </table>
