@@ -7,19 +7,6 @@ import { faShoppingCart, faStar } from '@fortawesome/free-solid-svg-icons'; // R
 import { toast } from 'react-toastify';
 import ProductShareLink from './ProductShareLink'; // Import the new component
 
-const getProductId = (productData) => {
-    if (!productData || !productData._id) {
-        return null;
-    }
-    // Handle MongoDB ObjectId structure if present
-    if (typeof productData._id === 'object' && productData._id.$oid) {
-        return productData._id.$oid;
-    }
-    if (typeof productData._id === 'string') {
-        return productData._id;
-    }
-    return null;
-};
 
 export default function ProductDetail({ cart, setCart }) {
     const { id } = useParams();
@@ -37,6 +24,21 @@ export default function ProductDetail({ cart, setCart }) {
     const [currentSizeStock, setCurrentSizeStock] = useState(0);
 
     const [sameCustomIdProducts, setSameCustomIdProducts] = useState([]);
+
+    const getProductId = (productData) => {
+    if (!productData || !productData._id) {
+        return null;
+    }
+    // Handle MongoDB ObjectId structure if present
+    if (typeof productData._id === 'object' && productData._id.$oid) {
+        return productData._id.$oid;
+    }
+    if (typeof productData._id === 'string') {
+        return productData._id;
+    }
+    return null;
+};
+
 
     function addToCart() {
         if (!product) {
