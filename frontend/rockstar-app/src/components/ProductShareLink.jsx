@@ -12,7 +12,7 @@ const ProductShareLink = ({ productId, productName, productDescription }) => {
 
     useEffect(() => {
         if (productId) {
-            setProductShareUrl(`${FRONTEND_BASE_URL}/product/${productId}`);
+            setProductShareUrl(`${FRONTEND_BASE_URL}/product/api/v1/${productId}`);
         } else {
             setProductShareUrl('');
         }
