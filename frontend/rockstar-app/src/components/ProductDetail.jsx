@@ -1351,4 +1351,3 @@ export default function ProductDetail({ cart, setCart }) {
     );
 
 }
->>>>>>> 4c885e13ceeb97d2b97976bcc263670dff82fcd3
