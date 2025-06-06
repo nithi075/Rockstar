@@ -21,6 +21,7 @@ app.use(express.json());
 // Using a single origin for now. If you need multiple, use an array:
 // origin: ['https://nithi-cart-front.onrender.com', 'https://another-frontend.onrender.com'],
 app.use(cors());
+app.use(express.static(path.join(__dirname, 'public')));
 
 // --- Test API Root ---
 app.get('/', (req, res) => {
