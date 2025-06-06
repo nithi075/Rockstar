@@ -424,7 +424,4 @@ export default function ProductDetail({ cart, setCart }) {
         </div>
     );
 }
-<<<<<<< HEAD
-=======
 
->>>>>>> dc4202580033240ec7098691331ec610c886a834
