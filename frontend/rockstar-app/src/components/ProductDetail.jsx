@@ -7,6 +7,10 @@ import { toast } from 'react-toastify';
 import ProductShareLink from './ProductShareLink';
 
 // Get the backend URL from environment variables
+// IMPORTANT: This should be process.env.REACT_APP_BACKEND_URL if you're using create-react-app
+// or Vite with REACT_APP_ prefix. For Next.js, NEXT_PUBLIC_BACKEND_URL is correct.
+// Since you mentioned 'App.jsx' and not a Next.js specific setup, I'll assume REACT_APP_
+// for now, but ensure it matches your build setup.
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000'; // Fallback for local development
 
 export default function ProductDetail({ cart, setCart }) {
@@ -109,15 +113,17 @@ export default function ProductDetail({ cart, setCart }) {
             setLoading(true);
             setError(null);
             try {
-                const response = await fetch(`https://backend-puaq.onrender.com/api/v1/product/${productId}`);
+                // Using the constant BACKEND_URL for API calls
+                const response = await fetch(`${BACKEND_URL}/api/v1/product/${productId}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
                 if (data.success && data.product) {
                     setProduct(data.product);
-                    // CORRECTED: Prepend backend URL
-                    setMainImg(data.product.images && data.product.images.length > 0 ? `<span class="math-inline">\{BACKEND\_URL\}/</span>{data.product.images[0].url}` : `${BACKEND_URL}/products/f1.jpg`);
+                    // CORRECTED: Prepend backend URL for image paths
+                    // Ensure data.product.images[0].url does NOT start with a '/'
+                    setMainImg(data.product.images && data.product.images.length > 0 ? `${BACKEND_URL}/${data.product.images[0].url}` : `${BACKEND_URL}/products/f1.jpg`);
                     console.log("ProductDetail: Successfully fetched product:", data.product);
 
                     if (data.product.sizes && data.product.sizes.length > 0) {
@@ -184,7 +190,8 @@ export default function ProductDetail({ cart, setCart }) {
             setLoadingAll(true);
             setErrorAll(null);
             try {
-                const response = await fetch('https://backend-puaq.onrender.com/api/v1/products');
+                // Using the constant BACKEND_URL for API calls
+                const response = await fetch(`${BACKEND_URL}/api/v1/products`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -289,11 +296,11 @@ export default function ProductDetail({ cart, setCart }) {
                                 <div className="small-img-col" key={index}>
                                     <img
                                         // CORRECTED: Small image src
-                                        src={`<span class="math-inline">\{BACKEND\_URL\}/</span>{image.url}`}
+                                        src={`${BACKEND_URL}/${image.url}`}
                                         width="100%"
                                         className={`small-img ${mainImg === `${BACKEND_URL}/${image.url}` ? 'active-thumbnail' : ''}`}
                                         alt={`${product.name} thumbnail ${index + 1}`}
-                                        onClick={() => handleSmallImgClick(`<span class="math-inline">\{BACKEND\_URL\}/</span>{image.url}`)}
+                                        onClick={() => handleSmallImgClick(`${BACKEND_URL}/${image.url}`)}
                                     />
                                 </div>
                             ))}
@@ -376,7 +383,7 @@ export default function ProductDetail({ cart, setCart }) {
                                 >
                                     <img
                                         // CORRECTED: More Colors image src
-                                        src={colorProduct.images && colorProduct.images.length > 0 ? `<span class="math-inline">\{BACKEND\_URL\}/</span>{colorProduct.images[0].url}` : `${BACKEND_URL}/products/f1.jpg`}
+                                        src={colorProduct.images && colorProduct.images.length > 0 ? `${BACKEND_URL}/${colorProduct.images[0].url}` : `${BACKEND_URL}/products/f1.jpg`}
                                         alt={colorProduct.name}
                                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                     />
@@ -401,7 +408,7 @@ export default function ProductDetail({ cart, setCart }) {
                                 <div className="pro">
                                     <div className="image-wrapper">
                                         {/* CORRECTED: Related products image src */}
-                                        <img src={relatedProduct.images && relatedProduct.images.length > 0 ? `<span class="math-inline">\{BACKEND\_URL\}/</span>{relatedProduct.images[0].url}` : `${BACKEND_URL}/img/products/f1.jpg`} alt={relatedProduct.name} />
+                                        <img src={relatedProduct.images && relatedProduct.images.length > 0 ? `${BACKEND_URL}/${relatedProduct.images[0].url}` : `${BACKEND_URL}/img/products/f1.jpg`} alt={relatedProduct.name} />
                                     </div>
                                     <div className="des">
                                         {relatedProduct.brand && <span>{relatedProduct.brand}</span>}
