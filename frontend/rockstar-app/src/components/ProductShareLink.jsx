@@ -9,10 +9,9 @@ const ProductShareLink = ({ productId, productName, productDescription }) => {
 
     useEffect(() => {
         if (productId) {
-            // Dynamically get the origin of the current URL
             const currentOrigin = window.location.origin;
             setProductShareUrl(`${currentOrigin}/product/${productId}`);
-            console.log("Generated share URL:", `${currentOrigin}/product/${productId}`); // For debugging
+            console.log("Generated share URL:", `${currentOrigin}/product/${productId}`);
         } else {
             setProductShareUrl('');
         }
@@ -24,29 +23,30 @@ const ProductShareLink = ({ productId, productName, productDescription }) => {
             return;
         }
 
-        const title = productName || "Check out this product";
-        const text = productDescription ? `Check out this amazing product: ${productName} - ${productDescription}` : `Check out this amazing product: ${productName}`;
-
+        // --- MODIFIED LOGIC HERE ---
         try {
-            if (navigator.share) {
-                // Web Share API
-                await navigator.share({
-                    title: title,
-                    text: text,
-                    url: productShareUrl,
-                });
-                toast.success("Product shared successfully!");
-            } else if (navigator.clipboard) {
-                // Clipboard API fallback
+            // Option 1: Always try to copy to clipboard directly if you prefer that over native share dialog
+            if (navigator.clipboard) {
                 await navigator.clipboard.writeText(productShareUrl);
                 toast.success("Product link copied to clipboard!");
-            } else {
-                // Prompt fallback
+            }
+            // Option 2: If you still want native share as primary, keep the original
+            // else if (navigator.share) { // Original logic for native share dialog
+            //     const title = productName || "Check out this product";
+            //     const text = productDescription ? `Check out this amazing product: ${productName} - ${productDescription}` : `Check out this amazing product: ${productName}`;
+            //     await navigator.share({
+            //         title: title,
+            //         text: text,
+            //         url: productShareUrl,
+            //     });
+            //     toast.success("Product shared successfully!"); // This toast appears in your current setup
+            // }
+            else { // Fallback to prompt if neither clipboard nor native share are available
                 prompt("Copy this link to share:", productShareUrl);
             }
         } catch (error) {
             console.error("Error sharing product:", error);
-            if (error.name !== 'AbortError') { // User cancelled share
+            if (error.name !== 'AbortError') { // User cancelled share dialog
                 toast.error("Failed to share product.");
             } else {
                 console.log("Product sharing aborted by user.");
@@ -55,7 +55,7 @@ const ProductShareLink = ({ productId, productName, productDescription }) => {
     };
 
     if (!productId) {
-        return null; // Don't render if there's no product ID
+        return null;
     }
 
     return (
