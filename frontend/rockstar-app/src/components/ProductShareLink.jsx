@@ -1,18 +1,18 @@
-import  { useState, useEffect } from 'react';
+// src/pages/ProductShareLink.jsx
+import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShareAlt } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'react-toastify';
-
-// Define your frontend base URL once here.
-// IMPORTANT: Make sure this matches your deployed Render frontend URL.
-const FRONTEND_BASE_URL = 'https://rockstar-fcga.onrender.com';
 
 const ProductShareLink = ({ productId, productName, productDescription }) => {
     const [productShareUrl, setProductShareUrl] = useState('');
 
     useEffect(() => {
         if (productId) {
-            setProductShareUrl(`${FRONTEND_BASE_URL}/product/${productId}`);
+            // Dynamically get the origin of the current URL
+            const currentOrigin = window.location.origin;
+            setProductShareUrl(`${currentOrigin}/product/${productId}`);
+            console.log("Generated share URL:", `${currentOrigin}/product/${productId}`); // For debugging
         } else {
             setProductShareUrl('');
         }
