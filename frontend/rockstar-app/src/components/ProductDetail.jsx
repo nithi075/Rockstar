@@ -1,17 +1,12 @@
 // src/pages/ProductDetail.jsx
+
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingCart, faStar } from '@fortawesome/free-solid-svg-icons';
+import { faShoppingCart, faStar } from '@fortawesome/free-solid-svg-icons'; // Removed faShareAlt as it's now in ProductShareLink
 import { toast } from 'react-toastify';
-import ProductShareLink from './ProductShareLink';
+import ProductShareLink from './ProductShareLink'; // Import the new component
 
-// Get the backend URL from environment variables
-// IMPORTANT: This should be process.env.REACT_APP_BACKEND_URL if you're using create-react-app
-// or Vite with REACT_APP_ prefix. For Next.js, NEXT_PUBLIC_BACKEND_URL is correct.
-// Since you mentioned 'App.jsx' and not a Next.js specific setup, I'll assume REACT_APP_
-// for now, but ensure it matches your build setup.
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000'; // Fallback for local development
 
 export default function ProductDetail({ cart, setCart }) {
     const { id } = useParams();
@@ -31,18 +26,18 @@ export default function ProductDetail({ cart, setCart }) {
     const [sameCustomIdProducts, setSameCustomIdProducts] = useState([]);
 
     const getProductId = (productData) => {
-        if (!productData || !productData._id) {
-            return null;
-        }
-        // Handle MongoDB ObjectId structure if present
-        if (typeof productData._id === 'object' && productData._id.$oid) {
-            return productData._id.$oid;
-        }
-        if (typeof productData._id === 'string') {
-            return productData._id;
-        }
+    if (!productData || !productData._id) {
         return null;
-    };
+    }
+    // Handle MongoDB ObjectId structure if present
+    if (typeof productData._id === 'object' && productData._id.$oid) {
+        return productData._id.$oid;
+    }
+    if (typeof productData._id === 'string') {
+        return productData._id;
+    }
+    return null;
+};
 
 
     function addToCart() {
@@ -113,17 +108,14 @@ export default function ProductDetail({ cart, setCart }) {
             setLoading(true);
             setError(null);
             try {
-                // Using the constant BACKEND_URL for API calls
-                const response = await fetch(`${BACKEND_URL}/api/v1/product/${productId}`);
+                const response = await fetch(`https://backend-puaq.onrender.com/api/v1/product/${productId}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
                 if (data.success && data.product) {
                     setProduct(data.product);
-                    // CORRECTED: Prepend backend URL for image paths
-                    // Ensure data.product.images[0].url does NOT start with a '/'
-                    setMainImg(data.product.images && data.product.images.length > 0 ? `${BACKEND_URL}/${data.product.images[0].url}` : `${BACKEND_URL}/products/f1.jpg`);
+                    setMainImg(data.product.images && data.product.images.length > 0 ? `/${data.product.images[0].url}` : '/products/f1.jpg');
                     console.log("ProductDetail: Successfully fetched product:", data.product);
 
                     if (data.product.sizes && data.product.sizes.length > 0) {
@@ -190,8 +182,7 @@ export default function ProductDetail({ cart, setCart }) {
             setLoadingAll(true);
             setErrorAll(null);
             try {
-                // Using the constant BACKEND_URL for API calls
-                const response = await fetch(`${BACKEND_URL}/api/v1/products`);
+                const response = await fetch('https://backend-puaq.onrender.com/api/v1/products');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -254,6 +245,8 @@ export default function ProductDetail({ cart, setCart }) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    // REMOVED handleShareProduct function as it's now in ProductShareLink component
+
     if (loading) {
         return <div>Loading product details...</div>;
     }
@@ -267,19 +260,27 @@ export default function ProductDetail({ cart, setCart }) {
     const currentProductBaseIdForRelated = getBaseCustomId(product.customId);
     let productsToDisplay = [];
 
+    // Set the desired count for "You might also like"
     const desiredCount = 8;
 
+    // Filter out the current product and any product that shares its baseCustomId
     const unrelatedProducts = allProducts.filter(p => {
         const pId = getProductId(p);
         const currentId = getProductId(product);
         const pBaseCustomId = getBaseCustomId(p.customId);
 
+        // Exclude the current product itself
+        // Exclude any product that shares the same base custom ID as the current product
         return pId !== currentId && pBaseCustomId !== currentProductBaseIdForRelated;
     });
 
+    // Randomly select products from the filtered list to fill the desired count
+    // Shuffle the unrelatedProducts array and take the first `desiredCount` elements
     const randomFill = [...unrelatedProducts].sort(() => 0.5 - Math.random()).slice(0, desiredCount);
     productsToDisplay = randomFill;
 
+    // Although productsToDisplay is already sliced to desiredCount,
+    // this line ensures it strictly adheres to the desiredCount just in case.
     const finalProductsToDisplay = productsToDisplay.slice(0, desiredCount);
 
     return (
@@ -287,20 +288,19 @@ export default function ProductDetail({ cart, setCart }) {
             <section className="pro-detail" id="section-p1">
                 <div className="single-pro-image">
                     <div className="image-wrapper">
-                        {/* CORRECTED: Main image src */}
-                        <img src={mainImg} alt={product.name} id="MainImg" width="100%" />
+                        <img src={mainImg} alt={product.name} id="MainImg"
+                        width="100%" />
                     </div>
                     {product.images && product.images.length > 1 && (
                         <div className="small-img-group">
                             {product.images.map((image, index) => (
                                 <div className="small-img-col" key={index}>
                                     <img
-                                        // CORRECTED: Small image src
-                                        src={`${BACKEND_URL}/${image.url}`}
+                                        src={`/${image.url}`}
                                         width="100%"
-                                        className={`small-img ${mainImg === `${BACKEND_URL}/${image.url}` ? 'active-thumbnail' : ''}`}
+                                        className={`small-img ${mainImg === `/${image.url}` ? 'active-thumbnail' : ''}`}
                                         alt={`${product.name} thumbnail ${index + 1}`}
-                                        onClick={() => handleSmallImgClick(`${BACKEND_URL}/${image.url}`)}
+                                        onClick={() => handleSmallImgClick(`/${image.url}`)}
                                     />
                                 </div>
                             ))}
@@ -343,9 +343,10 @@ export default function ProductDetail({ cart, setCart }) {
                         Add to Cart
                     </button>
 
-                    <h4 style={{ paddingTop: "5px", fontSize: "25px", paddingBottom: "0px" }}>Product Details</h4>
+                    <h4 style={{paddingTop:"5px" ,fontSize:"25px",paddingBottom:"0px"}}>Product Details</h4>
                     <span>{product.description}</span>
-
+                    
+                    {/* Use the ProductShareLink component here */}
                     <ProductShareLink
                         productId={id}
                         productName={product.name}
@@ -382,8 +383,7 @@ export default function ProductDetail({ cart, setCart }) {
                                     }}
                                 >
                                     <img
-                                        // CORRECTED: More Colors image src
-                                        src={colorProduct.images && colorProduct.images.length > 0 ? `${BACKEND_URL}/${colorProduct.images[0].url}` : `${BACKEND_URL}/products/f1.jpg`}
+                                        src={colorProduct.images && colorProduct.images.length > 0 ? `/${colorProduct.images[0].url}` : '/products/f1.jpg'}
                                         alt={colorProduct.name}
                                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                     />
@@ -399,20 +399,19 @@ export default function ProductDetail({ cart, setCart }) {
             {errorAll && <div>Error loading related products: {errorAll}</div>}
 
             {!loadingAll && !errorAll && finalProductsToDisplay.length > 0 && (
-                <section className="feature" id="section-p1" style={{ paddingTop: "5px" }}>
-                    <h2 style={{ paddingBottom: "0", lineHeight: "0px", fontSize: "25px" }}>You might also like</h2>
+                <section className="feature" id="section-p1" style={{paddingTop:"5px"}}>
+                    <h2 style={{paddingBottom:"0", lineHeight:"0px" ,fontSize:"25px"}}>You might also like</h2>
 
-                    <div className="pro-container" style={{ paddingTop: "5px" }}>
+                    <div className="pro-container" style={{paddingTop:"5px"}}>
                         {finalProductsToDisplay.map(relatedProduct => (
                             <Link to={`/product/${getProductId(relatedProduct)}`} key={getProductId(relatedProduct)} className="pro-link-wrapper">
                                 <div className="pro">
                                     <div className="image-wrapper">
-                                        {/* CORRECTED: Related products image src */}
-                                        <img src={relatedProduct.images && relatedProduct.images.length > 0 ? `${BACKEND_URL}/${relatedProduct.images[0].url}` : `${BACKEND_URL}/img/products/f1.jpg`} alt={relatedProduct.name} />
+                                        <img src={relatedProduct.images && relatedProduct.images.length > 0 ? `/${relatedProduct.images[0].url}` : 'img/products/f1.jpg'} alt={relatedProduct.name} />
                                     </div>
                                     <div className="des">
                                         {relatedProduct.brand && <span>{relatedProduct.brand}</span>}
-                                        <h5 style={{ paddingTop: "5px" }}>{relatedProduct.name}</h5>
+                                        <h5 style={{paddingTop:"5px"}}>{relatedProduct.name}</h5>
 
                                         <h4>₹{(parseFloat(relatedProduct.price) || 0).toFixed(2)}</h4>
                                     </div>
@@ -425,3 +424,4 @@ export default function ProductDetail({ cart, setCart }) {
         </div>
     );
 }
+
