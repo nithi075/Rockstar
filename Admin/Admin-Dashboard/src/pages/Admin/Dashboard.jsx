@@ -1,6 +1,6 @@
 // pages/Admin/Dashboard.jsx
 import { useEffect, useState } from "react";
-import api from "../../src/axios"; // <--- IMPORTANT: Import your custom Axios instance 'api'
+import api from "../../axios"; // <--- IMPORTANT: Import your custom Axios instance 'api'
 
 export default function Dashboard() {
     const [stats, setStats] = useState({ totalProducts: 0, totalOrders: 0, totalUsers: 0 });
