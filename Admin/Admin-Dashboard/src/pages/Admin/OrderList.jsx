@@ -1,6 +1,6 @@
 // pages/Admin/OrderList.jsx
 import { useEffect, useState } from "react";
-import api from "../../axios"; // Import the custom axios instance
+import axios from "axios";
 import { Link } from "react-router-dom";
 
 export default function OrderList() {
@@ -11,14 +11,10 @@ export default function OrderList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [ordersPerPage] = useState(10); // Display 10 orders per page
 
-  // HARDCODED: Root URL for images. This needs to be changed manually for local dev.
-  const backendRootUrl = 'https://admin-backend-x8of.onrender.com';
-
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        // Uses the baseURL configured in src/axios.js
-        const res = await api.get("/orders");
+        const res = await axios.get("/orders");
         // Sort orders by creation date (assuming 'createdAt' field exists)
         const sortedOrders = (res.data.orders || []).sort((a, b) =>
           new Date(b.createdAt) - new Date(a.createdAt)
@@ -37,8 +33,8 @@ export default function OrderList() {
 
   const handleMarkAsDelivered = async (orderId) => {
     try {
-      // Uses the baseURL configured in src/axios.js
-      await api.put(`/orders/${orderId}/deliver`, { status: 'Delivered' });
+      // Assuming an API endpoint like /orders/:id/deliver for marking as delivered
+      await axios.put(`/orders/${orderId}/deliver`, { status: 'Delivered' });
       // Update the order status in the local state
       setOrders(prevOrders =>
         prevOrders.map(order =>
@@ -94,13 +90,8 @@ export default function OrderList() {
                   <td className="order-img">
                     {order.cartItems && order.cartItems.length > 0 && order.cartItems[0].product?.images?.[0]?.url ? (
                       <img
-                        // HARDCODED: Image URL construction
-                        src={order.cartItems[0].product.images[0].url.startsWith('http') // Check if it's already a full URL (e.g., Cloudinary)
-                            ? order.cartItems[0].product.images[0].url
-                            : `${backendRootUrl}/uploads/${order.cartItems[0].product.images[0].url.startsWith('/')
-                                ? order.cartItems[0].product.images[0].url.substring(1)
-                                : order.cartItems[0].product.images[0].url}`
-                        }
+                        
+                        src={`http://localhost:5000/uploads/${order.cartItems[0].product.images[0].url}`}
                         alt={order.cartItems[0].product?.name || "Product"}
                         className="ord-img"
                       />
