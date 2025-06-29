@@ -91,7 +91,7 @@ export default function OrderList() {
                     {order.cartItems && order.cartItems.length > 0 && order.cartItems[0].product?.images?.[0]?.url ? (
                       <img
                         
-                        src={`http://localhost:5000/uploads/${order.cartItems[0].product.images[0].url}`}
+                        src={`https://admin-backend-x8of.onrender.com/${order.cartItems[0].product.images[0].url}`}
                         alt={order.cartItems[0].product?.name || "Product"}
                         className="ord-img"
                       />
