@@ -1,12 +1,9 @@
-// src/pages/ProductDetail.jsx
-
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingCart, faStar } from '@fortawesome/free-solid-svg-icons'; // Removed faShareAlt as it's now in ProductShareLink
+import { faShoppingCart, faStar } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'react-toastify';
-import ProductShareLink from './ProductShareLink'; // Import the new component
-
+import ProductShareLink from './ProductShareLink';
 
 export default function ProductDetail({ cart, setCart }) {
     const { id } = useParams();
@@ -26,19 +23,18 @@ export default function ProductDetail({ cart, setCart }) {
     const [sameCustomIdProducts, setSameCustomIdProducts] = useState([]);
 
     const getProductId = (productData) => {
-    if (!productData || !productData._id) {
+        if (!productData || !productData._id) {
+            return null;
+        }
+        // Handle MongoDB ObjectId structure if present
+        if (typeof productData._id === 'object' && productData._id.$oid) {
+            return productData._id.$oid;
+        }
+        if (typeof productData._id === 'string') {
+            return productData._id;
+        }
         return null;
-    }
-    // Handle MongoDB ObjectId structure if present
-    if (typeof productData._id === 'object' && productData._id.$oid) {
-        return productData._id.$oid;
-    }
-    if (typeof productData._id === 'string') {
-        return productData._id;
-    }
-    return null;
-};
-
+    };
 
     function addToCart() {
         if (!product) {
@@ -102,13 +98,79 @@ export default function ProductDetail({ cart, setCart }) {
         });
     }
 
+    const handleBuyNow = () => {
+        if (!product) {
+            toast.error("Product data not loaded. Cannot proceed with purchase.");
+            return;
+        }
+        if (qty < 1) {
+            toast.warn("Quantity must be at least 1 to buy now.");
+            return;
+        }
+        if (!selectedSize) {
+            toast.warn("Please select a size to buy now.");
+            return;
+        }
+
+        const selectedSizeObject = product.sizes.find(s => s.size === selectedSize);
+
+        if (!selectedSizeObject || selectedSizeObject.stock === 0) {
+            toast.error(`The selected size (${selectedSize}) is currently out of stock.`);
+            return;
+        }
+
+        if (qty > selectedSizeObject.stock) {
+            toast.warn(`Cannot buy ${qty} of size ${selectedSize}. Only ${selectedSizeObject.stock} available.`);
+            setQty(selectedSizeObject.stock); // Optionally adjust quantity to max available
+            return;
+        }
+
+        const currentProductId = getProductId(product);
+        if (!currentProductId) {
+            console.error("handleBuyNow: Could not determine valid product ID for current product:", product);
+            toast.error("Could not proceed with purchase due to product ID error.");
+            return;
+        }
+
+        // Add the item to the cart (or a temporary 'buy now' list)
+        setCart((prevCart) => {
+            const existingItem = prevCart.find(item => {
+                const itemProductId = getProductId(item.product);
+                return itemProductId === currentProductId && item.size === selectedSize;
+            });
+
+            if (existingItem) {
+                if (existingItem.qty + qty > selectedSizeObject.stock) {
+                    toast.warn(`Adding ${qty} more would exceed stock for size ${selectedSize}. You already have ${existingItem.qty} in cart. Max available: ${selectedSizeObject.stock}`);
+                    return prevCart; // Don't modify cart if it exceeds stock
+                }
+                const updatedCart = prevCart.map(item =>
+                    (getProductId(item.product) === currentProductId && item.size === selectedSize)
+                        ? { ...item, qty: item.qty + qty }
+                        : item
+                );
+                // toast.success(`Updated quantity for ${product.name} (Size: ${selectedSize}) in cart for immediate purchase!`);
+                return updatedCart;
+            } else {
+                const newCart = [...prevCart, { product, qty, size: selectedSize }];
+                // toast.success(`${product.name} (Size: ${selectedSize}, Qty: ${qty}) added to cart for immediate purchase!`);
+                return newCart;
+            }
+        });
+
+        toast.success(`Redirecting to cart with ${qty} of ${product.name} (Size: ${selectedSize})!`);
+        // Navigate to the cart page.
+        navigate('/cart'); // Changed from '/checkout' to '/cart'
+    };
+
+
     useEffect(() => {
         const fetchProductDetails = async (productId) => {
             console.log(`ProductDetail: Fetching product details for ID: ${productId}`);
             setLoading(true);
             setError(null);
             try {
-                const response = await fetch(`https://backend-puaq.onrender.com/api/v1/product/${productId}`);
+                const response = await fetch(`http://localhost:8000/api/v1/product/${productId}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -182,7 +244,7 @@ export default function ProductDetail({ cart, setCart }) {
             setLoadingAll(true);
             setErrorAll(null);
             try {
-                const response = await fetch('https://backend-puaq.onrender.com/api/v1/products');
+                const response = await fetch('http://localhost:8000/api/v1/products');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -245,8 +307,6 @@ export default function ProductDetail({ cart, setCart }) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // REMOVED handleShareProduct function as it's now in ProductShareLink component
-
     if (loading) {
         return <div>Loading product details...</div>;
     }
@@ -260,27 +320,19 @@ export default function ProductDetail({ cart, setCart }) {
     const currentProductBaseIdForRelated = getBaseCustomId(product.customId);
     let productsToDisplay = [];
 
-    // Set the desired count for "You might also like"
     const desiredCount = 8;
 
-    // Filter out the current product and any product that shares its baseCustomId
     const unrelatedProducts = allProducts.filter(p => {
         const pId = getProductId(p);
         const currentId = getProductId(product);
         const pBaseCustomId = getBaseCustomId(p.customId);
 
-        // Exclude the current product itself
-        // Exclude any product that shares the same base custom ID as the current product
         return pId !== currentId && pBaseCustomId !== currentProductBaseIdForRelated;
     });
 
-    // Randomly select products from the filtered list to fill the desired count
-    // Shuffle the unrelatedProducts array and take the first `desiredCount` elements
     const randomFill = [...unrelatedProducts].sort(() => 0.5 - Math.random()).slice(0, desiredCount);
     productsToDisplay = randomFill;
 
-    // Although productsToDisplay is already sliced to desiredCount,
-    // this line ensures it strictly adheres to the desiredCount just in case.
     const finalProductsToDisplay = productsToDisplay.slice(0, desiredCount);
 
     return (
@@ -289,7 +341,7 @@ export default function ProductDetail({ cart, setCart }) {
                 <div className="single-pro-image">
                     <div className="image-wrapper">
                         <img src={mainImg} alt={product.name} id="MainImg"
-                        width="100%" />
+                            width="100%" />
                     </div>
                     {product.images && product.images.length > 1 && (
                         <div className="small-img-group">
@@ -338,22 +390,32 @@ export default function ProductDetail({ cart, setCart }) {
                         max={currentSizeStock}
                         disabled={currentSizeStock === 0 || !selectedSize || qty === 0}
                     />
-                    <button className="normal" onClick={addToCart}
-                        disabled={currentSizeStock === 0 || !selectedSize || qty === 0 || qty > currentSizeStock}>
-                        Add to Cart
-                    </button>
+                    <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}> {/* Flex container for buttons */}
+                        <button
+                            className="normal"
+                            onClick={addToCart}
+                            disabled={currentSizeStock === 0 || !selectedSize || qty === 0 || qty > currentSizeStock}
+                        >
+                            Add to Cart
+                        </button>
+                        <button
+                            className="normal" // You might want a different class for styling "Buy Now"
+                            onClick={handleBuyNow}
+                            disabled={currentSizeStock === 0 || !selectedSize || qty === 0 || qty > currentSizeStock}
+                        >
+                            Buy Now
+                        </button>
+                    </div>
 
-                    <h4 style={{paddingTop:"5px" ,fontSize:"25px",paddingBottom:"0px"}}>Product Details</h4>
+                    <h4 style={{ paddingTop: "5px", fontSize: "25px", paddingBottom: "0px" }}>Product Details</h4>
                     <span>{product.description}</span>
-                    
-                    {/* Use the ProductShareLink component here */}
+
                     <ProductShareLink
                         productId={id}
                         productName={product.name}
                         productDescription={product.description}
                     />
                 </div>
-
             </section>
 
             <section>
@@ -392,17 +454,16 @@ export default function ProductDetail({ cart, setCart }) {
                         </div>
                     </div>
                 )}
-
             </section>
 
             {loadingAll && <div>Loading related products...</div>}
             {errorAll && <div>Error loading related products: {errorAll}</div>}
 
             {!loadingAll && !errorAll && finalProductsToDisplay.length > 0 && (
-                <section className="feature" id="section-p1" style={{paddingTop:"5px"}}>
-                    <h2 style={{paddingBottom:"0", lineHeight:"0px" ,fontSize:"25px"}}>You might also like</h2>
+                <section className="feature" id="section-p1" style={{ paddingTop: "5px" }}>
+                    <h2 style={{ paddingBottom: "0", lineHeight: "0px", fontSize: "25px" }}>You might also like</h2>
 
-                    <div className="pro-container" style={{paddingTop:"5px"}}>
+                    <div className="pro-container" style={{ paddingTop: "5px" }}>
                         {finalProductsToDisplay.map(relatedProduct => (
                             <Link to={`/product/${getProductId(relatedProduct)}`} key={getProductId(relatedProduct)} className="pro-link-wrapper">
                                 <div className="pro">
@@ -411,7 +472,7 @@ export default function ProductDetail({ cart, setCart }) {
                                     </div>
                                     <div className="des">
                                         {relatedProduct.brand && <span>{relatedProduct.brand}</span>}
-                                        <h5 style={{paddingTop:"5px"}}>{relatedProduct.name}</h5>
+                                        <h5 style={{ paddingTop: "5px" }}>{relatedProduct.name}</h5>
 
                                         <h4>₹{(parseFloat(relatedProduct.price) || 0).toFixed(2)}</h4>
                                     </div>
@@ -424,4 +485,3 @@ export default function ProductDetail({ cart, setCart }) {
         </div>
     );
 }
-

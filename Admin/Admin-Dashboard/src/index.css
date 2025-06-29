@@ -1,0 +1,3238 @@
+/* Overall container for the login page */
+
+
+
+.Login {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f7f9fc; /* Slightly lighter gray for a cleaner look */
+    padding: 1.5rem; /* Increased padding for better spacing on smaller screens */
+    box-sizing: border-box; /* Ensure padding is included in the element's total width */
+}
+
+/* Container for the login form itself */
+.Login-page {
+    background-color: #ffffff;
+    padding: 2.5rem; /* Slightly more padding for a roomier feel */
+    border-radius: 0.75rem; /* Slightly more rounded corners for a softer look */
+    /* Enhanced shadow for more depth, inspired by modern UI trends */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05), inset 0 0 0 1px rgba(0, 0, 0, 0.03);
+    width: 100%;
+    max-width: 30rem; /* Slightly wider max-width for better content display */
+    box-sizing: border-box;
+    position: relative; /* Needed if you add pseudo-elements or absolute children */
+    overflow: hidden; /* Ensures any internal shadows/borders stay within bounds */
+}
+
+/* Optional: Add a subtle background pattern or gradient for extra flair */
+.Login-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+    z-index: 0;
+    pointer-events: none; /* Allows clicks to pass through */
+}
+
+/* Admin Login heading */
+.Login-page h2 {
+    font-size: 2rem; /* A bit larger for prominence */
+    font-weight: 700;
+    text-align: center;
+    color: #2c3e50; /* A darker, more sophisticated gray-blue */
+    margin-bottom: 2rem; /* More space below the heading */
+    letter-spacing: -0.025em; /* Slightly tighter letter-spacing for a modern look */
+    position: relative;
+    z-index: 1; /* Ensure heading is above pseudo-element */
+}
+
+/* Styling for the form wrapper (space-y-6) */
+.Login-page form > div:not(:last-child) {
+    margin-bottom: 1.25rem; /* Slightly adjusted spacing between form elements */
+}
+
+/* Labels for email and password */
+.Login-email,
+.Password {
+    display: block;
+    font-size: 0.9rem; /* Slightly larger font size for labels */
+    font-weight: 600; /* Bolder labels for better readability */
+    color: #4a5568; /* A good mid-tone gray */
+    margin-bottom: 0.4rem; /* More space between label and input */
+    transition: color 0.2s ease; /* Smooth transition for label color */
+}
+
+/* Email and password input fields */
+.email-input,
+.Passwrd-input {
+    width: 100%;
+    padding: 0.75rem 1rem; /* More padding for a taller input field */
+    border: 1px solid #cbd5e0; /* A slightly softer gray border */
+    border-radius: 0.5rem; /* More rounded input fields */
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06); /* Subtle inner shadow for depth */
+    background-color: #fdfdfd; /* A very light off-white background for inputs */
+    font-size: 1rem; /* Standard font size for input text */
+    color: #2d3748; /* Darker text color for better contrast */
+    line-height: 1.5; /* Ensures consistent line height */
+    outline: none;
+    transition: border-color 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
+}
+
+.email-input:focus,
+.Passwrd-input:focus {
+    border-color: #4299e1; /* A more vibrant blue for focus */
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.3), inset 0 1px 2px rgba(0, 0, 0, 0.06); /* Enhanced focus ring */
+    background-color: #ffffff; /* Ensure background is white on focus */
+}
+
+/* Error message div */
+.Error-password {
+    color: #e53e3e; /* A slightly darker red for errors */
+    font-size: 0.875rem;
+    text-align: center;
+    margin-top: 0.5rem; /* Adjusted margin to ensure it's visually connected to the input */
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+
+/* Login button */
+.Login_button {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Vertically center content if icon or text varies in height */
+    padding: 0.75rem 1.5rem; /* More generous padding for a larger button */
+    border: none; /* Removed transparent border, relying on background and shadow */
+    border-radius: 0.5rem; /* More rounded button corners */
+    /* Stronger shadow for the button to make it pop */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    font-size: 1.125rem;
+    font-weight: 600; /* Bolder text for the button */
+    color: #ffffff;
+    background-color: #3b82f6; /* A slightly more vibrant primary blue */
+    cursor: pointer;
+    transition: background-color 0.25s ease-out, transform 0.1s ease-out, box-shadow 0.25s ease-out; /* Added transform for a subtle click effect */
+    letter-spacing: 0.025em; /* Slightly more spaced out letters */
+}
+
+.Login_button:hover {
+    background-color: #2563eb; /* Darker blue on hover */
+    transform: translateY(-1px); /* Subtle lift effect */
+    box-shadow: 0 6px 8px -2px rgba(0, 0, 0, 0.15), 0 3px 5px -1px rgba(0, 0, 0, 0.08); /* Enhanced shadow on hover */
+}
+
+.Login_button:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.4), 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* More prominent focus ring */
+}
+
+.Login_button:active {
+    transform: translateY(0); /* Press down effect */
+    box-shadow: 0 2px 3px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06); /* Reduced shadow on active */
+}
+
+.Login_button:disabled {
+    background-color: #90cdf4; /* Lighter blue for disabled state */
+    opacity: 0.7; /* Slightly less opaque */
+    cursor: not-allowed;
+    transform: none; /* No transform when disabled */
+    box-shadow: none; /* No shadow when disabled */
+}
+
+/* Media Query for smaller screens (e.g., mobile) */
+@media (max-width: 600px) {
+    .Login-page {
+        padding: 1.5rem; /* Less padding on very small screens */
+        border-radius: 0.5rem;
+    }
+
+    .Login-page h2 {
+        font-size: 1.6rem; /* Smaller heading on small screens */
+        margin-bottom: 1.5rem;
+    }
+
+    .email-input,
+    .Passwrd-input {
+        padding: 0.6rem 0.8rem; /* Reduced padding for inputs */
+    }
+
+    .Login_button {
+        padding: 0.6rem 1rem; /* Reduced padding for button */
+        font-size: 1rem; /* Smaller font size for button */
+    }
+}/* CreateProduct.css */
+
+/* --- General Form Container Styling --- */
+.Create-Product {
+    max-width: 850px; /* Slightly wider for more content space */
+    margin: 2.5rem auto; /* Increased top/bottom margin */
+    padding: 3rem; /* More generous padding inside the card */
+    background-color: #ffffff;
+    border-radius: 1rem; /* More pronounced rounded corners */
+    /* Enhanced shadow for a more premium, floating effect */
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05), inset 0 0 0 1px rgba(0, 0, 0, 0.03);
+    box-sizing: border-box; /* Include padding and border in element's total width/height */
+    position: relative; /* For potential pseudo-elements or absolute positioning */
+    overflow: hidden; /* Ensures shadows or borders don't spill out */
+}
+
+/* --- Heading Style --- */
+.Create-Product h1 {
+    font-size: 2.5rem; /* Larger heading for emphasis */
+    font-weight: 800; /* Extra bold for strong presence */
+    text-align: center;
+    color: #2c3e50; /* A deep, rich gray for better contrast */
+    margin-bottom: 2.5rem; /* More space below the heading */
+    letter-spacing: -0.03em; /* Slightly tighter letter spacing for modern look */
+    line-height: 1.2; /* Better line height for multi-line headings */
+}
+
+/* --- Success and Error Messages --- */
+.Create-Product p {
+    padding: 1rem 1.25rem; /* More padding for messages */
+    margin-bottom: 1.5rem; /* More space below messages */
+    border-radius: 0.5rem; /* Slightly more rounded message boxes */
+    font-weight: 600; /* Bolder text for messages */
+    text-align: center;
+    border-width: 1px; /* Explicitly define border width */
+    font-size: 0.95rem; /* Slightly larger font for readability */
+}
+
+.Create-Product p[style*="color: green"] { /* For success messages */
+    background-color: #e6ffed; /* Lighter green background */
+    color: #2f855a; /* Darker green text */
+    border-color: #48bb78; /* Mid-tone green border */
+}
+
+.Create-Product p[style*="color: red"] { /* For error messages */
+    background-color: #fff5f5; /* Lighter red background */
+    color: #c53030; /* Darker red text */
+    border-color: #fc8181; /* Mid-tone red border */
+}
+
+/* --- Form Field Group Spacing (for overall form structure) --- */
+.Create-Product form > div:not(:last-child) {
+    margin-bottom: 1.5rem; /* Consistent spacing between form groups */
+}
+
+/* --- Labels for Input Fields --- */
+.Product-Name,
+.des,
+.Price,
+.category,
+.Stock-Quantity,
+.Stock-size,
+.Product-Image {
+    display: block;
+    font-size: 0.95rem; /* Slightly larger font size for labels */
+    font-weight: 600; /* Bolder labels for better prominence */
+    color: #4a5568; /* A darker gray for better contrast with input fields */
+    margin-bottom: 0.5rem; /* More space between label and input */
+    line-height: 1.4; /* Improve line height for labels */
+}
+
+/* --- General Input Field Styling (text, number, textarea) --- */
+.P-Name,
+.descrip,
+.Input-price,
+.Category-input,
+.size-input,
+.p-image {
+    width: 100%;
+    padding: 0.75rem 1rem; /* More padding for a taller, more comfortable input */
+    border: 1px solid #e2e8f0; /* A softer, more neutral border color */
+    border-radius: 0.625rem; /* More rounded input fields */
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05); /* Subtle inner shadow for depth */
+    background-color: #fdfdfd; /* A very light off-white background */
+    font-size: 1rem; /* Standard font size for input text */
+    color: #2d3748; /* Darker text color for better readability */
+    line-height: 1.5; /* Ensures consistent line height */
+    box-sizing: border-box;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+/* --- Focus Styles for Inputs and Textareas --- */
+.P-Name:focus,
+.descrip:focus,
+.Input-price:focus,
+.Category-input:focus,
+.size-input:focus,
+.p-image:focus {
+    outline: none; /* Remove default outline */
+    border-color: #4299e1; /* A vibrant blue for focus */
+    box-shadow: 0 0 0 4px rgba(66, 153, 225, 0.3), inset 0 1px 2px rgba(0, 0, 0, 0.05); /* More prominent and softer focus ring */
+    background-color: #ffffff; /* Ensure background is pure white on focus */
+}
+
+/* --- Specific Styling for the 'Stock Quantity by Size' Section --- */
+.Sizes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); /* Adjusted minmax for slightly larger inputs */
+    gap: 1.25rem; /* More space between size input fields */
+    margin-top: 1rem; /* Increased margin from the "Stock Quantity by Size" label */
+}
+
+.Sizes > div {
+    /* If you have a wrapper div for each size input, you can add styles here */
+    /* Example: background-color: #f9fafb; padding: 0.75rem; border-radius: 0.5rem; */
+}
+
+/* --- File Input Specific Adjustments --- */
+.p-image {
+    padding-top: 0.85rem; /* Slightly more vertical padding for file input */
+    padding-bottom: 0.85rem;
+}
+
+/* --- Selected Images Display Text --- */
+/* Targeting by specific classes is usually better than `[style*=""]` for maintainability */
+.selected-images-display { /* Add this class to your p tag in JSX */
+    margin-top: 0.75rem; /* More space above */
+    font-size: 0.8rem; /* Slightly larger font for visibility */
+    color: #718096; /* A good readable gray */
+    font-style: italic; /* Indicate it's descriptive text */
+}
+
+
+/* --- Submit Button --- */
+.Button-2 {
+    width: 100%;
+    display: flex; /* Use flex to easily center content */
+    justify-content: center;
+    align-items: center;
+    padding: 1rem 1.5rem; /* More generous padding for a bigger button */
+    border: none; /* Rely on background and shadow instead of a border */
+    border-radius: 0.75rem; /* More rounded button corners */
+    /* Stronger, more appealing shadow for the button */
+    box-shadow: 0 6px 10px -2px rgba(0, 0, 0, 0.1), 0 3px 5px -1px rgba(0, 0, 0, 0.06);
+    font-size: 1.25rem; /* Larger font size for prominence */
+    font-weight: 700; /* Bolder text */
+    color: #ffffff;
+    background-color: #1a7e5f; /* A deeper, more appealing green */
+    cursor: pointer;
+    transition: background-color 0.25s ease-out, transform 0.1s ease-out, box-shadow 0.25s ease-out; /* Added transform for click effect */
+    letter-spacing: 0.02em; /* Subtle letter spacing */
+    text-transform: uppercase; /* Make the button text uppercase */
+}
+
+.Button-2:hover {
+    background-color: #146147; /* Darker green on hover */
+    transform: translateY(-2px); /* Subtle lift effect */
+    box-shadow: 0 8px 12px -3px rgba(0, 0, 0, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.08); /* Enhanced shadow on hover */
+}
+
+.Button-2:focus {
+    outline: none;
+    box-shadow: 0 0 0 5px rgba(26, 126, 95, 0.4), 0 6px 10px -2px rgba(0, 0, 0, 0.1), 0 3px 5px -1px rgba(0, 0, 0, 0.06); /* More prominent focus ring */
+}
+
+.Button-2:active {
+    transform: translateY(0); /* Press down effect */
+    box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06); /* Reduced shadow on active */
+}
+
+.Button-2:disabled {
+    background-color: #9ae6b4; /* Lighter, muted green for disabled */
+    opacity: 0.7; /* Slightly less opaque */
+    cursor: not-allowed;
+    transform: none; /* No transform when disabled */
+    box-shadow: none; /* No shadow when disabled */
+}
+
+/* --- Media Queries for Responsiveness --- */
+@media (max-width: 768px) {
+    .Create-Product {
+        margin: 1.5rem auto;
+        padding: 2rem;
+        border-radius: 0.75rem;
+    }
+
+    .Create-Product h1 {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .Create-Product p {
+        padding: 0.75rem 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .Product-Name, .des, .Price, .category, .Stock-Quantity, .Stock-size, .Product-Image {
+        font-size: 0.9rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .P-Name, .descrip, .Input-price, .Category-input, .size-input, .p-image {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.95rem;
+        border-radius: 0.5rem;
+    }
+
+    .Sizes {
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Adjust for smaller screens */
+    }
+
+    .Button-2 {
+        padding: 0.8rem 1.2rem;
+        font-size: 1.1rem;
+        border-radius: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .Create-Product {
+        margin: 1rem auto;
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+    }
+
+    .Create-Product h1 {
+        font-size: 1.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .P-Name, .descrip, .Input-price, .Category-input, .size-input, .p-image {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .Button-2 {
+        padding: 0.7rem 1rem;
+        font-size: 1rem;
+    }
+}
+/* Dashboard.css */
+
+/* --- Overall Dashboard Container Styling --- */
+.DashBoard {
+    padding: 3rem; /* More generous padding inside the dashboard card */
+    max-width: 1280px; /* Slightly wider max-width for larger screens */
+    margin: 3rem auto; /* Increased top/bottom margin for more visual separation */
+    background-color: #ffffff;
+    border-radius: 1rem; /* More pronounced rounded corners */
+    /* Enhanced, softer shadow for a floating, premium feel */
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1), 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    box-sizing: border-box; /* Ensures padding and border are included in the element's total width */
+    position: relative; /* For potential future additions like subtle background patterns */
+    overflow: hidden; /* Ensures elements stay within bounds */
+}
+
+/* --- Admin Page Title Styling --- */
+.Admin-page {
+    font-size: 3rem; /* Larger, more impactful title */
+    font-weight: 800; /* Extra bold for strong visual hierarchy */
+    text-align: center;
+    color: #2d3748; /* A darker, more sophisticated charcoal gray */
+    margin-bottom: 2.5rem; /* Increased space below the title */
+    border-bottom: 2px solid #e2e8f0; /* Softer border color */
+    padding-bottom: 1.5rem; /* More padding below the border */
+    letter-spacing: -0.05em; /* Slightly tighter letter spacing for modern appeal */
+    line-height: 1.2; /* Better line height for multi-line titles */
+}
+
+/* --- Grid Container for Dashboard Cards --- */
+.Admin-1 {
+    display: grid;
+    /* Responsive grid: columns will be at least 280px wide, or take up equal space */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem; /* Increased gap between cards */
+    margin-top: 2.5rem; /* Increased margin from the title */
+}
+
+/* --- Individual Dashboard Card Styling --- */
+.For-product,
+.For-order,
+.For-User {
+    background-color: #fcfdfe; /* A very subtle off-white for card backgrounds */
+    padding: 2rem; /* More padding inside each card */
+    border-radius: 0.75rem; /* Consistent rounded corners */
+    /* Softer, more refined shadow for cards */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+    text-align: center;
+    font-size: 1.35rem; /* Slightly larger font for card titles */
+    font-weight: 700; /* Bolder text for card titles */
+    color: #2d3748; /* Default text color for cards */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 150px; /* Increased minimum height for more substantial cards */
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Smooth transitions for hover effects */
+    cursor: pointer; /* Indicate interactivity */
+}
+
+/* --- Hover Effect for Dashboard Cards --- */
+.For-product:hover,
+.For-order:hover,
+.For-User:hover {
+    transform: translateY(-5px); /* Subtle lift effect on hover */
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.12), 0 3px 6px rgba(0, 0, 0, 0.06); /* Enhanced shadow on hover */
+}
+
+/* --- Specific Backgrounds and Colors for Each Card Type --- */
+.For-product {
+    background-color: #ebfef8; /* Lighter, more vibrant green for products */
+    border: 1px solid #68d391; /* Consistent green border */
+    color: #276749; /* Darker green for text */
+}
+
+.For-order {
+    background-color: #ebf8ff; /* Lighter, more vibrant blue for orders */
+    border: 1px solid #63b3ed; /* Consistent blue border */
+    color: #2b6cb0; /* Darker blue for text */
+}
+
+.For-User {
+    background-color: #fffaf0; /* Lighter, subtle orange-red for users */
+    border: 1px solid #fbd38d; /* Consistent orange-red border */
+    color: #975a16; /* Darker orange-red for text */
+}
+
+/* --- Optional: Icon Styling (assuming you use FontAwesome or similar) --- */
+/* Add this if your cards contain icons and you want to style them */
+.For-product .fa-icon,
+.For-order .fa-icon,
+.For-User .fa-icon {
+    font-size: 2.5rem; /* Larger icons */
+    margin-bottom: 0.75rem; /* Space between icon and text */
+    /* Consider using currentColor to inherit text color */
+    color: inherit;
+}
+
+/* --- Basic Responsiveness (already good, but slight tweaks) --- */
+@media (max-width: 992px) { /* Adjust breakpoint for tablets */
+    .DashBoard {
+        padding: 2rem;
+        margin: 2rem auto;
+    }
+    .Admin-page {
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+    }
+    .Admin-1 {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Slightly smaller min-width for tablets */
+        gap: 1.5rem;
+    }
+    .For-product,
+    .For-order,
+    .For-User {
+        padding: 1.5rem;
+        min-height: 130px;
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 768px) { /* Mobile breakpoint */
+    .Admin-page {
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+    }
+    .Admin-1 {
+        grid-template-columns: 1fr; /* Stack cards vertically on smaller phones */
+        gap: 1rem; /* Reduced gap when stacked */
+    }
+    .For-product,
+    .For-order,
+    .For-User {
+        min-height: 100px; /* Reduced min-height for stacked cards */
+        font-size: 1.1rem;
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) { /* Very small mobile devices */
+    .DashBoard {
+        padding: 1rem;
+        margin: 1rem auto;
+    }
+    .Admin-page {
+        font-size: 1.75rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+    }
+    .For-product,
+    .For-order,
+    .For-User {
+        padding: 0.75rem;
+        font-size: 1rem;
+        min-height: 80px;
+    }
+}
+/* EditProduct.css */
+
+/* --- Main Container for Product Edit Form --- */
+.Product-edit {
+    max-width: 850px; /* Slightly wider for more content space */
+    margin: 3rem auto; /* More vertical margin for better visual separation */
+    padding: 3rem; /* More generous internal padding */
+    background-color: #ffffff;
+    border-radius: 1rem; /* More prominent rounded corners */
+    /* Enhanced, multi-layered shadow for a subtle floating effect */
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05), inset 0 0 0 1px rgba(0, 0, 0, 0.03);
+    box-sizing: border-box; /* Ensures padding and border are included in the element's total width */
+    position: relative; /* For potential future additions like subtle background patterns */
+    overflow: hidden; /* Ensures elements stay within bounds */
+}
+
+/* --- Heading Style --- */
+.Product-edit h2 {
+    font-size: 2.5rem; /* Larger and more impactful heading */
+    font-weight: 800; /* Extra bold for strong presence */
+    text-align: center;
+    color: #2c3e50; /* A deep, rich gray for better contrast */
+    margin-bottom: 2.5rem; /* More space below the heading */
+    letter-spacing: -0.03em; /* Slightly tighter letter spacing for a modern look */
+    line-height: 1.2; /* Better line height for clarity */
+}
+
+/* --- Messages (Loading, Error, Not Found) --- */
+.product-loading,
+.loading-error,
+.product-notfound {
+    text-align: center;
+    padding: 1.25rem; /* More padding for message boxes */
+    margin: 2.5rem auto; /* Increased margin for better separation */
+    max-width: 650px; /* Slightly wider for more text */
+    border-radius: 0.75rem; /* Softer rounded corners for messages */
+    font-size: 1.15rem; /* Slightly larger font for readability */
+    font-weight: 600; /* Bolder text for important messages */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Subtle shadow for messages */
+}
+
+.product-loading {
+    background-color: #e0f2fe; /* Light blue */
+    color: #2563eb; /* Darker blue text */
+    border: 1px solid #60a5fa; /* Blue border */
+}
+
+.loading-error,
+.product-notfound {
+    background-color: #fee2e2; /* Light red */
+    color: #b91c1c; /* Darker red text */
+    border: 1px solid #ef4444; /* Red border */
+}
+
+/* --- Form Container --- */
+.Editing {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem; /* Increased gap between form groups */
+}
+
+/* --- Image Preview --- */
+.Editing img {
+    width: 180px; /* Slightly larger image preview */
+    height: 180px; /* Make it square for better aspect ratio consistency */
+    border-radius: 0.75rem; /* More rounded corners for the image */
+    object-fit: cover; /* Ensures image fills the space without distortion */
+    border: 2px solid #e2e8f0; /* Slightly more prominent border */
+    margin-bottom: 1.5rem; /* Increased spacing below the image */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for the image */
+}
+
+/* --- Labels --- */
+.pro-name,
+.pro-price,
+.pro-category,
+.pro-des,
+.Pro-Stock,
+.size-per {
+    display: block;
+    font-size: 0.95rem; /* Slightly larger font size for labels */
+    font-weight: 600; /* Bolder labels for better prominence */
+    color: #4a5568; /* A darker gray for better contrast */
+    margin-bottom: 0.5rem; /* More space between label and input */
+    line-height: 1.4; /* Improve line height for labels */
+}
+
+/* --- Input Fields (text, number, textarea) --- */
+.name-inp,
+.price-inp,
+.category-inp,
+.des-input,
+.inp-size {
+    width: 100%;
+    padding: 0.75rem 1rem; /* More padding for a taller, more comfortable input */
+    border: 1px solid #cbd5e0; /* A softer, more neutral border color */
+    border-radius: 0.625rem; /* More rounded input fields */
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05); /* Subtle inner shadow for depth */
+    background-color: #fdfdfd; /* A very light off-white background */
+    font-size: 1rem; /* Standard font size for input text */
+    color: #2d3748; /* Darker text color for better readability */
+    line-height: 1.5; /* Ensures consistent line height */
+    box-sizing: border-box;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+/* --- Focus Styles for Inputs and Textareas --- */
+.name-inp:focus,
+.price-inp:focus,
+.category-inp:focus,
+.des-input:focus,
+.inp-size:focus {
+    outline: none; /* Remove default outline */
+    border-color: #4299e1; /* A vibrant blue for focus */
+    box-shadow: 0 0 0 4px rgba(66, 153, 225, 0.3), inset 0 1px 2px rgba(0, 0, 0, 0.05); /* More prominent and softer focus ring */
+    background-color: #ffffff; /* Ensure background is pure white on focus */
+}
+
+/* --- Stock per Size section --- */
+.pro-sizes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Adjusted minmax for slightly larger inputs */
+    gap: 1.25rem; /* More space between size input fields */
+    margin-top: 1rem; /* Increased margin from the "Stock per Size" label */
+}
+
+.pro-sizes > div {
+    /* Styles for each individual size input container if needed */
+    /* Example: background-color: #f9fafb; padding: 0.75rem; border-radius: 0.5rem; */
+}
+
+/* --- Update Product Button --- */
+.Upadte-pro {
+    width: 100%;
+    display: flex; /* Use flex to easily center content */
+    justify-content: center;
+    align-items: center;
+    padding: 1rem 1.5rem; /* More generous padding for a bigger button */
+    border: none; /* Rely on background and shadow instead of a border */
+    border-radius: 0.75rem; /* More rounded button corners */
+    /* Stronger, more appealing shadow for the button */
+    box-shadow: 0 6px 10px -2px rgba(0, 0, 0, 0.1), 0 3px 5px -1px rgba(0, 0, 0, 0.06);
+    font-size: 1.25rem; /* Larger font size for prominence */
+    font-weight: 700; /* Bolder text */
+    color: #ffffff;
+    background-color: #1a7e5f; /* A deeper, more appealing green */
+    cursor: pointer;
+    transition: background-color 0.25s ease-out, transform 0.1s ease-out, box-shadow 0.25s ease-out; /* Added transform for click effect */
+    letter-spacing: 0.02em; /* Subtle letter spacing */
+    text-transform: uppercase; /* Make the button text uppercase */
+}
+
+.Upadte-pro:hover {
+    background-color: #146147; /* Darker green on hover */
+    transform: translateY(-2px); /* Subtle lift effect */
+    box-shadow: 0 8px 12px -3px rgba(0, 0, 0, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.08); /* Enhanced shadow on hover */
+}
+
+.Upadte-pro:focus {
+    outline: none;
+    box-shadow: 0 0 0 5px rgba(26, 126, 95, 0.4), 0 6px 10px -2px rgba(0, 0, 0, 0.1), 0 3px 5px -1px rgba(0, 0, 0, 0.06); /* More prominent focus ring */
+}
+
+.Upadte-pro:active {
+    transform: translateY(0); /* Press down effect */
+    box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06); /* Reduced shadow on active */
+}
+
+.Upadte-pro:disabled {
+    background-color: #9ae6b4; /* Lighter, muted green for disabled */
+    opacity: 0.7; /* Slightly less opaque */
+    cursor: not-allowed;
+    transform: none; /* No transform when disabled */
+    box-shadow: none; /* No shadow when disabled */
+}
+
+/* --- Media Queries for Responsiveness --- */
+@media (max-width: 768px) {
+    .Product-edit {
+        margin: 1.5rem auto;
+        padding: 2rem;
+        border-radius: 0.75rem;
+    }
+
+    .Product-edit h2 {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .product-loading,
+    .loading-error,
+    .product-notfound {
+        padding: 1rem;
+        font-size: 1rem;
+        margin: 1.5rem auto;
+    }
+
+    .Editing img {
+        width: 140px;
+        height: 140px;
+        margin-bottom: 1rem;
+    }
+
+    .pro-name, .pro-price, .pro-category, .pro-des, .Pro-Stock, .size-per {
+        font-size: 0.9rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .name-inp, .price-inp, .category-inp, .des-input, .inp-size {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.95rem;
+        border-radius: 0.5rem;
+    }
+
+    .pro-sizes {
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); /* Adjust for smaller screens */
+    }
+
+    .Upadte-pro {
+        padding: 0.8rem 1.2rem;
+        font-size: 1.1rem;
+        border-radius: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .Product-edit {
+        margin: 1rem auto;
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+    }
+
+    .Product-edit h2 {
+        font-size: 1.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .Editing img {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 0.75rem;
+    }
+
+    .name-inp, .price-inp, .category-inp, .des-input, .inp-size {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .Upadte-pro {
+        padding: 0.7rem 1rem;
+        font-size: 1rem;
+    }
+}
+/* OrderDetails.css */
+
+/* --- Main Container for Order Details --- */
+.Order-Details {
+    max-width: 960px; /* Increased max-width for more content space */
+    margin: 3rem auto; /* More vertical margin for better visual separation */
+    padding: 3rem; /* More generous internal padding */
+    background-color: #ffffff;
+    border-radius: 1rem; /* More prominent rounded corners */
+    /* Enhanced, multi-layered shadow for a subtle floating effect */
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05), inset 0 0 0 1px rgba(0, 0, 0, 0.03);
+    box-sizing: border-box; /* Ensures padding and border are included in the element's total width */
+    position: relative; /* For potential future additions */
+    overflow: hidden; /* Ensures elements stay within bounds */
+}
+
+/* --- Section Heading: Order Details Title --- */
+.Details {
+    font-size: 2.8rem; /* Larger, more impactful title */
+    font-weight: 800; /* Extra bold for strong presence */
+    text-align: center;
+    color: #2c3e50; /* A deep, rich gray for better contrast */
+    margin-bottom: 2.5rem; /* More space below the heading */
+    border-bottom: 2px solid #e2e8f0; /* Softer border color */
+    padding-bottom: 1.5rem; /* More padding below the border */
+    letter-spacing: -0.04em; /* Slightly tighter letter spacing for modern appeal */
+    line-height: 1.2; /* Better line height for clarity */
+}
+
+/* --- Messages (Loading, Error, Not Found) --- */
+.Order-loading,
+.loading-error,
+.order-notfound {
+    text-align: center;
+    padding: 1.25rem; /* More padding for message boxes */
+    margin: 2.5rem auto; /* Increased margin for better separation */
+    max-width: 700px; /* Slightly wider for more text */
+    border-radius: 0.75rem; /* Softer rounded corners for messages */
+    font-size: 1.15rem; /* Slightly larger font for readability */
+    font-weight: 600; /* Bolder text for important messages */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Subtle shadow for messages */
+}
+
+.Order-loading {
+    background-color: #e0f2fe; /* Light blue */
+    color: #2563eb; /* Darker blue text */
+    border: 1px solid #60a5fa; /* Blue border */
+}
+
+.loading-error,
+.order-notfound {
+    background-color: #fee2e2; /* Light red */
+    color: #b91c1c; /* Darker red text */
+    border: 1px solid #ef4444; /* Red border */
+}
+
+/* --- Customer Information Section --- */
+.Info {
+    background-color: #fcfdfe; /* Very subtle off-white for card backgrounds */
+    padding: 2rem; /* More generous padding */
+    border-radius: 0.75rem; /* Consistent rounded corners */
+    margin-bottom: 2.5rem; /* More space below this section */
+    border: 1px solid #e2e8f0; /* Softer border */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Slightly stronger shadow */
+}
+
+.Cust-info {
+    font-size: 1.8rem; /* Larger heading for this section */
+    font-weight: 700; /* Bolder */
+    color: #2d3748; /* Darker gray for better contrast */
+    margin-bottom: 1.25rem; /* More space below heading */
+    border-bottom: 1px dashed #cbd5e0; /* Softer dashed border */
+    padding-bottom: 0.75rem; /* More padding below dashed line */
+}
+
+.Info p {
+    margin-bottom: 0.75rem; /* More space between info lines */
+    font-size: 1.05rem; /* Slightly larger font for readability */
+    color: #4a5568; /* Mid-tone gray */
+    line-height: 1.6; /* Better line height */
+}
+
+/* --- Specific Strong Tags for Info Labels --- */
+.Cust-Name,
+.Cust-Phone,
+.Cust-Address,
+.Cust-OrderDate,
+.Status {
+    font-weight: 700; /* Bolder labels */
+    color: #2d3748; /* Darker gray for labels */
+    margin-right: 0.75rem; /* More space between label and value */
+}
+
+/* --- Order Status Styling --- */
+.Status {
+    display: flex; /* Use flexbox to align status text and value */
+    align-items: center;
+}
+
+.Status span {
+    font-weight: 700; /* Bolder status value */
+    text-transform: capitalize; /* Capitalize the first letter of the status */
+}
+
+.Status .text-green-600 {
+    color: #16a34a; /* More vibrant green */
+}
+.Status .text-red-600 {
+    color: #dc2626; /* Standard red */
+}
+.Status .text-blue-600 {
+    color: #2563eb; /* Standard blue */
+}
+/* Add more status colors if needed, e.g., for pending or shipped */
+.Status .text-yellow-600 {
+    color: #d97706; /* Yellow for pending/processing */
+}
+.Status .text-purple-600 {
+    color: #7c3aed; /* Purple for shipped */
+}
+
+
+/* --- Ordered Items Section --- */
+.Order-items {
+    font-size: 1.8rem; /* Larger heading for this section */
+    font-weight: 700; /* Bolder */
+    color: #2d3748; /* Darker gray */
+    margin-bottom: 1.5rem; /* More space below heading */
+    border-bottom: 1px dashed #cbd5e0; /* Softer dashed border */
+    padding-bottom: 0.75rem; /* More padding below dashed line */
+}
+
+.Order-details {
+    list-style: none; /* Remove default list bullets */
+    padding: 0;
+    margin: 0;
+}
+
+.Cust-id {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem; /* Increased gap between item details */
+    padding: 1.25rem 0; /* More vertical padding for each item */
+    border-bottom: 1px solid #e9ecef; /* Lighter, more subtle border */
+}
+
+.Cust-id:last-child {
+    border-bottom: none; /* No border for the last item */
+}
+
+.Cust-image {
+    width: 90px; /* Slightly larger image */
+    height: 90px; /* Keep it square */
+    object-fit: cover;
+    border-radius: 0.5rem; /* More rounded image corners */
+    border: 1px solid #e2e8f0; /* Softer border */
+    flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); /* Subtle shadow for images */
+}
+
+.More-cus-info {
+    flex-grow: 1;
+}
+
+.More-cus-info p {
+    margin-bottom: 0.35rem; /* More space between sub-details */
+    font-size: 1rem; /* Slightly larger font */
+    color: #4b5563; /* Mid-tone gray */
+}
+
+.More-cus-info .more-name {
+    font-weight: 700; /* Bolder product name */
+    color: #1f2937; /* Darker text */
+    font-size: 1.2rem; /* Larger product name */
+    margin-bottom: 0.5rem;
+}
+
+.More-cus-info .more-size,
+.More-cus-info .more-qty { /* Added .more-qty assuming quantity is also displayed */
+    font-size: 0.95rem; /* Slightly larger font */
+    color: #6b7280; /* Lighter gray for secondary info */
+}
+
+.More-cus-info .more-size span,
+.More-cus-info .more-qty span, /* Apply to quantity as well */
+.More-cus-info .more-price span {
+    font-weight: 600; /* Bolder values */
+    color: #374151; /* Darker value color */
+}
+
+.more-item-price {
+    font-size: 1.25rem; /* Larger price */
+    font-weight: 700; /* Bolder price */
+    color: #1f2937; /* Darker text */
+    margin-left: 1.5rem; /* More space from item info */
+    flex-shrink: 0;
+    text-align: right; /* Align total price to the right */
+}
+
+
+/* --- Total Amount --- */
+.order-reduce {
+    text-align: right;
+    font-size: 1.8rem; /* Larger total amount */
+    font-weight: 800; /* Extra bold for total */
+    color: #065f46; /* Stronger green for total */
+    margin-top: 2rem; /* More space above total */
+    padding-top: 1.5rem; /* More padding above border */
+    border-top: 2px solid #e2e8f0; /* Softer border color */
+}
+
+/* --- Responsiveness --- */
+@media (max-width: 992px) { /* Tablets and larger phones */
+    .Order-Details {
+        padding: 2rem;
+        margin: 2rem auto;
+    }
+    .Details {
+        font-size: 2.2rem;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+    }
+    .Info, .Order-items {
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .Cust-info, .Order-items {
+        font-size: 1.6rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+    }
+    .Info p {
+        font-size: 0.95rem;
+        margin-bottom: 0.6rem;
+    }
+    .Cust-id {
+        gap: 1rem;
+        padding: 1rem 0;
+    }
+    .Cust-image {
+        width: 70px;
+        height: 70px;
+    }
+    .More-cus-info .more-name {
+        font-size: 1.1rem;
+    }
+    .More-cus-info .more-size,
+    .More-cus-info .more-qty {
+        font-size: 0.85rem;
+    }
+    .more-item-price {
+        font-size: 1.1rem;
+        margin-left: 1rem;
+    }
+    .order-reduce {
+        font-size: 1.5rem;
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+    }
+}
+
+@media (max-width: 768px) { /* Smaller tablets and large phones */
+    .Order-Details {
+        padding: 1.5rem;
+        margin: 1.5rem auto;
+    }
+    .Details {
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+    }
+    .Info, .Order-items {
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .Cust-info, .Order-items {
+        font-size: 1.4rem;
+    }
+    .Cust-id {
+        flex-direction: column; /* Stack image and info vertically */
+        align-items: center;
+        text-align: center;
+        gap: 0.75rem;
+    }
+    .Cust-image {
+        margin-bottom: 0.5rem;
+    }
+    .More-cus-info {
+        flex-basis: 100%;
+        text-align: center;
+    }
+    .more-item-price {
+        flex-basis: 100%;
+        text-align: center;
+        margin-left: 0;
+        margin-top: 0.75rem;
+    }
+    .order-reduce {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 480px) { /* Very small phones */
+    .Order-Details {
+        padding: 1rem;
+        margin: 1rem auto;
+    }
+    .Details {
+        font-size: 1.75rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+    }
+    .Info p {
+        font-size: 0.9rem;
+    }
+    .Cust-image {
+        width: 60px;
+        height: 60px;
+    }
+    .More-cus-info .more-name {
+        font-size: 1rem;
+    }
+    .More-cus-info .more-size,
+    .More-cus-info .more-qty {
+        font-size: 0.8rem;
+    }
+    .more-item-price {
+        font-size: 1rem;
+    }
+    .order-reduce {
+        font-size: 1.1rem;
+    }
+}
+/* product-list-container.css (renamed for clarity, assuming a dedicated file) */
+
+/* --- Overall Container --- */
+.product-list-container {
+    padding: 30px; /* More generous padding */
+    background-color: #f0f2f5; /* Softer, lighter background */
+    min-height: calc(100vh - 60px); /* Adjust based on your header/footer height */
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif; /* Modern, clean font (or 'Roboto', 'Open Sans') */
+    color: #34495e; /* Darker, sophisticated text color */
+}
+
+/* --- Header Section (Title and Add Button) --- */
+.product-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px; /* Increased bottom margin */
+    flex-wrap: wrap;
+    gap: 20px; /* Increased gap */
+}
+
+.product-list-title {
+    font-size: 2.5rem; /* Larger, more impactful title */
+    color: #2c3e50; /* A deep, rich gray */
+    font-weight: 700; /* Bolder */
+    text-transform: capitalize; /* Capitalize instead of uppercase for a softer look */
+    letter-spacing: -0.02em; /* Slightly tighter letter spacing */
+    margin: 0;
+    line-height: 1.2;
+}
+
+.add-product-button {
+    background-color: #28a745; /* Standard green */
+    color: white;
+    padding: 14px 30px; /* More padding for a bigger button */
+    border: none;
+    border-radius: 10px; /* More rounded corners */
+    font-size: 1.05rem; /* Slightly larger font */
+    font-weight: 600; /* Semibold */
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Stronger shadow */
+    cursor: pointer;
+}
+
+.add-product-button:hover {
+    background-color: #218838;
+    transform: translateY(-2px); /* More noticeable lift effect */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+}
+
+/* --- Search Bar --- */
+.product-search-bar {
+    display: flex;
+    gap: 15px; /* Increased gap */
+    margin-bottom: 40px; /* Increased bottom margin */
+    flex-wrap: wrap;
+    align-items: center; /* Vertically align items */
+}
+
+.search-input {
+    flex-grow: 1;
+    padding: 14px 18px; /* More padding */
+    border: 1px solid #dcdcdc; /* Softer border */
+    border-radius: 10px; /* More rounded */
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    min-width: 250px; /* Ensure input is not too narrow */
+    color: #34495e; /* Consistent text color */
+}
+
+.search-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.2); /* Softer glow effect */
+}
+
+.search-button {
+    background-color: #007bff; /* Standard blue */
+    color: white;
+    padding: 14px 28px; /* Consistent padding */
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.search-button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* --- Loading and Error Messages --- */
+.loading-message,
+.error-message {
+    text-align: center;
+    font-size: 1.3rem; /* Larger font */
+    color: #555;
+    margin-top: 60px; /* More top margin */
+    padding: 25px; /* More padding */
+    background-color: #fff;
+    border-radius: 10px; /* More rounded */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Stronger shadow */
+    border: 1px solid #eee; /* Subtle border */
+}
+
+.error-message {
+    color: #dc3545; /* Standard red */
+    font-weight: bold;
+}
+
+/* --- Product Table Styling --- */
+.product-table-wrapper {
+    background-color: #fff;
+    border-radius: 12px; /* Even more rounded corners */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08); /* More prominent shadow */
+    overflow-x: auto;
+    margin-bottom: 40px; /* Increased bottom margin */
+    border: 1px solid #e0e0e0; /* Light border around the wrapper */
+}
+
+.product-table {
+    width: 100%;
+    border-collapse: separate; /* Use separate to allow border-spacing */
+    border-spacing: 0; /* No space between cells */
+    font-size: 0.98rem; /* Slightly larger font for table text */
+}
+
+.product-table-th,
+.product-table-td {
+    padding: 18px 25px; /* More padding for cells */
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0; /* Lighter border for rows */
+    vertical-align: middle;
+}
+
+.product-table thead {
+    background-color: #eaf1f8; /* Softer light blue for header */
+}
+
+.product-table-header-row th {
+    color: #5d6d7e; /* A slightly darker blue-gray for headers */
+    font-weight: 700; /* Bolder headers */
+    text-transform: uppercase;
+    font-size: 0.88rem; /* Slightly larger header font */
+    letter-spacing: 0.8px; /* More letter spacing for headers */
+}
+
+/* Table row hover effect */
+.product-table tbody tr.product-table-row {
+    transition: background-color 0.2s ease;
+}
+.product-table tbody tr.product-table-row:hover {
+    background-color: #f7f9fc; /* Very light background on row hover */
+}
+
+/* Specific column widths/alignments (adjust as needed) */
+.product-image-col { width: 8%; text-align: center; } /* Reduced width for image */
+.product-name-col { width: 35%; }
+.product-price-col { width: 12%; }
+.product-category-col { width: 15%; } /* Added category column */
+.product-stock-col { width: 10%; text-align: center; } /* Added stock column */
+.product-actions-col { width: 20%; text-align: center; } /* Adjusted actions width */
+
+
+/* Product Image in table cell */
+.product-image-cell {
+    text-align: center;
+}
+
+.product-thumbnail {
+    width: 60px; /* Slightly larger thumbnail */
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px; /* More rounded */
+    border: 1px solid #e0e0e0; /* Softer border */
+    display: block;
+    margin: 0 auto;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); /* Subtle shadow */
+}
+
+.no-products-found {
+    text-align: center;
+    padding: 30px; /* More padding */
+    color: #7f8c8d; /* Softer gray */
+    font-style: italic;
+    font-size: 1.1rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Action buttons in table */
+.product-action-buttons {
+    display: flex;
+    gap: 12px; /* More space between buttons */
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.edit-product-button,
+.delete-product-button {
+    padding: 9px 18px; /* More padding for touch targets */
+    border: none;
+    border-radius: 6px; /* Slightly more rounded */
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600; /* Semibold */
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.edit-product-button {
+    background-color: #007bff;
+    color: white;
+}
+
+.edit-product-button:hover {
+    background-color: #0056b3;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.delete-product-button {
+    background-color: #dc3545;
+    color: white;
+}
+
+.delete-product-button:hover {
+    background-color: #c82333;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Pagination controls */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 35px; /* More top margin */
+    padding: 15px; /* More padding */
+    background-color: #fff;
+    border-radius: 10px; /* More rounded */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); /* Stronger shadow */
+    border: 1px solid #e0e0e0; /* Subtle border */
+}
+
+.pagination-button {
+    background-color: #f7f9fc; /* Softer default background */
+    color: #667788; /* Softer text color */
+    border: 1px solid #e0e0e0; /* Softer border */
+    padding: 12px 22px; /* More padding */
+    margin: 0 10px; /* More margin */
+    border-radius: 8px; /* More rounded */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600; /* Semibold */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+}
+
+.pagination-button:hover:not(:disabled) {
+    background-color: #eef2f7; /* Lighter hover */
+    border-color: #c5d0db; /* Slightly darker border */
+    transform: translateY(-1px); /* Subtle lift */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+}
+
+.pagination-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #eff3f7; /* Lighter background when disabled */
+    color: #aebcce; /* Dimmer text when disabled */
+    box-shadow: none;
+    transform: none;
+}
+
+.pagination-info {
+    font-size: 1.05rem; /* Slightly larger font */
+    color: #7f8c8d; /* Softer gray */
+    margin: 0 20px; /* More margin */
+}
+
+.current-page-number,
+.total-pages-number {
+    font-weight: 700; /* Bolder numbers */
+    color: #34495e; /* Darker text */
+}
+
+
+/* --- Responsive Adjustments for Product List --- */
+@media (max-width: 992px) { /* Tablets */
+    .product-list-container {
+        padding: 25px;
+    }
+    .product-list-title {
+        font-size: 2.2rem;
+    }
+    .add-product-button {
+        padding: 12px 25px;
+    }
+    .product-search-bar {
+        margin-bottom: 30px;
+    }
+    .search-input, .search-button {
+        padding: 12px 15px;
+    }
+    .product-table-wrapper {
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.07);
+    }
+    .product-table-th, .product-table-td {
+        padding: 15px 20px;
+        font-size: 0.9rem;
+    }
+    .product-table-header-row th {
+        font-size: 0.8rem;
+    }
+    .product-thumbnail {
+        width: 55px;
+        height: 55px;
+    }
+    .edit-product-button, .delete-product-button {
+        padding: 7px 12px;
+        font-size: 0.85rem;
+    }
+    .pagination-button {
+        padding: 10px 18px;
+    }
+    .pagination-info {
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 768px) { /* Smaller tablets and phones */
+    .product-list-container {
+        padding: 20px;
+    }
+    .product-list-title {
+        font-size: 2rem;
+        text-align: center;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    .product-list-header {
+        flex-direction: column;
+        justify-content: center;
+        gap: 15px;
+    }
+    .add-product-button {
+        width: 100%;
+        max-width: 300px; /* Limit width even when full-width */
+        margin: 0 auto;
+    }
+    .product-search-bar {
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    .search-input,
+    .search-button {
+        width: 100%;
+        max-width: 300px; /* Limit width for search elements */
+        margin: 0 auto;
+    }
+
+    /* --- Table specific responsive styles --- */
+    /* Hide table headers on small screens visually */
+    .product-table thead {
+        border: 0;
+        clip: rect(0 0 0 0);
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        width: 1px;
+    }
+
+    .product-table,
+    .product-table tbody,
+    .product-table tr,
+    .product-table-td {
+        display: block;
+        width: 100%;
+    }
+
+    .product-table-row {
+        margin-bottom: 20px; /* More space between cards */
+        border: 1px solid #e0e0e0;
+        border-radius: 10px; /* More rounded card corners */
+        padding: 15px; /* More padding inside the card */
+        background-color: #fff;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Enhanced shadow */
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .product-table-td {
+        border-bottom: 1px solid #f0f0f0; /* Softer separator between cells */
+        text-align: left;
+        padding: 12px 0; /* Adjust padding for mobile cells */
+        position: relative;
+        padding-left: 120px; /* Creates space for the data-label */
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .product-table-row .product-table-td:last-child {
+        border-bottom: none;
+    }
+
+    .product-table-td::before {
+        content: attr(data-label);
+        font-weight: 700; /* Bolder label */
+        text-transform: uppercase;
+        margin-right: 10px;
+        display: inline-block;
+        width: 105px; /* Fixed width for the label */
+        text-align: left;
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #7f8c8d; /* Softer gray label */
+        font-size: 0.85rem; /* Smaller label font */
+    }
+
+    /* Specific adjustments for image cell on mobile */
+    .product-image-cell {
+        width: 100%;
+        text-align: center;
+        padding-left: 0;
+        order: -1;
+        margin-bottom: 15px; /* More space below image */
+        border-bottom: 1px solid #f0f0f0;
+        padding-bottom: 15px;
+    }
+
+    .product-image-cell::before {
+        content: none;
+    }
+
+    .product-thumbnail {
+        margin: 0 auto;
+        width: 70px; /* Larger image on mobile */
+        height: 70px;
+    }
+
+    /* Specific adjustments for action buttons cell on mobile */
+    .product-actions-cell {
+        width: 100%;
+        text-align: center;
+        padding-left: 0;
+        border-bottom: none;
+        padding-top: 15px;
+    }
+    .product-actions-cell::before {
+        content: none;
+    }
+    .product-action-buttons {
+        width: 100%;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .edit-product-button,
+    .delete-product-button {
+        flex-grow: 1;
+        padding: 12px; /* More touch-friendly padding */
+        font-size: 0.95rem;
+    }
+
+    /* Pagination */
+    .pagination-container {
+        flex-direction: column; /* Stack pagination items */
+        gap: 15px;
+        padding: 15px;
+    }
+
+    .pagination-button {
+        width: 100%;
+        margin: 0; /* Remove horizontal margin */
+        min-width: unset; /* Remove min-width constraint */
+        padding: 12px 15px;
+    }
+
+    .pagination-info {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) { /* Very small screens (e.g., mobile portrait, less than 480px) */
+    .product-list-container {
+        padding: 15px;
+    }
+    .product-list-title {
+        font-size: 1.8rem;
+    }
+    .add-product-button {
+        padding: 10px 20px;
+        font-size: 0.95rem;
+    }
+    .search-input, .search-button {
+        padding: 10px 12px;
+        font-size: 0.95rem;
+    }
+   
+    .product-table-td::before {
+        width: 90px; /* Adjust label width */
+    }
+    .product-thumbnail {
+        width: 90px;
+        height: 90px;
+    }
+    .edit-product-button, .delete-product-button {
+        font-size: 0.85rem;
+        padding: 8px;
+    }
+    .pagination-button {
+        font-size: 0.9rem;
+    }
+    .pagination-info {
+        font-size: 0.85rem;
+    }
+}
+/* Admin Navbar Container */
+.Admin-Navbar {
+    background-color: #333; /* Dark background for the navbar */
+    padding: 15px 20px;
+    display: flex;
+    justify-content: center; /* Center links horizontally by default */
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    position: relative; /* Needed for positioning the menu toggle and mobile menu */
+    height: 60px; /* Fixed height for the navbar */
+}
+
+/* Menu Toggle (Hamburger Icon) */
+.menu-toggle {
+    display: none; /* Hidden by default, shown only on mobile */
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    position: absolute; /* Position relative to .Admin-Navbar */
+    right: 20px; /* Align to the right */
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1001; /* Ensure it's above other content */
+}
+
+.hamburger-line {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background-color: #f0f0f0;
+    margin: 5px 0;
+    transition: all 0.3s ease;
+}
+
+/* Hide Hamburger on large screens */
+@media (min-width: 769px) {
+    .menu-toggle {
+        display: none;
+    }
+}
+
+
+/* Nav Links Container */
+.nav-links-container {
+    display: flex; /* Flex row by default for desktop */
+    justify-content: center;
+    align-items: center;
+    gap: 25px; /* Space between navigation links */
+    width: 100%; /* Take full width on desktop */
+}
+
+/* NavLink Styling */
+.Admin-Navbar a {
+    color: #f0f0f0; /* Light text color for links */
+    text-decoration: none; /* Remove underline */
+    font-size: 1.05rem;
+    font-weight: 500;
+    padding: 8px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.1s ease;
+    white-space: nowrap; /* Prevent text from wrapping within a link */
+}
+
+/* Hover state for NavLinks */
+.Admin-Navbar a:hover {
+    background-color: #555; /* Slightly lighter background on hover */
+    color: #fff;
+    transform: translateY(-1px); /* Slight lift effect */
+}
+
+/* Active NavLink state (when the current route matches) */
+.Admin-Navbar a.active {
+    background-color: #007bff; /* Blue background for the active link */
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 2px 7px rgba(0, 123, 255, 0.3); /* Subtle glow for active link */
+}
+
+.Admin-Navbar a.active:hover {
+    background-color: #0056b3; /* Darker blue on hover for active link */
+}
+
+
+@media (max-width: 768px) {
+    .Admin-Navbar {
+        justify-content: flex-start; /* Align content to the start on mobile */
+        padding: 15px 20px; /* Keep padding consistent */
+    }
+
+    /* Show the hamburger menu toggle */
+    .menu-toggle {
+        display: block; /* Show hamburger */
+    }
+
+    /* Styles for the slide-out navigation container */
+    .nav-links-container {
+        position: fixed; /* Fixed position for slide-out effect */
+        top: 0;
+        right: -300px; /* Start off-screen to the right (adjust width as needed) */
+        width: 250px; /* Width of the slide-out menu */
+        height: 100vh; /* Full viewport height */
+        background-color: #444; /* Background for the slide-out menu */
+        flex-direction: column; /* Stack links vertically */
+        justify-content: flex-start; /* Align links to the top */
+        padding-top: 80px; /* Space for a potential header/close button */
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3); /* Shadow for slide-out effect */
+        transition: right 0.3s ease-in-out; /* Smooth slide transition */
+        z-index: 1000; /* Ensure it's above page content but below toggle button */
+        gap: 15px; /* Adjust gap between stacked links */
+        box-sizing: border-box; /* Include padding in width */
+    }
+
+    /* State when the menu is open */
+    .nav-links-container.open {
+        right: 0; /* Slide into view */
+    }
+
+    /* Styles for individual links within the slide-out menu */
+    .nav-links-container a {
+        width: calc(100% - 40px); /* Full width minus side padding */
+        padding: 12px 20px;
+        text-align: left; /* Align text to the left */
+        color: #f0f0f0; /* Ensure link color is visible on dark background */
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Subtle separator */
+        font-size: 1.1rem;
+    }
+
+    .nav-links-container a:last-child {
+        border-bottom: none; /* No border for the last item */
+    }
+
+    .nav-links-container a:hover,
+    .nav-links-container a.active {
+        background-color: #555; /* Adjust hover/active background for the slide-out menu */
+        color: #fff;
+    }
+
+    /* Optionally, style the hamburger icon when the menu is open (e.g., to an X) */
+    /* This requires more complex CSS transforms, but here's a basic idea */
+    .menu-toggle.open .hamburger-line:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 5px);
+    }
+    .menu-toggle.open .hamburger-line:nth-child(2) {
+        opacity: 0;
+    }
+    .menu-toggle.open .hamburger-line:nth-child(3) {
+        transform: rotate(-45deg) translate(5px, -5px);
+    }
+}
+
+/* Even smaller screens (e.g., mobile portrait) */
+@media (max-width: 480px) {
+    .Admin-Navbar {
+        padding: 10px 15px;
+        height: 50px;
+    }
+    .menu-toggle {
+        right: 15px;
+    }
+    .nav-links-container {
+        width: 220px; /* Slightly narrower menu for very small screens */
+    }
+    .nav-links-container a {
+        font-size: 1rem;
+        padding: 10px 15px;
+    }
+}
+
+/* General Container */
+.Order-details {
+    padding: 25px;
+    background-color: #f8f8f8;
+    min-height: calc(100vh - 60px); /* Adjust based on your header/footer */
+    font-family: 'Roboto', sans-serif;
+    color: #333;
+    box-sizing: border-box;
+}
+
+/* Page Title */
+.o-list {
+    font-size: 2.5rem;
+    color: #333;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 30px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.o-list::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background-color: #007bff;
+    border-radius: 2px;
+}
+
+/* Message for no orders, loading, and error */
+.Order-details > p { /* Targets the direct paragraph child of Order-details */
+    text-align: center;
+    font-size: 1.2rem;
+    color: #777;
+    margin-top: 40px;
+}
+
+.Load-order,
+.error-order {
+    text-align: center;
+    font-size: 1.3rem;
+    padding: 30px;
+    margin-top: 50px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.error-order {
+    color: #dc3545; /* Red for error messages */
+    font-weight: bold;
+}
+
+/* Table Wrapper */
+.pro-order-list {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow-x: auto; /* Allows horizontal scrolling for table on small screens */
+    margin-top: 20px;
+}
+
+/* Table Styling */
+.order-table { /* Typo fixed to .order-table if you meant that in JSX too */
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+.order-table-list th,
+.order-table-list td {
+    padding: 18px 25px;
+    text-align: left;
+    border-bottom: 1px solid #eee; /* Light separator */
+    vertical-align: middle;
+}
+
+.order-table-list thead {
+    background-color: #e6f0ff; /* Light blue header background */
+}
+
+.order-table-list th {
+    color: #444;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+/* Column Specific Widths (Adjust as needed) */
+.order-pro-img { width: 15%; text-align: center; }
+.order-cust-name { width: 20%; }
+.order-list { width: 10%; text-align: center; } /* For Total Items */
+.order-total-amount { width: 15%; }
+.order-status { width: 15%; text-align: center; }
+.order-action { width: 25%; text-align: center; }
+
+
+/* Table Body Row Hover Effect */
+.order-table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* Product Image in Table */
+.order-img {
+    text-align: center; /* Centers the image */
+}
+
+.ord-img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    display: block;
+    margin: 0 auto; /* Centers the image */
+}
+
+.order-no-img {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0;
+    color: #999;
+    font-size: 0.75rem;
+    border-radius: 8px;
+    margin: 0 auto;
+    text-align: center;
+    line-height: 1.2;
+}
+
+/* Status Badges */
+.order-current-status {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: inline-block; /* Allows padding and margin to work */
+    text-transform: capitalize;
+}
+
+.deliverd-order {
+    background-color: #d4edda; /* Light green */
+    color: #155724; /* Dark green text */
+}
+
+.cancelled-order {
+    background-color: #f8d7da; /* Light red */
+    color: #721c24; /* Dark red text */
+}
+
+/* Default status if not delivered/cancelled */
+.bg-blue-100 { /* Example for other statuses, using a similar blue as in Tailwind */
+    background-color: #cfe2ff;
+    color: #0d6efd;
+}
+
+/* Action Buttons */
+.order-admin {
+    display: flex;
+    gap: 10px;
+    justify-content: center; /* Center buttons horizontally */
+    flex-wrap: wrap; /* Allow buttons to wrap */
+}
+
+.order-view,
+.order-delivered {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none; /* For Link component */
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.order-view {
+    background-color: #007bff; /* Blue */
+    color: white;
+}
+
+.order-view:hover {
+    background-color: #0056b3;
+    transform: translateY(-1px);
+}
+
+.order-delivered {
+    background-color: #28a745; /* Green */
+    color: white;
+}
+
+.order-delivered:hover {
+    background-color: #218838;
+    transform: translateY(-1px);
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    flex-wrap: wrap; /* Allow page numbers to wrap */
+    gap: 10px; /* Space between buttons */
+}
+
+.page-number {
+    background-color: #f0f0f0;
+    color: #555;
+    border: 1px solid #ddd;
+    padding: 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    min-width: 40px; /* Ensure buttons have minimum width */
+    text-align: center;
+}
+
+.page-number:hover:not(.more-than-one) { /* Apply hover only if not active */
+    background-color: #e0e0e0;
+    border-color: #ccc;
+}
+
+.page-number.more-than-one { /* Active page number */
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+.page-number.more-than-one:hover { /* Active page number hover */
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 992px) {
+    .order-table-list th,
+    .order-table-list td {
+        padding: 15px 20px;
+    }
+    .o-list {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .o-list {
+        font-size: 1.8rem;
+        margin-bottom: 25px;
+    }
+
+    .pro-order-list {
+        margin-top: 15px;
+    }
+
+    /* Hide table headers on small screens visually */
+    .order-table thead {
+        border: 0;
+        clip: rect(0 0 0 0);
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        width: 1px;
+    }
+
+    .order-table,
+    .order-table tbody,
+    .order-table tr,
+    .order-table-list td { /* Note: your <td> is within .order-table-list */
+        display: block; /* Make table elements behave like block-level elements */
+        width: 100%;
+    }
+
+    .order-table tbody tr { /* This targets the actual <tr> for the card effect */
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 10px;
+        background-color: #fff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column; /* Stack cells vertically */
+        align-items: flex-start;
+    }
+
+    .order-table-list td {
+        border-bottom: 1px solid #eee; /* Add separator between cells in card view */
+        text-align: left;
+        padding: 10px 0;
+        position: relative;
+        padding-left: 140px; /* Space for the data-label */
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Remove last border in the card */
+    .order-table tbody tr td:last-child {
+        border-bottom: none;
+    }
+
+    /* Data Label for Mobile View */
+    .order-table-list td::before {
+        content: attr(data-label); /* Displays the content of the data-label attribute from JSX */
+        font-weight: bold;
+        text-transform: uppercase;
+        display: block; /* Make label a block to take full left space */
+        width: 120px; /* Fixed width for the label */
+        text-align: left;
+        position: absolute;
+        left: 10px;
+        top: 50%; /* Vertically center */
+        transform: translateY(-50%);
+        color: #555;
+        font-size: 0.8rem;
+        white-space: nowrap; /* Prevent label text from wrapping */
+    }
+
+    /* Specific Adjustments for Image Cell */
+    .order-img {
+        width: 100%;
+        text-align: center;
+        padding-left: 0; /* No label needed, remove padding */
+        order: -1; /* Place image at the top of the card */
+        margin-bottom: 10px;
+        border-bottom: 1px solid #eee; /* Separator below image */
+        padding-bottom: 10px;
+    }
+
+    .order-img::before {
+        content: none; /* Hide data-label for image cell */
+    }
+
+    /* Specific Adjustments for Action Cell */
+    .order-action {
+        width: 100%;
+        text-align: center;
+        padding-left: 0;
+        border-bottom: none; /* No border for the last element in the card */
+        padding-top: 15px;
+    }
+
+    .order-action::before {
+        content: none; /* Hide data-label for action cell */
+    }
+
+    .order-admin {
+        width: 100%;
+        justify-content: center;
+        gap: 8px; /* Slightly smaller gap for buttons */
+    }
+
+    .order-view,
+    .order-delivered {
+        flex-grow: 1; /* Allow buttons to grow to fill space */
+        padding: 10px 15px;
+    }
+
+    .pagination {
+        margin-top: 25px;
+        padding: 12px;
+    }
+    .page-number {
+        padding: 8px 15px;
+        min-width: 35px;
+    }
+}
+
+@media (max-width: 480px) {
+    .Order-details {
+        padding: 15px;
+    }
+    .o-list {
+        font-size: 1.6rem;
+    }
+    .order-table-list td {
+        padding-left: 120px; /* Adjust padding for very small screens */
+    }
+    .order-table-list td::before {
+        width: 100px; /* Adjust label width */
+        font-size: 0.75rem;
+    }
+    .order-view,
+    .order-delivered {
+        font-size: 0.85rem;
+        padding: 8px 12px;
+    }
+    .pagination {
+        padding: 10px;
+    }
+    .page-number {
+        font-size: 0.9rem;
+    }
+}
+
+/* --- Root Variables (for global theming - keep these consistent across your app) --- */
+:root {
+    /* Colors */
+    --primary-blue: #007bff;
+    --primary-blue-dark: #0056b3;
+    --green-success: #28a745;
+    --green-success-dark: #218838;
+    --red-error: #dc3545;
+    --dark-text: #333;
+    --medium-text: #555;
+    --light-text: #777;
+    --lighter-text: #999;
+    --light-bg: #f8f8f8;
+    --white-bg: #fff;
+    --light-border: #eee;
+    --medium-border: #ddd;
+
+    /* Status text colors (mapping from your inline Tailwind-like classes) */
+    --status-green-text: #16a34a; /* Tailwind text-green-600 equivalent */
+    --status-red-text: #dc2626;   /* Tailwind text-red-600 equivalent */
+    --status-blue-text: #2563eb;  /* Tailwind text-blue-600 equivalent */
+
+    /* Spacing */
+    --spacing-xs: 8px;
+    --spacing-sm: 10px;
+    --spacing-md: 15px;
+    --spacing-lg: 20px;
+    --spacing-xl: 25px;
+    --spacing-xxl: 30px;
+    --spacing-xxxl: 40px;
+
+    /* Font Sizes */
+    --font-size-sm: 0.85rem;
+    --font-size-base: 1rem;
+    --font-size-md: 1.1rem;
+    --font-size-lg: 1.25rem;
+    --font-size-xl: 1.5rem;
+    --font-size-xxl: 2rem;
+
+    /* Border Radius */
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    --border-radius-pill: 20px;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 6px 16px rgba(0, 0, 0, 0.1);
+
+    /* Transitions */
+    --transition-fast: all 0.2s ease-in-out;
+}
+
+/* --- Base Styles & General Container for Order Details Page --- */
+.Order-Details { /* Exact class name from your JSX */
+    padding: var(--spacing-xxl);
+    background-color: var(--light-bg);
+    min-height: calc(100vh - 60px); /* Adjust based on your header/footer */
+    font-family: 'Roboto', sans-serif;
+    color: var(--dark-text);
+    box-sizing: border-box;
+    max-width: 900px; /* Max width for readability on large screens */
+    margin: var(--spacing-xxl) auto; /* Center the container */
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+}
+
+/* --- Page Title --- */
+.Details { /* Exact class name from your JSX */
+    font-size: var(--font-size-xxl);
+    color: var(--dark-text);
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: var(--spacing-xxl);
+    position: relative;
+    padding-bottom: var(--spacing-sm);
+}
+
+/* --- Loading, Error, Not Found Messages --- */
+.Order-loading, /* Exact class name from your JSX */
+.loading-error, /* Exact class name from your JSX */
+.order-notfound { /* Exact class name from your JSX */
+    text-align: center;
+    font-size: var(--font-size-lg);
+    padding: var(--spacing-xxl);
+    margin: var(--spacing-xxxl) auto;
+    background-color: var(--white-bg);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-md);
+    max-width: 500px;
+}
+
+.loading-error {
+    color: var(--red-error);
+    font-weight: bold;
+}
+
+/* --- Customer Information Section --- */
+.Info { /* Exact class name from your JSX */
+    background-color: var(--white-bg);
+    padding: var(--spacing-xl);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--spacing-xxl);
+}
+
+.Cust-info { /* Exact class name from your JSX */
+    font-size: var(--font-size-xl);
+    color: var(--dark-text);
+    margin-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--light-border);
+    padding-bottom: var(--spacing-xs);
+    font-weight: 600;
+}
+
+.Info p { /* Targeting paragraphs directly within .Info */
+    font-size: var(--font-size-base);
+    margin-bottom: var(--spacing-xs);
+    line-height: 1.5;
+}
+
+/* Strong tags within customer info for labels */
+.Cust-Name, /* Exact class names from your JSX */
+.Cust-Phone,
+.Cust-Address,
+.Cust-OrderDate,
+.Status {
+    font-weight: 600;
+    color: var(--medium-text);
+    display: inline-block; /* Ensures consistent spacing */
+    min-width: 100px; /* Align labels */
+}
+
+/* --- Status Text Styling (from your inline classes) --- */
+/* These classes are based on the inline `text-` classes in your JSX.
+   If you are actually using Tailwind CSS, these definitions might be redundant
+   or conflict with Tailwind's utility-first approach. */
+.font-semibold {
+    font-weight: 600;
+}
+
+.text-green-600 {
+    color: var(--status-green-text);
+}
+
+.text-red-600 {
+    color: var(--status-red-text);
+}
+
+.text-blue-600 {
+    color: var(--status-blue-text);
+}
+
+/* --- Ordered Items Section --- */
+.Order-items { /* Exact class name from your JSX */
+    font-size: var(--font-size-xl);
+    color: var(--dark-text);
+    margin-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--light-border);
+    padding-bottom: var(--spacing-xs);
+    font-weight: 600;
+}
+
+/* --- List of Ordered Items --- */
+.Order-details { /* Exact class name from your JSX (NOTE: used for UL) */
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md); /* Space between list items */
+}
+
+/* --- Individual Order Item Card --- */
+.Cust-id { /* Exact class name from your JSX */
+    display: flex;
+    align-items: center;
+    background-color: var(--white-bg);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+    gap: var(--spacing-md); /* Space between image, info, and subtotal */
+}
+
+.Cust-id:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.Cust-image { /* Exact class name from your JSX */
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--medium-border);
+    flex-shrink: 0; /* Prevent image from shrinking */
+}
+
+.More-cus-info { /* Exact class name from your JSX */
+    flex-grow: 1; /* Allows info to take available space */
+    min-width: 180px; /* Minimum width for info block before wrapping */
+}
+
+.more-name { /* Exact class name from your JSX */
+    font-weight: 600;
+    font-size: var(--font-size-md);
+    margin-bottom: var(--spacing-xs);
+    color: var(--primary-blue);
+}
+
+.more-size { /* Exact class name from your JSX */
+    font-size: var(--font-size-base);
+    color: var(--medium-text);
+    margin-bottom: 3px;
+}
+
+.more-size span { /* Targeted span for medium font weight */
+    font-weight: 500;
+    color: var(--dark-text);
+}
+
+.more-price { /* Exact class name from your JSX */
+    font-size: var(--font-size-base);
+    color: var(--medium-text);
+    margin-top: var(--spacing-xs);
+}
+
+.more-price span { /* Targeted span for medium font weight */
+    font-weight: 500;
+    color: var(--dark-text);
+}
+
+.more-item-price { /* Exact class name from your JSX */
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    color: var(--dark-text);
+    margin-left: auto; /* Pushes to the right */
+    flex-shrink: 0; /* Prevent from shrinking */
+    min-width: 80px; /* Ensure space for price */
+    text-align: right;
+}
+
+/* --- Total Amount --- */
+.order-reduce { /* Exact class name from your JSX */
+    text-align: right;
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    padding-top: var(--spacing-md);
+    border-top: 2px solid var(--light-border);
+    margin-top: var(--spacing-xl);
+    color: var(--dark-text);
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .Order-Details {
+        padding: var(--spacing-lg);
+        margin: var(--spacing-lg) auto;
+    }
+
+    .Details {
+        font-size: var(--font-size-xl);
+        margin-bottom: var(--spacing-xl);
+    }
+
+    .Info {
+        padding: var(--spacing-lg);
+    }
+
+    .Cust-info,
+    .Order-items {
+        font-size: var(--font-size-lg);
+    }
+
+    .Cust-id {
+        flex-direction: column; /* Stack image and info vertically */
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    .Cust-image {
+        width: 100px;
+        height: 100px;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .More-cus-info {
+        width: 100%;
+        min-width: unset; /* Remove min-width constraint */
+    }
+
+    .more-item-price {
+        width: 100%;
+        text-align: left; /* Align subtotal to the left */
+        margin-left: 0;
+        margin-top: var(--spacing-sm);
+        padding-top: var(--spacing-sm);
+        border-top: 1px dashed var(--light-border); /* Subtle separator */
+    }
+
+    .order-reduce {
+        font-size: var(--font-size-lg);
+    }
+}
+
+@media (max-width: 480px) {
+    .Order-Details {
+        padding: var(--spacing-md);
+        margin: var(--spacing-md) auto;
+    }
+
+    .Details {
+        font-size: var(--font-size-lg);
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .Info {
+        padding: var(--spacing-md);
+    }
+
+    .Cust-info,
+    .Order-items {
+        font-size: var(--font-size-md);
+    }
+
+    .Info p,
+    .more-size,
+    .more-price {
+        font-size: 0.9rem; /* Slightly smaller text for very small screens */
+    }
+
+    .more-name {
+        font-size: var(--font-size-md);
+    }
+
+    .more-item-price,
+    .order-reduce {
+        font-size: var(--font-size-md);
+    }
+}
+/* --- Root Variables (for global theming - ensure consistency) --- */
+:root {
+    /* Colors */
+    --primary-blue: #007bff;
+    --primary-blue-dark: #0056b3;
+    --green-success: #28a745;
+    --green-success-dark: #218838;
+    --red-error: #dc3545;
+    --dark-text: #333;
+    --medium-text: #555;
+    --light-text: #777;
+    --lighter-text: #999;
+    --light-bg: #f8f8f8;
+    --white-bg: #fff;
+    --light-border: #eee;
+    --medium-border: #ddd;
+    --header-bg: #e6f0ff; /* Light blue header background for tables */
+
+    /* Status badge colors (based on your existing classes) */
+    --status-delivered-bg: #d4edda;
+    --status-delivered-text: #155724;
+    --status-cancelled-bg: #f8d7da;
+    --status-cancelled-text: #721c24;
+    --status-blue-100-bg: #cfe2ff; /* From your bg-blue-100 class */
+    --status-blue-800-text: #0d6efd; /* From your text-blue-800 class */
+
+    /* Spacing */
+    --spacing-xs: 8px;
+    --spacing-sm: 10px;
+    --spacing-md: 15px;
+    --spacing-lg: 20px;
+    --spacing-xl: 25px;
+    --spacing-xxl: 30px;
+    --spacing-xxxl: 40px;
+    --spacing-xxxxl: 50px;
+
+    /* Font Sizes */
+    --font-size-sm: 0.85rem;
+    --font-size-base: 0.95rem;
+    --font-size-md: 1.2rem; /* Used for general messages */
+    --font-size-lg: 1.3rem; /* Used for loading/error messages */
+    --font-size-xl: 1.6rem; /* Responsive title size */
+    --font-size-xxl: 1.8rem; /* Responsive title size */
+    --font-size-xxxl: 2rem; /* Responsive title size */
+    --font-size-xxxxl: 2.5rem; /* Main title size */
+
+    /* Specific font weights/sizes for table cells */
+    --font-weight-bold: 700;
+    --font-weight-semibold: 600;
+    --font-size-data: 1rem; /* Base font size for table data */
+    --font-size-amount: 1.05rem; /* Slightly larger for amounts */
+    --color-amount: #004d40; /* Darker green/blue for total amount */
+
+    /* Border Radius */
+    --border-radius-sm: 5px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 10px;
+    --border-radius-pill: 20px;
+    --border-radius-pagination: 6px; /* Specific for pagination buttons */
+
+    /* Shadows */
+    --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 4px 20px rgba(0, 0, 0, 0.08);
+    --shadow-pagination: 0 2px 10px rgba(0, 0, 0, 0.05);
+    --shadow-button-hover-blue: 0 4px 8px rgba(0, 123, 255, 0.2);
+    --shadow-button-hover-green: 0 4px 8px rgba(40, 167, 69, 0.2);
+    --shadow-active-page: 0 2px 8px rgba(0, 123, 255, 0.3);
+
+    /* Transitions */
+    --transition-ease: all 0.3s ease;
+    --transition-button: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+/* --- General Container for the Order List Page --- */
+.Order-details { /* Exact class name from your JSX */
+    padding: var(--spacing-xl);
+    background-color: var(--light-bg);
+    min-height: calc(100vh - 60px); /* Adjust based on your header/footer */
+    font-family: 'Roboto', sans-serif;
+    color: var(--dark-text);
+    box-sizing: border-box;
+}
+
+/* --- Page Title (e.g., "Order List") --- */
+.o-list { /* Exact class name from your JSX */
+    font-size: var(--font-size-xxxxl);
+    color: var(--dark-text);
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: var(--spacing-xxl);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    position: relative;
+    padding-bottom: var(--spacing-sm);
+}
+
+.o-list::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background-color: var(--primary-blue);
+    border-radius: 2px;
+}
+
+/* --- Messages (No orders, Loading, Error) --- */
+/* This specific selector targets the paragraph directly nested in .Order-details
+   for the "No orders found" message. */
+.Order-details > p {
+    text-align: center;
+    font-size: var(--font-size-md);
+    color: var(--light-text);
+    margin-top: var(--spacing-xxxl);
+}
+
+.Load-order, /* Exact class name from your JSX */
+.error-order { /* Exact class name from your JSX */
+    text-align: center;
+    font-size: var(--font-size-lg);
+    padding: var(--spacing-xxl);
+    margin-top: var(--spacing-xxxxl);
+    background-color: var(--white-bg);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-md);
+}
+
+.error-order {
+    color: var(--red-error);
+    font-weight: bold;
+}
+
+/* --- Table Wrapper --- */
+.pro-order-list { /* Exact class name from your JSX */
+    background-color: var(--white-bg);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow-x: auto; /* Allows horizontal scrolling for table on small screens */
+    margin-top: var(--spacing-lg);
+}
+
+/* --- Table Styling --- */
+.order-table { /* Exact class name from your JSX */
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--font-size-base);
+}
+
+/* Table header and body cells */
+.order-table-list th, /* Exact class name from your JSX */
+.order-table-list td { /* Exact class name from your JSX */
+    padding: 18px 25px;
+    text-align: left;
+    border-bottom: 1px solid var(--light-border); /* Light separator */
+    vertical-align: middle;
+}
+
+/* Table header section */
+.order-table-list thead { /* Exact class name from your JSX */
+    background-color: var(--header-bg); /* Light blue header background */
+}
+
+/* Table header cells */
+.order-table-list th {
+    color: var(--dark-text);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: var(--font-size-sm);
+    letter-spacing: 0.5px;
+}
+
+/* Column Specific Widths (from your JSX on <th> elements) */
+.order-pro-img { width: 15%; text-align: center; } /* Exact class name from your JSX */
+.order-cust-name { width: 20%; } /* Exact class name from your JSX */
+.order-list { width: 10%; text-align: center; } /* Exact class name from your JSX (Used for Total Items) */
+.order-total-amount { width: 15%; } /* Exact class name from your JSX */
+.order-status { width: 15%; text-align: center; } /* Exact class name from your JSX */
+.order-action { width: 25%; text-align: center; } /* Exact class name from your JSX */
+
+/* Table Body Row Hover Effect */
+/* This matches the `hover:bg-gray-50` intent from your JSX, providing pure CSS */
+.order-table tbody tr.hover\:bg-gray-50:hover { /* Targeting the specific class used in JSX */
+    background-color: #f9f9f9; /* Pure CSS hover effect */
+}
+
+
+/* --- Product Image in Table Cell --- */
+.order-img { /* Exact class name from your JSX (on the <td>) */
+    text-align: center; /* Centers the image within its table cell */
+}
+
+.ord-img { /* Exact class name from your JSX (on the <img>) */
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--medium-border);
+    display: block; /* Important for margin: auto to work */
+    margin: 0 auto; /* Centers the image horizontally */
+}
+
+/* Style for when no image is available */
+.order-no-img { /* Exact class name from your JSX */
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0;
+    color: var(--lighter-text);
+    font-size: 0.75rem;
+    border-radius: var(--border-radius-md);
+    margin: 0 auto;
+    text-align: center;
+    line-height: 1.2;
+}
+
+/* --- Customer Name, Total Items, Total Amount specific cells (Enhanced) --- */
+/* Customer Name Cell */
+.order-info-name { /* Exact class name from your JSX */
+    font-size: var(--font-size-data);
+    color: var(--dark-text);
+    font-weight: var(--font-weight-semibold);
+    padding-right: var(--spacing-sm); /* Adds some padding to the right */
+    white-space: nowrap; /* Prevents text from wrapping */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Adds "..." for long names that overflow */
+    max-width: 180px; /* Constrains width to prevent overly wide columns */
+}
+
+/* Total Items Cell */
+.order-length-cartitems { /* Exact class name from your JSX */
+    text-align: center; /* Centers the number of items */
+    font-size: var(--font-size-data);
+    color: var(--medium-text);
+    font-weight: var(--font-weight-bold); /* Makes the number stand out */
+    padding-left: var(--spacing-sm); /* Ensures consistent padding */
+    padding-right: var(--spacing-sm);
+}
+
+/* Total Amount Cell */
+.cart-total-amount { /* Exact class name from your JSX */
+    text-align: right; /* Right-aligns the currency amount */
+    font-size: var(--font-size-amount); /* Slightly larger font for prominence */
+    color: var(--color-amount); /* Distinct color for financial amounts */
+    font-weight: var(--font-weight-bold); /* Emphasizes the total amount */
+    padding-left: var(--spacing-sm); /* Ensures consistent padding */
+    white-space: nowrap; /* Prevents amount from wrapping onto multiple lines */
+}
+
+/* Status Cell */
+.order-status { /* Exact class name from your JSX */
+    text-align: center; /* Centers the status badge */
+}
+
+/* --- Status Badges --- */
+.order-current-status { /* Exact class name from your JSX */
+    padding: 6px 12px;
+    border-radius: var(--border-radius-pill);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    display: inline-block; /* Allows padding and margin to work */
+    text-transform: capitalize;
+    min-width: 80px; /* Consistent width */
+    text-align: center; /* Center text within badge */
+}
+
+/* Specific status styles (from your JSX) */
+.deliverd-order { /* Exact class name from your JSX (note the 'deliverd' typo if unintended) */
+    background-color: var(--status-delivered-bg);
+    color: var(--status-delivered-text);
+}
+
+.cancelled-order { /* Exact class name from your JSX */
+    background-color: var(--status-cancelled-bg);
+    color: var(--status-cancelled-text);
+}
+
+/* Default/Other statuses (from your `bg-blue-100 text-blue-800` in JSX) */
+/* These classes are based on the inline `bg-` and `text-` classes in your JSX.
+   If you are actually using Tailwind CSS, these definitions might be redundant
+   or conflict with Tailwind's utility-first approach. */
+.bg-blue-100 { /* Exact class name from your JSX */
+    background-color: var(--status-blue-100-bg);
+}
+.text-blue-800 { /* Exact class name from your JSX */
+    color: var(--status-blue-800-text);
+}
+
+
+/* --- Action Buttons Container --- */
+.order-admin { /* Exact class name from your JSX */
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: center; /* Center buttons horizontally */
+    flex-wrap: wrap; /* Allow buttons to wrap */
+}
+
+/* --- Individual Action Buttons --- */
+.order-view, /* Exact class name from your JSX */
+.order-delivered { /* Exact class name from your JSX */
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border: none;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none; /* For Link component */
+    transition: var(--transition-button);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    box-shadow: var(--shadow-sm); /* Subtle shadow for buttons */
+    outline-offset: 2px; /* For better keyboard focus visibility */
+}
+
+.order-view {
+    background-color: var(--primary-blue);
+    color: white;
+}
+
+.order-view:hover,
+.order-view:focus-visible { /* Added focus-visible for accessibility */
+    background-color: var(--primary-blue-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-button-hover-blue);
+}
+
+.order-delivered {
+    background-color: var(--green-success);
+    color: white;
+}
+
+.order-delivered:hover,
+.order-delivered:focus-visible { /* Added focus-visible for accessibility */
+    background-color: var(--green-success-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-button-hover-green);
+}
+
+/* --- Action Cell Specific (The TD holding the actions) --- */
+.order-id { /* Exact class name from your JSX, for the <td> */
+    /* Add specific styles for this cell if needed */
+}
+
+
+/* --- Pagination Controls --- */
+.pagination { /* Exact class name from your JSX */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: var(--spacing-xxl);
+    padding: var(--spacing-md);
+    background-color: var(--white-bg);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-pagination);
+    flex-wrap: wrap; /* Allow page numbers to wrap */
+    gap: var(--spacing-sm); /* Space between buttons */
+}
+
+.page-number { /* Exact class name from your JSX */
+    background-color: #f0f0f0;
+    color: var(--medium-text);
+    border: 1px solid var(--medium-border);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--border-radius-pagination);
+    cursor: pointer;
+    transition: var(--transition-ease);
+    font-weight: 500;
+    min-width: 40px; /* Ensure buttons have minimum width */
+    text-align: center;
+    user-select: none; /* Prevent text selection */
+    outline-offset: 2px; /* For better keyboard focus visibility */
+}
+
+.page-number:hover:not(.more-than-one), /* Apply hover only if not active, using your class */
+.page-number:focus-visible:not(.more-than-one) { /* Added focus-visible for accessibility */
+    background-color: #e0e0e0;
+    border-color: #ccc;
+}
+
+/* Active page number (using your `more-than-one` class for active) */
+.page-number.more-than-one { /* Exact class name from your JSX */
+    background-color: var(--primary-blue);
+    color: white;
+    border-color: var(--primary-blue);
+    font-weight: 700;
+    box-shadow: var(--shadow-active-page);
+}
+
+.page-number.more-than-one:hover, /* Active page number hover */
+.page-number.more-than-one:focus-visible { /* Added focus-visible for accessibility */
+    background-color: var(--primary-blue-dark);
+    border-color: var(--primary-blue-dark);
+}
+
+/* The `less-than-one` class implicitly gets the base `.page-number` styles,
+   as it's only applied when not `more-than-one`. No specific rule needed for it. */
+
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 992px) {
+    .order-table-list th,
+    .order-table-list td {
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+    .o-list {
+        font-size: var(--font-size-xxxl);
+    }
+}
+
+@media (max-width: 768px) {
+    .o-list {
+        font-size: var(--font-size-xxl);
+        margin-bottom: var(--spacing-xl);
+    }
+
+    .pro-order-list {
+        margin-top: var(--spacing-md);
+    }
+
+    /* Hide table headers on small screens visually */
+    .order-table thead {
+        border: 0;
+        clip: rect(0 0 0 0);
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        width: 1px;
+    }
+
+    .order-table,
+    .order-table tbody,
+    .order-table tr,
+    .order-table-list td {
+        display: block; /* Make table elements behave like block-level elements */
+        width: 100%;
+    }
+
+    .order-table tbody tr {
+        margin-bottom: var(--spacing-md);
+        border: 1px solid var(--medium-border);
+        border-radius: var(--border-radius-md);
+        padding: var(--spacing-sm);
+        background-color: var(--white-bg);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column; /* Stack cells vertically */
+        align-items: flex-start;
+    }
+
+    .order-table-list td {
+        border-bottom: 1px solid var(--light-border); /* Add separator between cells in card view */
+        text-align: left;
+        padding: var(--spacing-sm) 0;
+        position: relative;
+        padding-left: 140px; /* Space for the data-label */
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Remove last border in the card */
+    .order-table tbody tr td:last-child {
+        border-bottom: none;
+    }
+
+    /* Data Label for Mobile View */
+    .order-table-list td::before {
+        content: attr(data-label); /* Displays the content of the data-label attribute from JSX */
+        font-weight: bold;
+        text-transform: uppercase;
+        display: block;
+        width: 120px; /* Fixed width for the label */
+        text-align: left;
+        position: absolute;
+        left: var(--spacing-sm);
+        top: 50%; /* Vertically center */
+        transform: translateY(-50%);
+        color: var(--medium-text);
+        font-size: 0.8rem;
+        white-space: nowrap; /* Prevent label text from wrapping */
+    }
+
+    /* Specific Adjustments for Image Cell */
+    .order-img { /* Targeting the <td> holding the image */
+        width: 100%;
+        text-align: center;
+        padding-left: 0;
+        order: -1; /* Place image at the top of the card */
+        margin-bottom: var(--spacing-sm);
+        border-bottom: 1px solid var(--light-border);
+        padding-bottom: var(--spacing-sm);
+    }
+
+    .order-img::before {
+        content: none; /* Hide data-label for image cell */
+    }
+
+    /* Specific Adjustments for Action Cell */
+    .order-id { /* Targeting the <td> holding the actions */
+        width: 100%;
+        text-align: center;
+        padding-left: 0;
+        border-bottom: none;
+        padding-top: var(--spacing-md);
+    }
+
+    .order-id::before {
+        content: none; /* Hide data-label for action cell */
+    }
+
+    .order-admin {
+        width: 100%;
+        justify-content: center;
+        gap: var(--spacing-xs);
+    }
+
+    .order-view,
+    .order-delivered {
+        flex-grow: 1; /* Allow buttons to grow to fill space */
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+
+    /* Customer Name Cell - Mobile */
+    .order-info-name {
+        padding-right: 0; /* Remove extra padding when stacked */
+        white-space: normal; /* Allow text to wrap within the stacked card */
+        text-overflow: unset; /* Remove ellipsis */
+        max-width: unset; /* Remove width constraint */
+    }
+
+    /* Total Items Cell - Mobile */
+    .order-length-cartitems {
+        text-align: left; /* Align with the data-label on mobile */
+        padding-left: var(--spacing-sm); /* Maintain padding for content after label */
+    }
+
+    /* Total Amount Cell - Mobile */
+    .cart-total-amount {
+        text-align: left; /* Align with the data-label on mobile */
+        padding-left: var(--spacing-sm); /* Maintain padding for content after label */
+    }
+
+    /* Status Cell - Mobile */
+    .order-status {
+        text-align: left; /* Align with the data-label on mobile */
+        padding-left: var(--spacing-sm); /* Maintain padding for content after label */
+    }
+
+    .pagination {
+        margin-top: var(--spacing-xl);
+        padding: var(--spacing-md);
+    }
+    .page-number {
+        padding: var(--spacing-xs) var(--spacing-md);
+        min-width: 35px;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .Order-details {
+        padding: var(--spacing-md);
+        
+    }
+    .Cust-image{
+        justify-items: center;
+        
+    }
+    .Cust-id{
+        text-align: center;
+    }
+    .order-info-name{
+        padding-bottom: 10px;
+        padding-left: 10px;
+        font-size: 25px;
+    }
+    .order-length-cartitems{
+        padding-bottom: 10px;
+
+    }
+    .cart-total-amount{
+        padding-bottom: 10px;
+    }
+    .o-list {
+        font-size: var(--font-size-xl);
+    }
+    .order-table-list td {
+        padding-left: 120px; /* Adjust padding for very small screens */
+    }
+    .order-table-list td::before {
+        width: 100px; /* Adjust label width */
+        font-size: 0.75rem;
+    }
+    .order-view,
+    .order-delivered {
+        font-size: 0.85rem;
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+    .pagination {
+        padding: var(--spacing-sm);
+    }
+    .page-number {
+        font-size: 0.9rem;
+    }
+    .ord-img{
+        
+        width: 100px;
+        height: 100px;
+    }
+    
+}
