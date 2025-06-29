@@ -20,9 +20,8 @@ const EditProduct = () => {
 
   // List of valid categories from your backend/models/productModel.js enum
   const categories = [
-    'Electronics', 'Cameras', 'Laptops', 'Accessories', 'Headphones',
-    'Food', 'Books', 'Clothes/Shoes', 'Beauty/Health', 'Sports',
-    'Outdoor', 'Home', 'T-Shirts', 'Mobiles', 'Watches', 'Jewelry'
+    'Electronics', 'Cameras', 'Laptops', 'Accessories', 'Track-Pants',
+    'Formal-Pants', 'Shirts', 'T-Shirts', 'Jackets'
   ];
 
   useEffect(() => {
