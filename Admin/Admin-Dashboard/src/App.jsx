@@ -1,7 +1,9 @@
 // src/App.jsx
 import React from "react";
 import { BrowserRouter, Routes, Route, useLocation, Link } from "react-router-dom";
-import axios from 'axios';
+// No direct axios.defaults.baseURL here, as it's now set in src/axios.js
+// We just need to import 'api' if we plan to use it directly in App.jsx for some reason,
+// but for routing, it's not strictly necessary.
 
 // Admin Components
 import AdminNavbar from "./components/AdminNavbar";
@@ -13,17 +15,6 @@ import OrderDetails from "./pages/Admin/OrderDetails";
 import AdminLoginPage from './pages/Admin/AdminLoginPage';
 import CreateProduct from './pages/Admin/CreateProduct';
 import './index.css';
-
-// --- GLOBAL AXIOS CONFIGURATION: START ---
-// CORRECTED: Use environment variables for the baseURL
-// For Vite: import.meta.env.VITE_BACKEND_API_URL
-// For Create React App: process.env.REACT_APP_BACKEND_API_URL
-axios.defaults.baseURL = import.meta.env.VITE_BACKEND_API_URL || process.env.REACT_APP_BACKEND_API_URL;
-axios.defaults.withCredentials = true; // Crucial for sending httpOnly cookies across domains/ports
-
-// Log the baseURL to the console for verification during development
-console.log("Axios baseURL configured as:", axios.defaults.baseURL);
-// --- GLOBAL AXIOS CONFIGURATION: END ---
 
 function AppContent() {
   const location = useLocation();
