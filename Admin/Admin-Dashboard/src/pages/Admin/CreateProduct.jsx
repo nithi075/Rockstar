@@ -9,6 +9,7 @@ export default function CreateProduct() {
     description: '',
     price: '',
     category: '',
+    // Changed stock to an object for sizes
     stockBySizes: {
       S: '',
       M: '',
@@ -22,6 +23,7 @@ export default function CreateProduct() {
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
+  // Handle changes for main product fields
   const handleChange = (e) => {
     const { name, value } = e.target;
     setProduct(prevProduct => ({
@@ -30,6 +32,7 @@ export default function CreateProduct() {
     }));
   };
 
+  // Handle changes specifically for stock quantities per size
   const handleStockSizeChange = (size, value) => {
     setProduct(prevProduct => ({
       ...prevProduct,
@@ -55,32 +58,38 @@ export default function CreateProduct() {
     formData.append('description', product.description);
     formData.append('price', product.price);
     formData.append('category', product.category);
-    formData.append('stockBySizes', JSON.stringify(product.stockBySizes)); // Append as JSON string
+    // Append stockBySizes as a JSON string
+    formData.append('stockBySizes', JSON.stringify(product.stockBySizes));
 
+    // Append each selected image file
     images.forEach((image) => {
       formData.append('images', image);
     });
 
     try {
-      // CORRECTED: Use relative URL, relying on Axios baseURL
-      // Assuming your backend route is '/api/v1/admin/products' and baseURL is set to '/api/v1'
       const res = await axios.post('/admin/products', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
       setSuccess('Product created successfully!');
-      setProduct({ // Clear the form
+      // Clear the form
+      setProduct({
         name: '',
         description: '',
         price: '',
         category: '',
-        stockBySizes: { S: '', M: '', L: '', XL: '' },
+        stockBySizes: {
+          S: '',
+          M: '',
+          L: '',
+          XL: '',
+        },
       });
       setImages([]);
-      // CORRECTED: Navigate to the frontend's product list route
+      // Redirect to product list after a short delay
       setTimeout(() => {
-        navigate('/admin/products'); // Change this to your actual frontend route
+        navigate('/admin/products');
       }, 1500);
     } catch (err) {
       console.error('Error creating product:', err);
@@ -93,7 +102,7 @@ export default function CreateProduct() {
   return (
     <div className="Create-Product">
       <h1>Create New Product</h1>
-      {error && <p>{error}</p>}
+      {error && <p >{error}</p>}
       {success && <p>{success}</p>}
 
       <form onSubmit={handleSubmit} className="space-y-4">
