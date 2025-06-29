@@ -24,7 +24,7 @@ const EditProduct = () => {
       try {
         // Use 'api' instance for GET request
         // It will become: http://localhost:5000/api/v1/products/:id
-        const res = await api.get(`https://admin-backend-x8of.onrender.com/products/${id}`);
+        const res = await api.get(`https://admin-backend-x8of.onrender.com/api/v1/products/${id}`);
         const product = res.data.product;
 
         setForm({
@@ -90,7 +90,7 @@ const EditProduct = () => {
       // *** THE FIX IS HERE ***
       // Use the 'api' instance and provide only the relative path after the baseURL
       // It will become: http://localhost:5000/api/v1/products/admin/product/:id
-      await api.put(`https://admin-backend-x8of.onrender.com/products/admin/product/${id}`, payload);
+      await api.put(`https://admin-backend-x8of.onrender.com/api/v1/products/admin/product/${id}`, payload);
 
       console.log("Product updated successfully!");
       alert("Product updated successfully!");
@@ -113,7 +113,7 @@ const EditProduct = () => {
           <div>
             <img
               width={100}
-              src={form.images[0].url.startsWith('http') ? form.images[0].url : `https://admin-backend-x8of.onrender.com/${form.images[0].url}`}
+              src={form.images[0].url.startsWith('http') ? form.images[0].url : `https://admin-backend-x8of.onrender.com/api/v1/${form.images[0].url}`}
               alt="Product Preview"
               className="w-40 h-auto rounded-md object-cover border border-gray-200"
             />
