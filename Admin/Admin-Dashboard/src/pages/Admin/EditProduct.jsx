@@ -19,10 +19,9 @@ const EditProduct = () => {
   const [error, setError] = useState(null);
 
   // List of valid categories from your backend/models/productModel.js enum
-  const categories = [
-    'Electronics', 'Cameras', 'Laptops', 'Accessories', 'Track-Pants',
-    'Formal-Pants', 'Shirts', 'T-Shirts', 'Jackets'
-  ];
+ const categories = [
+    'Shirts', 'T-Shirts', 'Jackets', 'Pants', 'Shorts', 'Formal Pants', 'Track Pants', 'Oversized-Shirts'
+];
 
   useEffect(() => {
     const fetchProduct = async () => {
