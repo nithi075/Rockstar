@@ -67,7 +67,7 @@ export default function CreateProduct() {
     });
 
     try {
-      const res = await axios.post('/admin/products', formData, {
+      const res = await axios.post('https://admin-backend-x8of.onrender.com/admin/products', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -89,7 +89,7 @@ export default function CreateProduct() {
       setImages([]);
       // Redirect to product list after a short delay
       setTimeout(() => {
-        navigate('/admin/products');
+        navigate('https://admin-backend-x8of.onrender.com/admin/products');
       }, 1500);
     } catch (err) {
       console.error('Error creating product:', err);
