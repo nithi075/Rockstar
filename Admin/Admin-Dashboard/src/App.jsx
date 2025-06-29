@@ -11,12 +11,18 @@ import OrderList from "./pages/Admin/OrderList";
 import EditProduct from "./pages/Admin/EditProduct";
 import OrderDetails from "./pages/Admin/OrderDetails";
 import AdminLoginPage from './pages/Admin/AdminLoginPage';
-import CreateProduct from './pages/Admin/CreateProduct'; // <--- IMPORT THE NEW COMPONENT HERE
-import './index.css'
+import CreateProduct from './pages/Admin/CreateProduct';
+import './index.css';
 
 // --- GLOBAL AXIOS CONFIGURATION: START ---
-axios.defaults.baseURL = 'https://admin-backend-x8of.onrender.com/api/v1'; // Your backend API base URL
+// CORRECTED: Use environment variables for the baseURL
+// For Vite: import.meta.env.VITE_BACKEND_API_URL
+// For Create React App: process.env.REACT_APP_BACKEND_API_URL
+axios.defaults.baseURL = import.meta.env.VITE_BACKEND_API_URL || process.env.REACT_APP_BACKEND_API_URL;
 axios.defaults.withCredentials = true; // Crucial for sending httpOnly cookies across domains/ports
+
+// Log the baseURL to the console for verification during development
+console.log("Axios baseURL configured as:", axios.defaults.baseURL);
 // --- GLOBAL AXIOS CONFIGURATION: END ---
 
 function AppContent() {
@@ -34,8 +40,7 @@ function AppContent() {
         <Route path="/admin/dashboard" element={<Dashboard />} />
         <Route path="/admin/products" element={<ProductList />} />
         <Route path="/admin/products/edit/:id" element={<EditProduct />} />
-        {/* Replace the placeholder with the actual CreateProduct component */}
-        <Route path="/admin/products/new" element={<CreateProduct />} /> {/* <--- UPDATED THIS LINE */}
+        <Route path="/admin/products/new" element={<CreateProduct />} />
         <Route path="/admin/orders" element={<OrderList />} />
         <Route path="/admin/orders/:orderId" element={<OrderDetails />} />
 
