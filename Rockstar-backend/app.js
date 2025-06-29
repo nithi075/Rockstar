@@ -1,4 +1,3 @@
-// app.js
 
 const express = require('express');
 const cors = require('cors');
@@ -8,8 +7,7 @@ const path = require('path');
 const connectDB = require('./config/connectDatabase');
 const errorMiddleware = require('./middlewares/error');
 
-// Make sure dotenv.config() is at the very top to load environment variables
-dotenv.config({ path: './config/config.env' });
+dotenv.config({ path: './config/config.env' }); // Make sure this is at the very top, before any other imports that might use process.env
 console.log('Server starting. JWT_EXPIRE loaded:', process.env.JWT_EXPIRE);
 connectDB();
 
@@ -19,26 +17,9 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
-// --- Dynamic CORS Origin Configuration ---
-let allowedOrigins = [];
-
-// Always include the FRONTEND_URL from environment variables
-if (process.env.FRONTEND_URL) {
-    allowedOrigins.push(process.env.FRONTEND_URL);
-}
-
-// Add localhost origins ONLY in development
-if (process.env.NODE_ENV === 'DEVELOPMENT') {
-    allowedOrigins.push('http://localhost:5173');
-    allowedOrigins.push('http://localhost:5174');
-    allowedOrigins.push('http://localhost:5175');
-}
-
-// Log allowed origins for debugging
-console.log('CORS Allowed Origins:', allowedOrigins);
-
+// CORS configuration with credentials - This is good!
 app.use(cors({
-    origin: allowedOrigins, // Use the dynamically constructed array
+    origin: [process.env.FRONTEND_URL,'http://localhost:5173' , 'http://localhost:5174' ,'http://localhost:5175'], // Allow both values if they are different
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -46,7 +27,7 @@ app.use(cors({
 
 // Serve static files (e.g., uploaded images)
 app.use('/static', express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); 
 
 // API Routes
 app.use('/api/v1/products', require('./routes/product'));
