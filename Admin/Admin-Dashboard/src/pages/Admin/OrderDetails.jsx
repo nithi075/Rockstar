@@ -57,7 +57,7 @@ const OrderDetails = () => {
               // how your backend serves the images.
               //
               // Option 1 (Most Common): If item.product.images[0].url is JUST the filename (e.g., "product123.jpg")
-              src={item.product?.images?.[0]?.url ? `http://localhost:5000/uploads/${item.product.images[0].url}` : "/placeholder.jpg"}
+              src={item.product?.images?.[0]?.url ? `https://admin-backend-x8of.onrender.com/${item.product.images[0].url}` : "/placeholder.jpg"}
 
               // Option 2: If item.product.images[0].url ALREADY includes "/uploads/" (e.g., "/uploads/product123.jpg")
               // src={item.product?.images?.[0]?.url ? `http://localhost:5000${item.product.images[0].url}` : "/placeholder.jpg"}
