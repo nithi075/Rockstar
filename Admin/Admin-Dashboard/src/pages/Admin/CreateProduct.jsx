@@ -9,7 +9,6 @@ export default function CreateProduct() {
     description: '',
     price: '',
     category: '',
-    // Changed stock to an object for sizes
     stockBySizes: {
       S: '',
       M: '',
@@ -23,7 +22,6 @@ export default function CreateProduct() {
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
-  // Handle changes for main product fields
   const handleChange = (e) => {
     const { name, value } = e.target;
     setProduct(prevProduct => ({
@@ -32,7 +30,6 @@ export default function CreateProduct() {
     }));
   };
 
-  // Handle changes specifically for stock quantities per size
   const handleStockSizeChange = (size, value) => {
     setProduct(prevProduct => ({
       ...prevProduct,
@@ -58,38 +55,32 @@ export default function CreateProduct() {
     formData.append('description', product.description);
     formData.append('price', product.price);
     formData.append('category', product.category);
-    // Append stockBySizes as a JSON string
-    formData.append('stockBySizes', JSON.stringify(product.stockBySizes));
+    formData.append('stockBySizes', JSON.stringify(product.stockBySizes)); // Append as JSON string
 
-    // Append each selected image file
     images.forEach((image) => {
       formData.append('images', image);
     });
 
     try {
-      const res = await axios.post('https://admin-backend-x8of.onrender.com/admin/products', formData, {
+      // CORRECTED: Use relative URL, relying on Axios baseURL
+      // Assuming your backend route is '/api/v1/admin/products' and baseURL is set to '/api/v1'
+      const res = await axios.post('/admin/products', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
       setSuccess('Product created successfully!');
-      // Clear the form
-      setProduct({
+      setProduct({ // Clear the form
         name: '',
         description: '',
         price: '',
         category: '',
-        stockBySizes: {
-          S: '',
-          M: '',
-          L: '',
-          XL: '',
-        },
+        stockBySizes: { S: '', M: '', L: '', XL: '' },
       });
       setImages([]);
-      // Redirect to product list after a short delay
+      // CORRECTED: Navigate to the frontend's product list route
       setTimeout(() => {
-        navigate('https://admin-backend-x8of.onrender.com/admin/products');
+        navigate('/admin/products'); // Change this to your actual frontend route
       }, 1500);
     } catch (err) {
       console.error('Error creating product:', err);
@@ -102,7 +93,7 @@ export default function CreateProduct() {
   return (
     <div className="Create-Product">
       <h1>Create New Product</h1>
-      {error && <p >{error}</p>}
+      {error && <p>{error}</p>}
       {success && <p>{success}</p>}
 
       <form onSubmit={handleSubmit} className="space-y-4">
