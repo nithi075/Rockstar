@@ -1,23 +1,40 @@
 // pages/Admin/Dashboard.jsx
 import { useEffect, useState } from "react";
-import axios from "axios"; // Assuming axios is configured globally with a baseURL
+import api from "../axios"; // CORRECTED: Import your custom Axios instance
 
 export default function Dashboard() {
   const [stats, setStats] = useState({ totalProducts: 0, totalOrders: 0, totalUsers: 0 });
+  const [loading, setLoading] = useState(true); // Added loading state
+  const [error, setError] = useState(null);    // Added error state
 
   useEffect(() => {
-    // CORRECTED: Use a relative URL, relying on Axios's global baseURL
-    // This assumes your axios.defaults.baseURL is set to something like
-    // 'https://admin-backend-x8of.onrender.com/api/v1' in production
-    // or 'http://localhost:5000/api/v1' in development
-    axios.get("/admin/dashboard")
-      .then(res => {
+    const fetchDashboardStats = async () => {
+      setLoading(true);
+      setError(null); // Clear previous errors
+      try {
+        // CORRECTED: Use your custom 'api' instance
+        // This will correctly make the request to 'https://admin-backend-x8of.onrender.com/api/v1/admin/dashboard'
+        const res = await api.get("/admin/dashboard");
         setStats(res.data.data);
-      })
-      .catch(error => {
+      } catch (error) {
         console.error("Error fetching dashboard stats:", error);
-      });
+        // Provide more descriptive error messages
+        setError("Failed to load dashboard stats. " + (error.response?.data?.message || error.message || "Please try again."));
+      } finally {
+        setLoading(false); // Ensure loading is set to false
+      }
+    };
+
+    fetchDashboardStats();
   }, []);
+
+  if (loading) {
+    return <div className="DashBoard">Loading dashboard stats...</div>;
+  }
+
+  if (error) {
+    return <div className="DashBoard Error">Error: {error}</div>;
+  }
 
   return (
     <div className="DashBoard">
