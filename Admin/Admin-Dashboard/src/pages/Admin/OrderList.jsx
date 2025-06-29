@@ -34,7 +34,7 @@ export default function OrderList() {
   const handleMarkAsDelivered = async (orderId) => {
     try {
       // Assuming an API endpoint like /orders/:id/deliver for marking as delivered
-      await axios.put(`/orders/${orderId}/deliver`, { status: 'Delivered' });
+      await axios.put(`https://admin-backend-x8of.onrender.com/api/v1/orders/${orderId}/deliver`, { status: 'Delivered' });
       // Update the order status in the local state
       setOrders(prevOrders =>
         prevOrders.map(order =>
@@ -91,7 +91,7 @@ export default function OrderList() {
                     {order.cartItems && order.cartItems.length > 0 && order.cartItems[0].product?.images?.[0]?.url ? (
                       <img
                         
-                        src={`https://admin-backend-x8of.onrender.com/${order.cartItems[0].product.images[0].url}`}
+                        src={`https://admin-backend-x8of.onrender.com/api/v1/${order.cartItems[0].product.images[0].url}`}
                         alt={order.cartItems[0].product?.name || "Product"}
                         className="ord-img"
                       />
