@@ -22,7 +22,7 @@ const AdminLoginPage = () => {
             if (response.data.success) {
                 alert('Login Successful!');
                 console.log("Login Response Data:", response.data);
-                navigate('/admin/dashboard'); // Redirect to admin dashboard on success
+                navigate('https://admin-backend-x8of.onrender.com/api/v1/admin/dashboard'); // Redirect to admin dashboard on success
             } else {
                 setError(response.data.message || 'Login failed. Please try again.');
             }
