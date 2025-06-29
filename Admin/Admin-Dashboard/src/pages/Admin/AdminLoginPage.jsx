@@ -1,6 +1,6 @@
 // src/pages/Admin/AdminLoginPage.jsx
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../../axios'; // <--- CHANGE THIS: Import your custom Axios instance 'api'
 import { useNavigate } from 'react-router-dom';
 
 const AdminLoginPage = () => {
@@ -16,10 +16,15 @@ const AdminLoginPage = () => {
         setLoading(true);
 
         try {
-            // Axios global config (baseURL, withCredentials) handles the full URL
-            const response = await axios.post('https://admin-backend-x8of.onrender.com/api/v1/users/login', { email, password });
+            // <--- CHANGE THIS: Use your custom 'api' instance for the login request
+            const response = await api.post('/users/login', { email, password }); // Use relative path since baseURL is set in api.js
 
             if (response.data.success) {
+                // <--- ADD THIS: Store the token in localStorage
+                localStorage.setItem('authToken', response.data.token);
+                // The api.interceptors.request.use will now automatically pick this up
+                // for all subsequent requests made with the 'api' instance.
+
                 alert('Login Successful!');
                 console.log("Login Response Data:", response.data);
                 navigate('/admin/dashboard'); // Redirect to admin dashboard on success
@@ -28,7 +33,6 @@ const AdminLoginPage = () => {
             }
         } catch (err) {
             console.error('Login error:', err);
-            // Access the error message from the backend if available
             setError(err.response?.data?.message || 'An unexpected error occurred during login.');
         } finally {
             setLoading(false);
