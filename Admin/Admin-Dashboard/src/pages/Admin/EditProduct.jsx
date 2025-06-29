@@ -24,7 +24,7 @@ const EditProduct = () => {
       try {
         // Use 'api' instance for GET request
         // It will become: http://localhost:5000/api/v1/products/:id
-        const res = await api.get(`/products/${id}`);
+        const res = await api.get(`https://admin-backend-x8of.onrender.com/products/${id}`);
         const product = res.data.product;
 
         setForm({
@@ -90,7 +90,7 @@ const EditProduct = () => {
       // *** THE FIX IS HERE ***
       // Use the 'api' instance and provide only the relative path after the baseURL
       // It will become: http://localhost:5000/api/v1/products/admin/product/:id
-      await api.put(`/products/admin/product/${id}`, payload);
+      await api.put(`https://admin-backend-x8of.onrender.com/products/admin/product/${id}`, payload);
 
       console.log("Product updated successfully!");
       alert("Product updated successfully!");
