@@ -32,7 +32,6 @@ exports.getAllProducts = catchAsyncErrors(async (req, res, next) => {
     }
     // --- End Category and Price Filtering ---
 
-
     const totalCount = await Product.countDocuments(query); // Use the combined query
 
     const products = await Product.find(query) // Use the combined query
@@ -79,7 +78,11 @@ exports.createProduct = catchAsyncErrors(async (req, res, next) => {
 // @route   PUT /api/v1/product/:id (or /api/v1/products/:id)
 // @access  Private (e.g., Admin)
 exports.updateProduct = catchAsyncErrors(async (req, res, next) => {
-    try { // <--- START OF ADDED TRY BLOCK
+    // <--- ADDED DEBUGGING LOGS HERE ---
+    console.log(`[UPDATE PRODUCT] Request received for ID: ${req.params.id}`);
+    console.log(`[UPDATE PRODUCT] Request Body:`, req.body);
+    // -----------------------------------
+    try {
         let product = await Product.findById(req.params.id);
         if (!product) {
             return next(new ErrorHandler('Product not found', 404));
@@ -98,8 +101,8 @@ exports.updateProduct = catchAsyncErrors(async (req, res, next) => {
 
         res.status(200).json({ success: true, product });
 
-    } catch (error) { // <--- START OF ADDED CATCH BLOCK
-        console.error("Error in updateProduct:", error); // <--- CRUCIAL LOGGING LINE
+    } catch (error) {
+        console.error("Error in updateProduct:", error); // This is the crucial error logging line
         return next(new ErrorHandler(`Product update failed: ${error.message || 'Unknown error'}`, 500));
     }
 });
