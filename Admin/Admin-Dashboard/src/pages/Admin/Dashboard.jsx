@@ -6,7 +6,7 @@ export default function Dashboard() {
   const [stats, setStats] = useState({ totalProducts: 0, totalOrders: 0, totalUsers: 0 });
 
   useEffect(() => {
-    axios.get("/admin/dashboard") // Simplified URL, no need for full base URL
+    axios.get("https://admin-backend-x8of.onrender.com/admin/dashboard") // Simplified URL, no need for full base URL
       .then(res => {
         setStats(res.data.data);
       })
