@@ -1,12 +1,16 @@
 // pages/Admin/Dashboard.jsx
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "axios"; // Assuming axios is configured globally with a baseURL
 
 export default function Dashboard() {
   const [stats, setStats] = useState({ totalProducts: 0, totalOrders: 0, totalUsers: 0 });
 
   useEffect(() => {
-    axios.get("https://admin-backend-x8of.onrender.com/api/v1/admin/dashboard") // Simplified URL, no need for full base URL
+    // CORRECTED: Use a relative URL, relying on Axios's global baseURL
+    // This assumes your axios.defaults.baseURL is set to something like
+    // 'https://admin-backend-x8of.onrender.com/api/v1' in production
+    // or 'http://localhost:5000/api/v1' in development
+    axios.get("/admin/dashboard")
       .then(res => {
         setStats(res.data.data);
       })
