@@ -1,7 +1,6 @@
-// pages/Admin/ProductList.jsx
 import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import api from '../../axios'; // <--- CORRECTED: Import your configured Axios instance
 
 export default function ProductList() {
   const [products, setProducts] = useState([]);
@@ -18,9 +17,8 @@ export default function ProductList() {
     setLoading(true);
     setError(null); // Clear previous errors
     try {
-      // Ensure your axios config sets the baseURL (e.g., http://localhost:5000/api/v1)
-      // If not, you might need to use the full path: `http://localhost:5000/api/v1/products...`
-      const res = await axios.get(
+      // Use 'api.get' to ensure Authorization header is sent
+      const res = await api.get( // <--- CORRECTED: Use 'api' here
         `/products?page=${currentPage}&limit=${productsPerPage}&keyword=${searchQuery}`
       );
       setProducts(res.data.products);
@@ -49,7 +47,8 @@ export default function ProductList() {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this product? This action cannot be undone.")) {
       try {
-        await axios.delete(`/products/${id}`); // Assuming base URL is configured
+        // <--- CORRECTED: Use 'api.delete' and the correct admin path
+        await api.delete(`/products/admin/product/${id}`); 
         alert("Product deleted successfully!");
         fetchProducts(); // Re-fetch products to update the list
       } catch (err) {
@@ -112,7 +111,6 @@ export default function ProductList() {
               <tbody>
                 {products.length === 0 ? (
                   <tr>
-                    {/* colSpan is correct here for 4 columns */}
                     <td colSpan="4" className="no-products-found">
                       No products found.
                     </td>
@@ -129,7 +127,7 @@ export default function ProductList() {
                         <td data-label="Image:" className="product-table-td product-image-cell">
                           <img
                             width={50}
-                            height={50} // Added height for better layout control
+                            height={50}
                             src={imageUrl}
                             alt={product.name}
                             className="product-thumbnail"
