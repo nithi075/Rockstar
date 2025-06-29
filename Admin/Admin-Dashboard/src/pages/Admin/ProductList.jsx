@@ -1,7 +1,7 @@
 // pages/Admin/ProductList.jsx
 import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import axios from "axios"; // Assuming axios is configured globally with a baseURL
 
 export default function ProductList() {
   const [products, setProducts] = useState([]);
@@ -13,15 +13,23 @@ export default function ProductList() {
   const [totalProducts, setTotalProducts] = useState(0);
   const productsPerPage = 15;
 
+  // Get the backend root URL from environment variables for image display
+  // This should be the *root* of your backend domain, not necessarily the API base path.
+  // Example: 'https://admin-backend-x8of.onrender.com' or 'http://localhost:5000'
+  const backendRootUrl = import.meta.env.VITE_BACKEND_ROOT_URL || process.env.REACT_APP_BACKEND_ROOT_URL;
+
+
   // useCallback to memoize the fetchProducts function, preventing unnecessary re-creations
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     setError(null); // Clear previous errors
     try {
-      // Ensure your axios config sets the baseURL (e.g., http://localhost:5000/api/v1)
-      // If not, you might need to use the full path: `http://localhost:5000/api/v1/products...`
+      // CORRECTED: Use relative URL, relying on Axios's global baseURL
+      // This assumes your axios.defaults.baseURL is set to something like
+      // 'https://admin-backend-x8of.onrender.com/api/v1' in production
+      // or 'http://localhost:5000/api/v1' in development
       const res = await axios.get(
-        `https://admin-backend-x8of.onrender.com/api/v1/products?page=${currentPage}&limit=${productsPerPage}&keyword=${searchQuery}`
+        `/products?page=${currentPage}&limit=${productsPerPage}&keyword=${searchQuery}`
       );
       setProducts(res.data.products);
       setTotalProducts(res.data.totalCount);
@@ -49,7 +57,9 @@ export default function ProductList() {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this product? This action cannot be undone.")) {
       try {
-        await axios.delete(`https://admin-backend-x8of.onrender.com/api/v1/products/${id}`); // Assuming base URL is configured
+        // CORRECTED: Use relative URL, relying on Axios's global baseURL
+        // Assuming your backend route is /api/v1/products/:id for DELETE
+        await axios.delete(`/products/${id}`); 
         alert("Product deleted successfully!");
         fetchProducts(); // Re-fetch products to update the list
       } catch (err) {
@@ -67,7 +77,7 @@ export default function ProductList() {
       <div className="product-list-header">
         <h2 className="product-list-title">Product List</h2>
         <Link
-          to="/admin/products/new"
+          to="/admin/products/new" // Correct: client-side route
           className="add-product-button"
         >
           Add New Product
@@ -112,16 +122,23 @@ export default function ProductList() {
               <tbody>
                 {products.length === 0 ? (
                   <tr>
-                    {/* colSpan is correct here for 4 columns */}
                     <td colSpan="4" className="no-products-found">
                       No products found.
                     </td>
                   </tr>
                 ) : (
                   products.map((product) => {
+                    // CORRECTED: Use backendRootUrl for image paths
+                    // This logic ensures if the URL is already absolute (e.g., Cloudinary), it's used directly
+                    // Otherwise, it constructs a relative path from your backendRootUrl, assuming /uploads/
                     const imageUrl =
-                      product.images && product.images.length > 0
-                        ? `https://admin-backend-x8of.onrender.com/api/v1/${product.images[0].url}`
+                      product.images && product.images.length > 0 && product.images[0].url
+                        ? (product.images[0].url.startsWith('http') 
+                            ? product.images[0].url
+                            : `${backendRootUrl}/uploads/${product.images[0].url.startsWith('/') 
+                                ? product.images[0].url.substring(1) 
+                                : product.images[0].url}`
+                          )
                         : "/placeholder.jpg"; // Fallback placeholder image
 
                     return (
@@ -141,7 +158,7 @@ export default function ProductList() {
                         <td data-label="Actions:" className="product-table-td product-actions-cell">
                           <div className="product-action-buttons">
                             <Link
-                              to={`https://admin-backend-x8of.onrender.com/admin/products/edit/${product._id}`}
+                              to={`/admin/products/edit/${product._id}`} // Correct: client-side route
                               className="edit-product-button"
                             >
                               Edit
