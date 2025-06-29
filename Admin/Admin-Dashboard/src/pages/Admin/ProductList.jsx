@@ -1,7 +1,7 @@
 // pages/Admin/ProductList.jsx
 import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
-import api from "../../axios"; // Import the custom axios instance
+import axios from "axios";
 
 export default function ProductList() {
   const [products, setProducts] = useState([]);
@@ -13,16 +13,14 @@ export default function ProductList() {
   const [totalProducts, setTotalProducts] = useState(0);
   const productsPerPage = 15;
 
-  // HARDCODED: Root URL for images. This needs to be changed manually for local dev.
-  const backendRootUrl = 'https://admin-backend-x8of.onrender.com';
-
   // useCallback to memoize the fetchProducts function, preventing unnecessary re-creations
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     setError(null); // Clear previous errors
     try {
-      // Uses the baseURL configured in src/axios.js
-      const res = await api.get(
+      // Ensure your axios config sets the baseURL (e.g., http://localhost:5000/api/v1)
+      // If not, you might need to use the full path: `http://localhost:5000/api/v1/products...`
+      const res = await axios.get(
         `/products?page=${currentPage}&limit=${productsPerPage}&keyword=${searchQuery}`
       );
       setProducts(res.data.products);
@@ -51,8 +49,7 @@ export default function ProductList() {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this product? This action cannot be undone.")) {
       try {
-        // Uses the baseURL configured in src/axios.js
-        await api.delete(`/products/${id}`);
+        await axios.delete(`/products/${id}`); // Assuming base URL is configured
         alert("Product deleted successfully!");
         fetchProducts(); // Re-fetch products to update the list
       } catch (err) {
@@ -70,7 +67,7 @@ export default function ProductList() {
       <div className="product-list-header">
         <h2 className="product-list-title">Product List</h2>
         <Link
-          to="/admin/products/new" // Correct: client-side route
+          to="/admin/products/new"
           className="add-product-button"
         >
           Add New Product
@@ -115,29 +112,24 @@ export default function ProductList() {
               <tbody>
                 {products.length === 0 ? (
                   <tr>
+                    {/* colSpan is correct here for 4 columns */}
                     <td colSpan="4" className="no-products-found">
                       No products found.
                     </td>
                   </tr>
                 ) : (
                   products.map((product) => {
-                    // HARDCODED: Image URL construction
                     const imageUrl =
-                      product.images && product.images.length > 0 && product.images[0].url
-                        ? (product.images[0].url.startsWith('http')
-                            ? product.images[0].url
-                            : `${backendRootUrl}/uploads/${product.images[0].url.startsWith('/')
-                                ? product.images[0].url.substring(1)
-                                : product.images[0].url}`
-                          )
-                        : "/placeholder.jpg";
+                      product.images && product.images.length > 0
+                        ? `http://localhost:5000/uploads/${product.images[0].url}`
+                        : "/placeholder.jpg"; // Fallback placeholder image
 
                     return (
                       <tr key={product._id} className="product-table-row">
                         <td data-label="Image:" className="product-table-td product-image-cell">
                           <img
                             width={50}
-                            height={50}
+                            height={50} // Added height for better layout control
                             src={imageUrl}
                             alt={product.name}
                             className="product-thumbnail"
@@ -149,7 +141,7 @@ export default function ProductList() {
                         <td data-label="Actions:" className="product-table-td product-actions-cell">
                           <div className="product-action-buttons">
                             <Link
-                              to={`/admin/products/edit/${product._id}`} // Correct: client-side route
+                              to={`/admin/products/edit/${product._id}`}
                               className="edit-product-button"
                             >
                               Edit
