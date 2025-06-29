@@ -113,7 +113,7 @@ const EditProduct = () => {
           <div>
             <img
               width={100}
-              src={form.images[0].url.startsWith('http') ? form.images[0].url : `http://localhost:5000/uploads/${form.images[0].url}`}
+              src={form.images[0].url.startsWith('http') ? form.images[0].url : `https://admin-backend-x8of.onrender.com/${form.images[0].url}`}
               alt="Product Preview"
               className="w-40 h-auto rounded-md object-cover border border-gray-200"
             />
