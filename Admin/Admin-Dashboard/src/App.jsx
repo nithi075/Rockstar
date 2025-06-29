@@ -15,7 +15,7 @@ import CreateProduct from './pages/Admin/CreateProduct'; // <--- IMPORT THE NEW 
 import './index.css'
 
 // --- GLOBAL AXIOS CONFIGURATION: START ---
-axios.defaults.baseURL = 'http://localhost:5000/api/v1'; // Your backend API base URL
+axios.defaults.baseURL = 'https://admin-backend-x8of.onrender.com/api/v1'; // Your backend API base URL
 axios.defaults.withCredentials = true; // Crucial for sending httpOnly cookies across domains/ports
 // --- GLOBAL AXIOS CONFIGURATION: END ---
 
