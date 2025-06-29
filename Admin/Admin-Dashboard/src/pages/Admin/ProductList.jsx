@@ -21,7 +21,7 @@ export default function ProductList() {
       // Ensure your axios config sets the baseURL (e.g., http://localhost:5000/api/v1)
       // If not, you might need to use the full path: `http://localhost:5000/api/v1/products...`
       const res = await axios.get(
-        `https://admin-backend-x8of.onrender.com/products?page=${currentPage}&limit=${productsPerPage}&keyword=${searchQuery}`
+        `https://admin-backend-x8of.onrender.com/api/v1/products?page=${currentPage}&limit=${productsPerPage}&keyword=${searchQuery}`
       );
       setProducts(res.data.products);
       setTotalProducts(res.data.totalCount);
@@ -49,7 +49,7 @@ export default function ProductList() {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this product? This action cannot be undone.")) {
       try {
-        await axios.delete(`https://admin-backend-x8of.onrender.com/products/${id}`); // Assuming base URL is configured
+        await axios.delete(`https://admin-backend-x8of.onrender.com/api/v1/products/${id}`); // Assuming base URL is configured
         alert("Product deleted successfully!");
         fetchProducts(); // Re-fetch products to update the list
       } catch (err) {
@@ -121,7 +121,7 @@ export default function ProductList() {
                   products.map((product) => {
                     const imageUrl =
                       product.images && product.images.length > 0
-                        ? `https://admin-backend-x8of.onrender.com/${product.images[0].url}`
+                        ? `https://admin-backend-x8of.onrender.com/api/v1/${product.images[0].url}`
                         : "/placeholder.jpg"; // Fallback placeholder image
 
                     return (
