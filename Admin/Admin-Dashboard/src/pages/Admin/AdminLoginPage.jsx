@@ -16,19 +16,18 @@ const AdminLoginPage = () => {
         setLoading(true);
 
         try {
-            // Axios global config (baseURL, withCredentials) handles the full URL
             const response = await axios.post('/users/login', { email, password });
 
             if (response.data.success) {
                 alert('Login Successful!');
                 console.log("Login Response Data:", response.data);
-                navigate('https://admin-backend-x8of.onrender.com/api/v1/admin/dashboard'); // Redirect to admin dashboard on success
+                // CORRECTED LINE: Navigate to the frontend's admin dashboard route
+                navigate('/admin/dashboard');
             } else {
                 setError(response.data.message || 'Login failed. Please try again.');
             }
         } catch (err) {
             console.error('Login error:', err);
-            // Access the error message from the backend if available
             setError(err.response?.data?.message || 'An unexpected error occurred during login.');
         } finally {
             setLoading(false);
