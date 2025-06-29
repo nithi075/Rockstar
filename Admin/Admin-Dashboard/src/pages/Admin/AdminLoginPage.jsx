@@ -17,7 +17,7 @@ const AdminLoginPage = () => {
 
         try {
             // Axios global config (baseURL, withCredentials) handles the full URL
-            const response = await axios.post('/users/login', { email, password });
+            const response = await axios.post('https://admin-backend-x8of.onrender.com/api/v1/users/login', { email, password });
 
             if (response.data.success) {
                 alert('Login Successful!');
