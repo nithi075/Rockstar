@@ -1,37 +1,19 @@
 // pages/Admin/Dashboard.jsx
 import { useEffect, useState } from "react";
-import api from "../../axios"; // <--- THIS IS THE CORRECTED IMPORT PATH based on your file structure
+import axios from "axios";
 
 export default function Dashboard() {
   const [stats, setStats] = useState({ totalProducts: 0, totalOrders: 0, totalUsers: 0 });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchDashboardStats = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await api.get("/admin/dashboard");
+    axios.get("/admin/dashboard") // Simplified URL, no need for full base URL
+      .then(res => {
         setStats(res.data.data);
-      } catch (error) {
+      })
+      .catch(error => {
         console.error("Error fetching dashboard stats:", error);
-        setError("Failed to load dashboard stats. " + (error.response?.data?.message || error.message || "Please try again."));
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDashboardStats();
+      });
   }, []);
-
-  if (loading) {
-    return <div className="DashBoard">Loading dashboard stats...</div>;
-  }
-
-  if (error) {
-    return <div className="DashBoard Error">Error: {error}</div>;
-  }
 
   return (
     <div className="DashBoard">
