@@ -1,9 +1,7 @@
 // src/App.jsx
 import React from "react";
 import { BrowserRouter, Routes, Route, useLocation, Link } from "react-router-dom";
-// No direct axios.defaults.baseURL here, as it's now set in src/axios.js
-// We just need to import 'api' if we plan to use it directly in App.jsx for some reason,
-// but for routing, it's not strictly necessary.
+import axios from 'axios';
 
 // Admin Components
 import AdminNavbar from "./components/AdminNavbar";
@@ -13,8 +11,13 @@ import OrderList from "./pages/Admin/OrderList";
 import EditProduct from "./pages/Admin/EditProduct";
 import OrderDetails from "./pages/Admin/OrderDetails";
 import AdminLoginPage from './pages/Admin/AdminLoginPage';
-import CreateProduct from './pages/Admin/CreateProduct';
-import './index.css';
+import CreateProduct from './pages/Admin/CreateProduct'; // <--- IMPORT THE NEW COMPONENT HERE
+import './index.css'
+
+// --- GLOBAL AXIOS CONFIGURATION: START ---
+axios.defaults.baseURL = 'http://localhost:5000/api/v1'; // Your backend API base URL
+axios.defaults.withCredentials = true; // Crucial for sending httpOnly cookies across domains/ports
+// --- GLOBAL AXIOS CONFIGURATION: END ---
 
 function AppContent() {
   const location = useLocation();
@@ -31,7 +34,8 @@ function AppContent() {
         <Route path="/admin/dashboard" element={<Dashboard />} />
         <Route path="/admin/products" element={<ProductList />} />
         <Route path="/admin/products/edit/:id" element={<EditProduct />} />
-        <Route path="/admin/products/new" element={<CreateProduct />} />
+        {/* Replace the placeholder with the actual CreateProduct component */}
+        <Route path="/admin/products/new" element={<CreateProduct />} /> {/* <--- UPDATED THIS LINE */}
         <Route path="/admin/orders" element={<OrderList />} />
         <Route path="/admin/orders/:orderId" element={<OrderDetails />} />
 
