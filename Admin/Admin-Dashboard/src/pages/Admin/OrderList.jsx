@@ -1,6 +1,6 @@
 // pages/Admin/OrderList.jsx
 import { useEffect, useState } from "react";
-import axios from "axios"; // Assuming axios is configured globally with a baseURL
+import api from "../../axios"; // Import the custom axios instance
 import { Link } from "react-router-dom";
 
 export default function OrderList() {
@@ -11,17 +11,14 @@ export default function OrderList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [ordersPerPage] = useState(10); // Display 10 orders per page
 
-  // Get the backend root URL from environment variables for image display
-  // This should be the *root* of your backend domain, not necessarily the API base path.
-  // Example: 'https://admin-backend-x8of.onrender.com' or 'http://localhost:5000'
-  const backendRootUrl = import.meta.env.VITE_BACKEND_ROOT_URL || process.env.REACT_APP_BACKEND_ROOT_URL;
-
+  // HARDCODED: Root URL for images. This needs to be changed manually for local dev.
+  const backendRootUrl = 'https://admin-backend-x8of.onrender.com';
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        // This is already correct, using a relative path and relying on Axios's baseURL
-        const res = await axios.get("/orders");
+        // Uses the baseURL configured in src/axios.js
+        const res = await api.get("/orders");
         // Sort orders by creation date (assuming 'createdAt' field exists)
         const sortedOrders = (res.data.orders || []).sort((a, b) =>
           new Date(b.createdAt) - new Date(a.createdAt)
@@ -40,9 +37,8 @@ export default function OrderList() {
 
   const handleMarkAsDelivered = async (orderId) => {
     try {
-      // CORRECTED: Use relative URL, relying on Axios's global baseURL
-      // Assuming your backend route is /api/v1/orders/:id/deliver
-      await axios.put(`/orders/${orderId}/deliver`, { status: 'Delivered' });
+      // Uses the baseURL configured in src/axios.js
+      await api.put(`/orders/${orderId}/deliver`, { status: 'Delivered' });
       // Update the order status in the local state
       setOrders(prevOrders =>
         prevOrders.map(order =>
@@ -98,13 +94,11 @@ export default function OrderList() {
                   <td className="order-img">
                     {order.cartItems && order.cartItems.length > 0 && order.cartItems[0].product?.images?.[0]?.url ? (
                       <img
-                        // CORRECTED: Use the backendRootUrl for image paths
-                        // Assuming your backend serves images from /uploads/ at its root
-                        // E.g., https://admin-backend-x8of.onrender.com/uploads/someimage.jpg
+                        // HARDCODED: Image URL construction
                         src={order.cartItems[0].product.images[0].url.startsWith('http') // Check if it's already a full URL (e.g., Cloudinary)
                             ? order.cartItems[0].product.images[0].url
-                            : `${backendRootUrl}/uploads/${order.cartItems[0].product.images[0].url.startsWith('/') 
-                                ? order.cartItems[0].product.images[0].url.substring(1) 
+                            : `${backendRootUrl}/uploads/${order.cartItems[0].product.images[0].url.startsWith('/')
+                                ? order.cartItems[0].product.images[0].url.substring(1)
                                 : order.cartItems[0].product.images[0].url}`
                         }
                         alt={order.cartItems[0].product?.name || "Product"}
