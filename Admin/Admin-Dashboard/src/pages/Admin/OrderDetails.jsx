@@ -12,7 +12,7 @@ const OrderDetails = () => {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const { data } = await axios.get(`/orders/${orderId}`);
+        const { data } = await axios.get(`https://admin-backend-x8of.onrender.com/orders/${orderId}`);
         setOrder(data.order);
         setLoading(false);
       } catch (err) {
