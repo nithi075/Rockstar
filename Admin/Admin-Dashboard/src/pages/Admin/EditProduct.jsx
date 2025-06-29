@@ -1,7 +1,6 @@
-// pages/Admin/EditProduct.jsx
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import api from '../../axios'; // <--- Make sure this import path is correct based on your file structure
+import api from '../../axios'; // Make sure this import path is correct based on your file structure
 
 const EditProduct = () => {
   const { id } = useParams();
@@ -19,12 +18,18 @@ const EditProduct = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // List of valid categories from your backend/models/productModel.js enum
+  const categories = [
+    'Electronics', 'Cameras', 'Laptops', 'Accessories', 'Headphones',
+    'Food', 'Books', 'Clothes/Shoes', 'Beauty/Health', 'Sports',
+    'Outdoor', 'Home', 'T-Shirts', 'Mobiles', 'Watches', 'Jewelry'
+  ];
+
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         // Use 'api' instance for GET request
-        // It will become: http://localhost:5000/api/v1/products/:id
-        const res = await api.get(`/products/${id}`);
+        const res = await api.get(`/products/${id}`); // Path is correct for fetching single product
         const product = res.data.product;
 
         setForm({
@@ -33,6 +38,7 @@ const EditProduct = () => {
           description: product.description || "",
           category: product.category || "",
           images: product.images || [],
+          // Ensure sizes are structured correctly if product.sizes is null/undefined
           sizes: product.sizes || [],
         });
         setLoading(false);
@@ -81,15 +87,13 @@ const EditProduct = () => {
       name: form.name,
       price: Number(form.price),
       description: form.description,
-      category: form.category,
-      images: form.images,
+      category: form.category, // This will now come from the <select>
+      images: form.images, // If images are handled separately (e.g., uploads), this part might need adjustment
       sizes: form.sizes,
     };
 
     try {
-      // *** THE FIX IS HERE ***
-      // Use the 'api' instance and provide only the relative path after the baseURL
-      // It will become: http://localhost:5000/api/v1/products/admin/product/:id
+      // Use the 'api' instance and correct path for PUT request
       await api.put(`/products/admin/product/${id}`, payload);
 
       console.log("Product updated successfully!");
@@ -142,20 +146,25 @@ const EditProduct = () => {
             onChange={handleChange}
             className="price-inp"
             required
+            min="0" // Added min attribute for price
           />
         </div>
 
         <div>
           <label htmlFor="category" className="pro-category">Category</label>
-          <input
-            type="text"
+          <select // <--- CRITICAL CHANGE: Use select for category
             id="category"
             name="category"
             value={form.category}
             onChange={handleChange}
             className="category-inp"
             required
-          />
+          >
+            <option value="">--Select a Category--</option> {/* Default option */}
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
         </div>
 
         <div>
