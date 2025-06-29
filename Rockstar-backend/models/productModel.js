@@ -34,9 +34,7 @@ const productSchema = new mongoose.Schema({
         required: [true, 'Please select a category for this product'],
         enum: {
             values: [
-                'Electronics', 'Cameras', 'Laptops', 'Accessories', 'Headphones',
-                'Food', 'Books', 'Clothes/Shoes', 'Beauty/Health', 'Sports',
-                'Outdoor', 'Home', 'T-Shirts', 'Mobiles', 'Watches', 'Jewelry'
+                'Shirts', 'T-Shirts', 'Jackets', 'Pants', 'Shorts','Formal Pants','Track Pants','Oversized-Shirts'
             ],
             message: 'Please select a valid category'
         }
