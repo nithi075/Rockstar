@@ -1,7 +1,7 @@
 // pages/Admin/OrderDetails.jsx
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+import axios from "axios"; // Assuming axios is configured globally with a baseURL
 
 const OrderDetails = () => {
   const { orderId } = useParams();
@@ -9,10 +9,20 @@ const OrderDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Get the backend base URL from environment variables for image display
+  // This should be the *root* of your backend domain, not necessarily the API base path.
+  // Example: 'https://admin-backend-x8of.onrender.com' or 'http://localhost:5000'
+  const backendRootUrl = import.meta.env.VITE_BACKEND_ROOT_URL || process.env.REACT_APP_BACKEND_ROOT_URL;
+
+
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const { data } = await axios.get(`https://admin-backend-x8of.onrender.com/api/v1/orders/${orderId}`);
+        // CORRECTED: Use relative URL, relying on Axios's global baseURL
+        // This assumes your axios.defaults.baseURL is set to something like
+        // 'https://admin-backend-x8of.onrender.com/api/v1' in production
+        // or 'http://localhost:5000/api/v1' in development
+        const { data } = await axios.get(`/orders/${orderId}`);
         setOrder(data.order);
         setLoading(false);
       } catch (err) {
@@ -34,8 +44,7 @@ const OrderDetails = () => {
 
       <div className="Info">
         <h3 className="Cust-info">Customer Information:</h3>
-        <p><strong className="
-        Cust-Name">Name:</strong> {order.customerInfo?.name}</p>
+        <p><strong className="Cust-Name">Name:</strong> {order.customerInfo?.name}</p>
         <p><strong className="Cust-Phone">Phone:</strong> {order.customerInfo?.phone}</p>
         <p><strong className="Cust-Address">Address:</strong> {order.customerInfo?.address || 'N/A'}</p>
         <p><strong className="Cust-OrderDate">Order Date:</strong> {new Date(order.createdAt).toLocaleString()}</p>
@@ -50,29 +59,19 @@ const OrderDetails = () => {
       <ul className="Order-details">
         {order.cartItems.map((item) => (
           <li key={item._id} className="Cust-id">
-            {/* THIS IS THE PRIMARY PLACE TO CHANGE */}
             <img
-              // **POTENTIAL CHANGE HERE:**
-              // You need to ensure the URL constructed here exactly matches
-              // how your backend serves the images.
-              //
-              // Option 1 (Most Common): If item.product.images[0].url is JUST the filename (e.g., "product123.jpg")
-              src={item.product?.images?.[0]?.url ? `https://admin-backend-x8of.onrender.com/api/v1/${item.product.images[0].url}` : "/placeholder.jpg"}
-
-              // Option 2: If item.product.images[0].url ALREADY includes "/uploads/" (e.g., "/uploads/product123.jpg")
-              // src={item.product?.images?.[0]?.url ? `http://localhost:5000${item.product.images[0].url}` : "/placeholder.jpg"}
-
-              // Option 3: If item.product.images[0].url is ALREADY a complete URL (e.g., "http://localhost:5000/uploads/product123.jpg")
-              // src={item.product?.images?.[0]?.url ? item.product.images[0].url : "/placeholder.jpg"}
-
-              // Option 4 (Robust): Handles cases where 'url' might or might not start with a '/'
-              // src={item.product?.images?.[0]?.url
-              //   ? `http://localhost:5000/${item.product.images[0].url.startsWith('/') ? item.product.images[0].url.substring(1) : item.product.images[0].url}`
-              //   : "/placeholder.jpg"
-              // }
-
+              // CORRECTED: Use the backendRootUrl for image paths
+              // Assuming your backend serves images from /uploads/ at its root
+              // E.g., https://admin-backend-x8of.onrender.com/uploads/someimage.jpg
+              src={item.product?.images?.[0]?.url 
+                ? (item.product.images[0].url.startsWith('http') // Check if it's already a full URL (e.g., Cloudinary)
+                    ? item.product.images[0].url
+                    : `${backendRootUrl}/uploads/${item.product.images[0].url.startsWith('/') ? item.product.images[0].url.substring(1) : item.product.images[0].url}`
+                  )
+                : "/placeholder.jpg"
+              }
               width={100}
-              alt={item.product?.name || "Product Image"} // Good practice to have a fallback for alt text
+              alt={item.product?.name || "Product Image"}
               className="Cust-image"
             />
             <div className="More-cus-info">
