@@ -1,6 +1,6 @@
 // src/pages/Admin/AdminLoginPage.jsx
 import React, { useState } from 'react';
-import api from '../../axios'; // IMPORT YOUR CUSTOM AXIOS INSTANCE
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const AdminLoginPage = () => {
@@ -16,39 +16,20 @@ const AdminLoginPage = () => {
         setLoading(true);
 
         try {
-            // CORRECTED: Use your custom 'api' instance instead of 'axios'
-            // This ensures baseURL and withCredentials are applied
-            const response = await api.post('/users/login', { email, password });
+            // Axios global config (baseURL, withCredentials) handles the full URL
+            const response = await axios.post('/users/login', { email, password });
 
             if (response.data.success) {
                 alert('Login Successful!');
                 console.log("Login Response Data:", response.data);
-                // Navigate to the frontend's admin dashboard route
-                navigate('/admin/dashboard');
+                navigate('/admin/dashboard'); // Redirect to admin dashboard on success
             } else {
-                // Backend sent a success: false, along with a message
-                setError(response.data.message || 'Login failed. Please check your credentials.');
+                setError(response.data.message || 'Login failed. Please try again.');
             }
         } catch (err) {
             console.error('Login error:', err);
-            // More robust error handling for network errors or server responses
-            if (err.response) {
-                // The request was made and the server responded with a status code
-                // that falls out of the range of 2xx
-                console.error("Error response data:", err.response.data);
-                console.error("Error response status:", err.response.status);
-                console.error("Error response headers:", err.response.headers);
-                setError(err.response.data.message || `Login failed. Server responded with status ${err.response.status}.`);
-            } else if (err.request) {
-                // The request was made but no response was received
-                // `error.request` is an instance of XMLHttpRequest in the browser and an http.ClientRequest in node.js
-                console.error("Error request:", err.request);
-                setError('No response from server. Please check your internet connection or server status.');
-            } else {
-                // Something happened in setting up the request that triggered an Error
-                console.error('Error message:', err.message);
-                setError('An unexpected error occurred during login setup.');
-            }
+            // Access the error message from the backend if available
+            setError(err.response?.data?.message || 'An unexpected error occurred during login.');
         } finally {
             setLoading(false);
         }
