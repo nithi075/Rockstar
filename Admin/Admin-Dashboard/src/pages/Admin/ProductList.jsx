@@ -121,7 +121,7 @@ export default function ProductList() {
                   products.map((product) => {
                     const imageUrl =
                       product.images && product.images.length > 0
-                        ? `http://localhost:5000/uploads/${product.images[0].url}`
+                        ? `https://admin-backend-x8of.onrender.com/uploads/${product.images[0].url}`
                         : "/placeholder.jpg"; // Fallback placeholder image
 
                     return (
