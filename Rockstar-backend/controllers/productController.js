@@ -3,7 +3,7 @@ const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 const ErrorHandler = require('../utils/errorHandler'); // Make sure you have this utility
 
 // @desc    Get all products
-// @route   GET /api/v1/products (with pagination, search, category filter, and latest sorting)
+// @route   GET /api/v1/products (with pagination, search, category filter, and sorting)
 // @access  Public
 exports.getAllProducts = catchAsyncErrors(async (req, res, next) => {
     const page = Number(req.query.page) || 1;
@@ -14,7 +14,6 @@ exports.getAllProducts = catchAsyncErrors(async (req, res, next) => {
         ? { name: { $regex: req.query.keyword, $options: 'i' } }
         : {};
 
-    // --- Added Category and Price Filtering from your previous attempts ---
     const query = { ...keyword };
 
     if (req.query.category) {
@@ -30,12 +29,19 @@ exports.getAllProducts = catchAsyncErrors(async (req, res, next) => {
             query.price.$lte = parseFloat(req.query.maxPrice);
         }
     }
-    // --- End Category and Price Filtering ---
+
+    // --- NEW: Add Sorting Logic ---
+    const sortField = req.query.sortField || 'createdAt'; // Default sort field
+    const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1; // Default sort order is descending
+
+    const sortOptions = {};
+    sortOptions[sortField] = sortOrder;
+    // --- END NEW: Add Sorting Logic ---
 
     const totalCount = await Product.countDocuments(query); // Use the combined query
 
     const products = await Product.find(query) // Use the combined query
-        .sort({ createdAt: -1 }) // Sort by creation date for "latest" products
+        .sort(sortOptions) // Apply dynamic sorting
         .skip(skip)
         .limit(limit);
 
