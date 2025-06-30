@@ -1,7 +1,7 @@
 // pages/Admin/OrderList.jsx
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
+import api from "../../axios"; // ✅ Use shared Axios instance
 
 export default function OrderList() {
   const [orders, setOrders] = useState([]);
@@ -9,69 +9,50 @@ export default function OrderList() {
   const [error, setError] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [ordersPerPage] = useState(10);
+  const ordersPerPage = 10;
 
   useEffect(() => {
     const fetchOrders = async () => {
+      setLoading(true);
       try {
-        const res = await axios.get("https://admin-backend-x8of.onrender.com/api/v1/orders", {
-          withCredentials: true, // Needed for cookie auth
-        });
-
-        const sortedOrders = (res.data.orders || []).sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        const res = await api.get("/orders"); // ✅ Use api instead of axios
+        const sortedOrders = (res.data.orders || []).sort((a, b) =>
+          new Date(b.createdAt) - new Date(a.createdAt)
         );
         setOrders(sortedOrders);
       } catch (err) {
-        console.error("Error fetching orders:", err);
         setError("Failed to fetch orders. " + (err.response?.data?.message || err.message));
       } finally {
         setLoading(false);
       }
     };
-
     fetchOrders();
   }, []);
 
   const handleMarkAsDelivered = async (orderId) => {
     try {
-      await axios.put(
-        `https://admin-backend-x8of.onrender.com/api/v1/orders/${orderId}/deliver`,
-        { status: "Delivered" },
-        { withCredentials: true }
-      );
-      setOrders((prevOrders) =>
-        prevOrders.map((order) =>
-          order._id === orderId ? { ...order, status: "Delivered" } : order
+      await api.put(`/orders/${orderId}/deliver`, { status: 'Delivered' });
+      setOrders(prev =>
+        prev.map(order =>
+          order._id === orderId ? { ...order, status: 'Delivered' } : order
         )
       );
-      alert("Order marked as Delivered!");
+      alert("Order marked as delivered!");
     } catch (err) {
-      console.error("Error marking order as delivered:", err);
-      alert("Failed to mark order as delivered. " + (err.response?.data?.message || err.message));
+      alert("Failed to update status. " + (err.response?.data?.message || err.message));
     }
   };
 
-  const calculateTotalAmount = (cartItems) => {
-    return cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2);
-  };
+  const calculateTotalAmount = (cartItems) =>
+    cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2);
 
   const indexOfLastOrder = currentPage * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
   const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
-
   const totalPages = Math.ceil(orders.length / ordersPerPage);
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const paginate = (page) => setCurrentPage(page);
 
-  // 👉 Inline Loader using your className
-  if (loading)
-    return (
-      <div className="Load-order">
-        <div className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full text-blue-500"></div>
-        <p>Loading orders...</p>
-      </div>
-    );
-
+  if (loading) return <p className="Load-order">Loading orders...</p>;
   if (error) return <p className="error-order">{error}</p>;
 
   return (
@@ -99,14 +80,14 @@ export default function OrderList() {
                     {order.cartItems?.[0]?.product?.images?.[0]?.url ? (
                       <img
                         src={`https://admin-backend-x8of.onrender.com/uploads/${order.cartItems[0].product.images[0].url}`}
-                        alt={order.cartItems[0].product?.name || "Product"}
+                        alt={order.cartItems[0].product.name || "Product"}
                         className="ord-img"
                       />
                     ) : (
                       <div className="order-no-img">No Image</div>
                     )}
                   </td>
-                  <td className="order-info-name">{order.customerInfo?.name || "N/A"}</td>
+                  <td className="order-info-name">{order.customerInfo?.name || 'N/A'}</td>
                   <td className="order-length-cartitems">{order.cartItems?.length || 0}</td>
                   <td className="cart-total-amount">₹{calculateTotalAmount(order.cartItems || [])}</td>
                   <td className="order-status">
@@ -142,17 +123,18 @@ export default function OrderList() {
             </tbody>
           </table>
 
+          {/* Pagination */}
           {totalPages > 1 && (
             <div className="pagination">
-              {[...Array(totalPages).keys()].map((number) => (
+              {[...Array(totalPages)].map((_, i) => (
                 <button
-                  key={number + 1}
-                  onClick={() => paginate(number + 1)}
+                  key={i + 1}
+                  onClick={() => paginate(i + 1)}
                   className={`page-number ${
-                    currentPage === number + 1 ? "more-than-one" : "less-than-one"
+                    currentPage === i + 1 ? "more-than-one" : "less-than-one"
                   }`}
                 >
-                  {number + 1}
+                  {i + 1}
                 </button>
               ))}
             </div>
