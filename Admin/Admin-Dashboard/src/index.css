@@ -3236,3 +3236,75 @@
     }
     
 }
+/* Sort By Dropdown Styles */
+.product-sort-by {
+    display: flex; /* Arranges label and select horizontally */
+    align-items: center; /* Vertically aligns label and select */
+    gap: 12px; /* Space between the "Sort By:" label and the dropdown */
+    white-space: nowrap; /* Prevents the label and dropdown from wrapping to a new line */
+}
+
+.product-sort-by label {
+    font-size: 1em;
+    color: #495057; /* Dark grey text */
+    font-weight: 500; /* Medium font weight */
+}
+
+.sort-select {
+    padding: 10px 15px; /* Padding inside the dropdown */
+    border: 1px solid #ced4da; /* Light grey border */
+    border-radius: 8px; /* Rounded corners */
+    background-color: white; /* White background */
+    font-size: 1em;
+    color: #495057; /* Text color for selected option */
+    -webkit-appearance: none; /* Remove default dropdown arrow (for WebKit browsers like Chrome/Safari) */
+    -moz-appearance: none; /* Remove default dropdown arrow (for Firefox) */
+    appearance: none; /* Standard property to remove default dropdown arrow */
+    /* Custom arrow using SVG data URI */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http://www.w3.org/2000/svg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236c757d%22%20d%3D%22M287%20197.9c-3.6%203.6-8.5%205.5-13.6%205.5s-10.1-1.9-13.6-5.5L146.2%2099.7%2032.6%20213.3c-3.6%203.6-8.5%205.5-13.6%205.5s-10.1-1.9-13.6-5.5-5.5-8.5-5.5-13.6%201.9-10.1%205.5-13.6L132.6%2068.7c7.2-7.2%2018.6-7.2%2025.7%200l113.7%20113.7c3.6%203.6%205.5%208.5%205.5%2013.6s-1.9%2010.1-5.5%2013.6z%22/%3E%3C/svg%3E');
+    background-repeat: no-repeat; /* Don't repeat the arrow */
+    background-position: right 15px center; /* Position the arrow 15px from the right, vertically centered */
+    background-size: 10px; /* Size of the custom arrow */
+    padding-right: 35px; /* Add extra padding on the right to make space for the arrow */
+    cursor: pointer; /* Indicate it's clickable */
+    outline: none; /* Remove default focus outline */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03); /* Soft shadow for depth */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions for focus/hover */
+}
+
+.sort-select:hover {
+    border-color: #a0a0a0; /* Darker border on hover */
+}
+
+.sort-select:focus {
+    border-color: #007bff; /* Primary blue border on focus */
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Blue glow on focus */
+}
+
+/* --- Responsive Adjustments for small screens --- */
+@media (max-width: 768px) {
+    .product-sort-by {
+        flex-direction: column; /* Stack label and select vertically */
+        align-items: flex-start; /* Align items to the start when stacked */
+        width: 100%; /* Take full width */
+        gap: 8px; /* Reduce gap when stacked */
+    }
+
+    .sort-select {
+        width: 100%; /* Make dropdown take full width when stacked */
+        box-sizing: border-box; /* Include padding and border in the element's total width */
+        padding-right: 15px; /* Adjust padding as full width might not need extra space for arrow */
+        background-position: right 10px center; /* Adjust arrow position for full width */
+    }
+}
+
+@media (max-width: 480px) {
+    .product-sort-by label {
+        font-size: 0.9em; /* Slightly smaller font for very small screens */
+    }
+
+    .sort-select {
+        padding: 8px 12px; /* Reduce padding for smaller screens */
+        font-size: 0.9em;
+    }
+}
