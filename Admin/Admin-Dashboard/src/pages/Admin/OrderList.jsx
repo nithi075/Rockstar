@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
@@ -7,15 +6,13 @@ export default function OrderList() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [ordersPerPage] = useState(10); // Display 10 orders per page
+  const [ordersPerPage] = useState(10);
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const res = await axios.get("/orders");
-        // Sort orders by creation date (assuming 'createdAt' field exists)
         const sortedOrders = (res.data.orders || []).sort((a, b) =>
           new Date(b.createdAt) - new Date(a.createdAt)
         );
@@ -33,9 +30,7 @@ export default function OrderList() {
 
   const handleMarkAsDelivered = async (orderId) => {
     try {
-      // Assuming an API endpoint like /orders/:id/deliver for marking as delivered
-      await axios.put(/orders/${orderId}/deliver, { status: 'Delivered' });
-      // Update the order status in the local state
+      await axios.put(`/orders/${orderId}/deliver`, { status: 'Delivered' });
       setOrders(prevOrders =>
         prevOrders.map(order =>
           order._id === orderId ? { ...order, status: 'Delivered' } : order
@@ -52,15 +47,10 @@ export default function OrderList() {
     return cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2);
   };
 
-  // Calculate orders to display on the current page
   const indexOfLastOrder = currentPage * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
   const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
-
-  // Calculate total pages
   const totalPages = Math.ceil(orders.length / ordersPerPage);
-
-  // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   if (loading) return <p className="Load-order">Loading orders...</p>;
@@ -85,13 +75,12 @@ export default function OrderList() {
               </tr>
             </thead>
             <tbody>
-              {currentOrders.map(order => ( // Use currentOrders here
+              {currentOrders.map(order => (
                 <tr key={order._id} className="details-order">
                   <td className="order-img">
-                    {order.cartItems && order.cartItems.length > 0 && order.cartItems[0].product?.images?.[0]?.url ? (
+                    {order.cartItems?.[0]?.product?.images?.[0]?.url ? (
                       <img
-                        
-                        src={http://localhost:5000/uploads/${order.cartItems[0].product.images[0].url}}
+                        src={`http://localhost:5000/uploads/${order.cartItems[0].product.images[0].url}`}
                         alt={order.cartItems[0].product?.name || "Product"}
                         className="ord-img"
                       />
@@ -99,22 +88,22 @@ export default function OrderList() {
                       <div className="order-no-img">No Image</div>
                     )}
                   </td>
-                  <td className="order-info-name" >{order.customerInfo?.name || 'N/A'}</td>
+                  <td className="order-info-name">{order.customerInfo?.name || 'N/A'}</td>
                   <td className="order-length-cartitems">{order.cartItems?.length || 0}</td>
                   <td className="cart-total-amount">₹{calculateTotalAmount(order.cartItems || [])}</td>
                   <td className="order-status">
-                    <span className={order-current-status ${
-                        order.status === 'Delivered' ? 'deliverd-order' :
-                        order.status === 'Cancelled' ? 'cancelled-order' :
-                        'bg-blue-100 text-blue-800'
-                    }}>
-                        {order.status}
+                    <span className={`order-current-status ${
+                      order.status === 'Delivered' ? 'deliverd-order' :
+                      order.status === 'Cancelled' ? 'cancelled-order' :
+                      'bg-blue-100 text-blue-800'
+                    }`}>
+                      {order.status}
                     </span>
                   </td>
                   <td className="order-id">
                     <div className="order-admin">
                       <Link
-                        to={/admin/orders/${order._id}}
+                        to={`/admin/orders/${order._id}`}
                         className="order-view"
                       >
                         View
@@ -133,6 +122,7 @@ export default function OrderList() {
               ))}
             </tbody>
           </table>
+
           {/* Pagination Controls */}
           {totalPages > 1 && (
             <div className="pagination">
@@ -140,11 +130,9 @@ export default function OrderList() {
                 <button
                   key={number + 1}
                   onClick={() => paginate(number + 1)}
-                  className={page-number ${
-                    currentPage === number + 1
-                      ? 'more-than-one'
-                      : 'less-than-one'
-                  }}
+                  className={`page-number ${
+                    currentPage === number + 1 ? 'more-than-one' : 'less-than-one'
+                  }`}
                 >
                   {number + 1}
                 </button>
