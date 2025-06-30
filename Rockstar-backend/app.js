@@ -19,7 +19,7 @@ app.use(cookieParser());
 
 // CORS configuration with credentials - This is good!
 app.use(cors({
-    origin: [process.env.FRONTEND_URL,'http://localhost:5173' , 'http://localhost:5174' ,'http://localhost:5175','https://admin-backend-x8of.onrender.com'], // Allow both values if they are different
+    origin: [process.env.FRONTEND_URL,'http://localhost:5173' , 'http://localhost:5174' ,'http://localhost:5175','https://rockstar-dashboard.onrender.com'], // Allow both values if they are different
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
