@@ -1,40 +1,41 @@
-// src/axios.js
+// src/axios.js (with added console.logs)
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://admin-backend-x8of.onrender.com/api/v1',
-  withCredentials: true,
+    baseURL: 'https://admin-backend-x8of.onrender.com/api/v1',
+    withCredentials: true,
 });
 
-// Request Interceptor
 api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('authToken'); // Retrieve token from storage
+    (config) => {
+        const token = localStorage.getItem('authToken');
+        console.log('AXIOS INTERCEPTOR DEBUG: Checking token...');
+        console.log('AXIOS INTERCEPTOR DEBUG: Token from localStorage:', token ? 'FOUND (' + token.substring(0, 20) + '...)' : 'NOT FOUND');
 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+            console.log('AXIOS INTERCEPTOR DEBUG: Authorization header set for request:', config.url);
+        } else {
+            console.log('AXIOS INTERCEPTOR DEBUG: NO TOKEN, Authorization header WILL NOT be set for request:', config.url);
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
     }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
 );
 
-// Response Interceptor (for handling 401 errors globally)
 api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response && error.response.status === 401) {
-      console.log("Unauthorized response detected. Clearing token and redirecting to login.");
-      localStorage.removeItem('authToken'); // Clear the expired/invalid token
-      delete api.defaults.headers.common['Authorization']; // Clear header from axios instance
-      // Redirect to login page
-      // You might need to adjust this depending on your router (e.g., history.push('/login'))
-      window.location.href = '/login';
+    (response) => response,
+    (error) => {
+        if (error.response && error.response.status === 401) {
+            console.error("Unauthorized response detected from backend:", error.response.data.message);
+            localStorage.removeItem('authToken');
+            delete api.defaults.headers.common['Authorization'];
+            window.location.href = '/login';
+        }
+        return Promise.reject(error);
     }
-    return Promise.reject(error);
-  }
 );
 
 export default api;
