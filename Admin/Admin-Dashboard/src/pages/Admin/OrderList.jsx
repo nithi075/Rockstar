@@ -1,26 +1,30 @@
+// pages/Admin/OrderList.jsx
 import { useEffect, useState } from "react";
+import axios from "axios";
 import { Link } from "react-router-dom";
-import api from "../../axios"; // custom axios instance that includes token
-import { Loader } from "../../components/Loader";
-import { Alert } from "../../components/Alert";
-
-const backendURL = "https://admin-backend-x8of.onrender.com/api/v1";
 
 export default function OrderList() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [ordersPerPage] = useState(10);
+
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        setLoading(true);
-        const res = await api.get(`${backendURL}/orders`);
-        setOrders(res.data.orders || []);
-        setError("");
+        const res = await axios.get("https://admin-backend-x8of.onrender.com/api/v1/orders", {
+          withCredentials: true, // Needed for cookie auth
+        });
+
+        const sortedOrders = (res.data.orders || []).sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setOrders(sortedOrders);
       } catch (err) {
         console.error("Error fetching orders:", err);
-        setError("Failed to fetch orders. Please check authentication.");
+        setError("Failed to fetch orders. " + (err.response?.data?.message || err.message));
       } finally {
         setLoading(false);
       }
@@ -29,61 +33,130 @@ export default function OrderList() {
     fetchOrders();
   }, []);
 
-  if (loading) return <Loader />;
-  if (error) return <Alert type="error" message={error} />;
+  const handleMarkAsDelivered = async (orderId) => {
+    try {
+      await axios.put(
+        `https://admin-backend-x8of.onrender.com/api/v1/orders/${orderId}/deliver`,
+        { status: "Delivered" },
+        { withCredentials: true }
+      );
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order._id === orderId ? { ...order, status: "Delivered" } : order
+        )
+      );
+      alert("Order marked as Delivered!");
+    } catch (err) {
+      console.error("Error marking order as delivered:", err);
+      alert("Failed to mark order as delivered. " + (err.response?.data?.message || err.message));
+    }
+  };
+
+  const calculateTotalAmount = (cartItems) => {
+    return cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2);
+  };
+
+  const indexOfLastOrder = currentPage * ordersPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+  const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
+
+  const totalPages = Math.ceil(orders.length / ordersPerPage);
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // 👉 Inline Loader using your className
+  if (loading)
+    return (
+      <div className="Load-order">
+        <div className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full text-blue-500"></div>
+        <p>Loading orders...</p>
+      </div>
+    );
+
+  if (error) return <p className="error-order">{error}</p>;
 
   return (
-    <div className="p-4">
-      <h2 className="text-2xl font-semibold mb-4">All Orders</h2>
+    <div className="Order-details">
+      <h1 className="o-list">Order List</h1>
       {orders.length === 0 ? (
-        <p className="text-gray-500">No orders found.</p>
+        <p>No orders found.</p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full table-auto border-collapse border border-gray-300">
-            <thead className="bg-gray-100">
+        <div className="pro-order-list">
+          <table className="order-table">
+            <thead className="order-table-list">
               <tr>
-                <th className="border p-2">Image</th>
-                <th className="border p-2">Name</th>
-                <th className="border p-2">Size</th>
-                <th className="border p-2">Qty</th>
-                <th className="border p-2">Amount</th>
-                <th className="border p-2">Customer</th>
-                <th className="border p-2">Date</th>
-                <th className="border p-2">Details</th>
+                <th className="order-pro-img">Product Image</th>
+                <th className="order-cust-name">Customer Name</th>
+                <th className="order-list">Total Items</th>
+                <th className="order-total-amount">Total Amount</th>
+                <th className="order-status">Status</th>
+                <th className="order-action">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) =>
-                order.cartItems.map((item, idx) => (
-                  <tr key={order._id + idx}>
-                    <td className="border p-2">
+              {currentOrders.map((order) => (
+                <tr key={order._id} className="details-order">
+                  <td className="order-img">
+                    {order.cartItems?.[0]?.product?.images?.[0]?.url ? (
                       <img
-                        src={`https://admin-backend-x8of.onrender.com/uploads/${item.product?.image}`}
-                        alt={item.product?.name}
-                        className="w-16 h-16 object-cover rounded"
+                        src={`https://admin-backend-x8of.onrender.com/uploads/${order.cartItems[0].product.images[0].url}`}
+                        alt={order.cartItems[0].product?.name || "Product"}
+                        className="ord-img"
                       />
-                    </td>
-                    <td className="border p-2">{item.product?.name}</td>
-                    <td className="border p-2">{item.size}</td>
-                    <td className="border p-2">{item.quantity}</td>
-                    <td className="border p-2">₹{item.price}</td>
-                    <td className="border p-2">{order.customerInfo?.name}</td>
-                    <td className="border p-2">
-                      {new Date(order.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="border p-2">
-                      <Link
-                        to={`/admin/orders/${order._id}`}
-                        className="text-blue-600 hover:underline"
-                      >
+                    ) : (
+                      <div className="order-no-img">No Image</div>
+                    )}
+                  </td>
+                  <td className="order-info-name">{order.customerInfo?.name || "N/A"}</td>
+                  <td className="order-length-cartitems">{order.cartItems?.length || 0}</td>
+                  <td className="cart-total-amount">₹{calculateTotalAmount(order.cartItems || [])}</td>
+                  <td className="order-status">
+                    <span
+                      className={`order-current-status ${
+                        order.status === "Delivered"
+                          ? "deliverd-order"
+                          : order.status === "Cancelled"
+                          ? "cancelled-order"
+                          : "bg-blue-100 text-blue-800"
+                      }`}
+                    >
+                      {order.status}
+                    </span>
+                  </td>
+                  <td className="order-id">
+                    <div className="order-admin">
+                      <Link to={`/admin/orders/${order._id}`} className="order-view">
                         View
                       </Link>
-                    </td>
-                  </tr>
-                ))
-              )}
+                      {order.status !== "Delivered" && order.status !== "Cancelled" && (
+                        <button
+                          onClick={() => handleMarkAsDelivered(order._id)}
+                          className="order-delivered"
+                        >
+                          Delivered
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
+
+          {totalPages > 1 && (
+            <div className="pagination">
+              {[...Array(totalPages).keys()].map((number) => (
+                <button
+                  key={number + 1}
+                  onClick={() => paginate(number + 1)}
+                  className={`page-number ${
+                    currentPage === number + 1 ? "more-than-one" : "less-than-one"
+                  }`}
+                >
+                  {number + 1}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
