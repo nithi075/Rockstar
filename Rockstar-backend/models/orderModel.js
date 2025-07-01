@@ -5,7 +5,7 @@ const orderSchema = new mongoose.Schema({
     {
       product: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "productModel", // match your actual model name
+        ref: "productModel", // Ensure this matches your actual model
         required: true,
       },
       quantity: { type: Number, required: true },
