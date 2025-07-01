@@ -9,9 +9,10 @@ const {
 
 const { isAuthenticatedUser, isAdmin } = require('../middlewares/auth');
 
-router.post('/order/new', createOrder); // Public or protected depending on use case
+// Customer creates an order (public or optionally protected)
+router.post('/order/new', createOrder);
 
-// Admin routes
+// Admin can view all orders and specific order details
 router.get('/admin/orders', isAuthenticatedUser, isAdmin('admin'), getAllOrders);
 router.get('/admin/orders/:id', isAuthenticatedUser, isAdmin('admin'), getSingleOrder);
 
