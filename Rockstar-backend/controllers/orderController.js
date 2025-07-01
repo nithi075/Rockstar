@@ -1,102 +1,63 @@
-const orderModel = require('../models/orderModel');
-const productModel = require('../models/productModel');
-const ErrorHandler = require('../utils/errorHandler');
-const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
-const mongoose = require('mongoose');
+const Order = require("../models/order");
+const Product = require("../models/product");
+const ErrorHandler = require("../utils/errorHandler");
+const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
 
-// Create new order
+// CREATE ORDER
 exports.createOrder = catchAsyncErrors(async (req, res, next) => {
-    const {
-        cartItems,
-        customerInfo,
-        totalAmount,
-    } = req.body;
+  const { cartItems, customerInfo } = req.body;
 
-    // Check stock for each item
-    for (const item of cartItems) {
-        const product = await productModel.findById(item.product);
-        if (!product) {
-            return next(new ErrorHandler(`Product not found: ${item.product}`, 404));
-        }
+  if (!cartItems || !customerInfo) {
+    return next(new ErrorHandler("Cart items and customer info are required", 400));
+  }
 
-        const sizeStock = product.stockBySizes.find(s => s.size === item.size);
-        if (!sizeStock || sizeStock.quantity < item.quantity) {
-            return next(new ErrorHandler(`Insufficient stock for ${product.name} size ${item.size}`, 400));
-        }
+  const bulkOps = [];
+
+  for (const item of cartItems) {
+    const product = await Product.findById(item.product);
+    if (!product) {
+      return next(new ErrorHandler("Product not found", 404));
     }
 
-    // Create order
-    const order = await orderModel.create({
-        user: req.user._id,
-        cartItems,
-        customerInfo,
-        totalAmount,
-        paidAt: Date.now(),
-    });
-
-    // Decrease stock
-    for (const item of cartItems) {
-        await productModel.updateOne(
-            { _id: item.product, "stockBySizes.size": item.size },
-            { $inc: { "stockBySizes.$.quantity": -item.quantity } }
-        );
+    const stockItem = product.stock.find((s) => s.size === item.size);
+    if (!stockItem || stockItem.quantity < item.quantity) {
+      return next(new ErrorHandler(`Not enough stock for ${product.name} (${item.size})`, 400));
     }
 
-    res.status(201).json({
-        success: true,
-        message: "Order placed successfully",
-        order,
+    stockItem.quantity -= item.quantity;
+
+    bulkOps.push({
+      updateOne: {
+        filter: { _id: product._id, "stock.size": item.size },
+        update: { $inc: { "stock.$.quantity": -item.quantity } },
+      },
     });
+  }
+
+  await Product.bulkWrite(bulkOps);
+
+  const order = await Order.create({
+    cartItems,
+    customerInfo,
+    createdAt: Date.now(),
+  });
+
+  res.status(201).json({ success: true, order });
 });
 
-// Get all orders (admin)
-exports.getAllOrders = catchAsyncErrors(async (req, res, next) => {
-    const orders = await orderModel
-        .find()
-        .populate("user", "name email")
-        .populate("cartItems.product", "name price images");
-
-    res.status(200).json({
-        success: true,
-        orders,
-    });
+// GET ALL ORDERS
+exports.getAllOrders = catchAsyncErrors(async (req, res) => {
+  const orders = await Order.find().populate("cartItems.product", "name image price");
+  res.status(200).json({ success: true, orders });
 });
 
-// Get single order by ID
+// GET SINGLE ORDER
 exports.getSingleOrder = catchAsyncErrors(async (req, res, next) => {
-    const order = await orderModel
-        .findById(req.params.id)
-        .populate("cartItems.product", "name price images")
-        .populate("user", "name email");
+  const order = await Order.findById(req.params.id).populate("cartItems.product", "name image price");
 
-    if (!order) {
-        return next(new ErrorHandler("Order not found", 404));
-    }
+  if (!order) {
+    return next(new ErrorHandler("Order not found", 400));
+  }
 
-    // Allow only admin or owner
-    if (
-        req.user.role !== "admin" &&
-        order.user._id.toString() !== req.user._id.toString()
-    ) {
-        return next(new ErrorHandler("Access denied: You can only view your own orders", 403));
-    }
-
-    res.status(200).json({
-        success: true,
-        order,
-    });
-});
-
-// Delete order (admin)
-exports.deleteOrder = catchAsyncErrors(async (req, res, next) => {
-    const order = await orderModel.findById(req.params.id);
-    if (!order) {
-        return next(new ErrorHandler("Order not found", 404));
-    }
-
-    await orderModel.findByIdAndDelete(req.params.id);
-    res.status(200).json({
-        success: true,
-        message: "Order deleted successfully",
-    });
+  res.status(200).json({ success: true, order });
 });
