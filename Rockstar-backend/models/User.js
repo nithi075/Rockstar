@@ -1,5 +1,3 @@
-// models/User.js
-
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs'); // Or 'bcrypt' if you're using the C++ bindings version
 const jwt = require('jsonwebtoken'); // IMPORTANT: Ensure 'jsonwebtoken' is imported here!
@@ -113,4 +111,6 @@ userSchema.methods.getResetPasswordToken = function() {
     return resetToken;
 };
 
+// This must be the ONLY line where 'User' model is defined and exported in this file.
+// If you have another 'mongoose.model('User', ...)' call, REMOVE IT.
 module.exports = mongoose.model('User', userSchema);
