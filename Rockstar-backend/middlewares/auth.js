@@ -1,65 +1,54 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/User"); // Ensure this matches your file's case (User or user)
-const catchAsyncErrors = require("./catchAsyncErrors");
-const ErrorHandler = require("../utils/errorHandler");
+const jwt = require('jsonwebtoken'); // Import jsonwebtoken once
+const User = require('../models/User'); // Import User model once (ensure 'User' matches your file's casing, e.g., 'user.js' vs 'User.js')
+const catchAsyncErrors = require('./catchAsyncErrors');
+const ErrorHandler = require('../utils/errorHandler');
 
+// Checks if user is authenticated
 exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
-  let token;
+    let token;
 
-  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
-    token = req.headers.authorization.split(" ")[1];
-  }
-
-  if (!token) {
-    console.error("Auth Error: No token found in header."); // Added log
-    return next(new ErrorHandler("Login first to access this resource. (No token in header)", 401));
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("Auth: Token decoded:", decoded); // Added log
-
-    if (!decoded || !decoded.id) {
-      console.error("Auth Error: Decoded token has no ID or is invalid.", decoded); // Added log
-      return next(new ErrorHandler("Invalid token payload.", 401));
+    // 1. Check if the Authorization header is present and starts with 'Bearer'
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        // 2. Extract the token from the "Bearer <token>" string
+        token = req.headers.authorization.split(' ')[1];
     }
 
-    // Check if User model is loaded correctly before calling findById
-    if (!User || typeof User.findById !== 'function') {
-        console.error("Auth Error: User model not properly loaded or findById is not a function."); // Added log
-        return next(new ErrorHandler("Server configuration error: User model unavailable.", 500));
+    // If no token is found in the header, return 401
+    if (!token) {
+        return next(new ErrorHandler('Login first to access this resource. (No token in header)', 401));
     }
 
-    req.user = await User.findById(decoded.id);
-    console.log("Auth: User found:", req.user ? req.user.email : "User not found for ID " + decoded.id); // Added log
+    try {
+        // Verify the token using the secret key
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        
+        // Find the user associated with the decoded ID and attach to request
+        req.user = await User.findById(decoded.id);
+        
+        // If user not found, even if token is valid, something is off
+        if (!req.user) {
+            return next(new ErrorHandler('User not found with this token. Please login again.', 401));
+        }
 
-    if (!req.user) {
-      console.error("Auth Error: No user found for decoded ID:", decoded.id); // Added log
-      return next(new ErrorHandler("User associated with token not found.", 401));
+        next(); // Proceed to the next middleware/route handler
+    } catch (error) {
+        // Handle cases where token is invalid (e.g., malformed, expired, invalid signature)
+        return next(new ErrorHandler('Invalid or Expired Token. Please login again.', 401));
     }
-
-    next();
-  } catch (error) {
-    console.error("Auth Error: Token verification failed or database error:", error.message); // Added log
-    return next(new ErrorHandler("Invalid or Expired Token. Please login again.", 401));
-  }
 });
 
+// Handling user roles for authorization
 exports.authorizeRoles = (...roles) => {
-  return (req, res, next) => {
-    if (!req.user) { // Explicitly check for req.user before accessing its properties
-      console.error("Auth Error: req.user is undefined in authorizeRoles."); // Added log
-      return next(
-        new ErrorHandler("Authentication failed or user data missing. Please login.", 401)
-      );
-    }
-
-    if (!roles.includes(req.user.role)) {
-      console.error(`Auth Error: Role '${req.user.role}' not allowed.`); // Added log
-      return next(
-        new ErrorHandler(`Role (${req.user.role}) is not allowed to access this resource.`, 403)
-      );
-    }
-    next();
-  };
+    return (req, res, next) => {
+        // Ensure req.user exists and its role is included in the allowed roles
+        if (!req.user || !roles.includes(req.user.role)) {
+            return next(
+                new ErrorHandler(
+                    `Role (${req.user ? req.user.role : 'unassigned'}) is not allowed to access this resource.`,
+                    403
+                )
+            );
+        }
+        next(); // Proceed if authorized
+    };
 };
