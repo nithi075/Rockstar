@@ -1,17 +1,48 @@
-const express = require("express");
-const router = express.Router();
+// routes/order.js
 
+const express = require("express");
 const {
-  createOrder,
+  newOrder,
+  getSingleOrder,
+  myOrders,
   getAllOrders,
-  getOrderById
+  updateOrder,
+  deleteOrder,
 } = require("../controllers/orderController");
 
-const { isAuthenticatedUser, isAdmin } = require("../middlewares/auth");
+const {
+  isAuthenticatedUser,
+  authorizeRoles,
+} = require("../middlewares/auth"); // ✅ Correct import
 
-// Routes
-router.post("/order/new", createOrder); // Public
-router.get("/admin/orders", isAuthenticatedUser, isAdmin("admin"), getAllOrders); // Admin
-router.get("/order/:id", isAuthenticatedUser, isAdmin("admin"), getOrderById);    // Admin
+const router = express.Router();
+
+router.post("/order/new", isAuthenticatedUser, newOrder);
+
+router.get("/order/:id", isAuthenticatedUser, getSingleOrder);
+
+router.get("/orders/me", isAuthenticatedUser, myOrders);
+
+// ✅ Use authorizeRoles instead of isAdmin
+router.get(
+  "/admin/orders",
+  isAuthenticatedUser,
+  authorizeRoles("admin"),
+  getAllOrders
+);
+
+router.put(
+  "/admin/order/:id",
+  isAuthenticatedUser,
+  authorizeRoles("admin"),
+  updateOrder
+);
+
+router.delete(
+  "/admin/order/:id",
+  isAuthenticatedUser,
+  authorizeRoles("admin"),
+  deleteOrder
+);
 
 module.exports = router;
