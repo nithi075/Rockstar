@@ -1,53 +1,48 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 import { Link } from "react-router-dom";
-import api from "../../axios";
 
 export default function OrderList() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const { data } = await api.get("/admin/orders");
-        setOrders(data);
-      } catch (err) {
-        console.error("Failed to fetch orders", err);
-      } finally {
+    axios.get("/admin/orders")
+      .then(res => {
+        setOrders(res.data.orders);
         setLoading(false);
-      }
-    };
-
-    fetchOrders();
+      })
+      .catch(err => {
+        console.error("Failed to fetch orders", err);
+        setError("Failed to load orders");
+        setLoading(false);
+      });
   }, []);
 
-  if (loading) return <div className="p-4">Loading orders...</div>;
+  if (loading) return <div className="p-4 text-center">Loading...</div>;
+  if (error) return <div className="p-4 text-red-500">{error}</div>;
 
   return (
     <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">Orders</h1>
-      <table className="min-w-full border">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className="p-2">Customer</th>
-            <th className="p-2">Total</th>
-            <th className="p-2">Date</th>
-            <th className="p-2">Action</th>
+      <h1 className="text-2xl font-semibold mb-4">Orders</h1>
+      <table className="w-full border text-sm">
+        <thead className="bg-gray-100">
+          <tr>
+            <th className="border px-4 py-2">Order ID</th>
+            <th className="border px-4 py-2">Customer</th>
+            <th className="border px-4 py-2">Total Items</th>
+            <th className="border px-4 py-2">Action</th>
           </tr>
         </thead>
         <tbody>
-          {orders.map((order) => (
-            <tr key={order._id} className="border-t">
-              <td className="p-2">{order.customerInfo?.name}</td>
-              <td className="p-2">₹{order.totalAmount}</td>
-              <td className="p-2">{new Date(order.createdAt).toLocaleString()}</td>
-              <td className="p-2">
-                <Link
-                  to={`/admin/orders/${order._id}`}
-                  className="text-blue-600 hover:underline"
-                >
-                  View
-                </Link>
+          {orders.map(order => (
+            <tr key={order._id}>
+              <td className="border px-4 py-2">{order._id}</td>
+              <td className="border px-4 py-2">{order.customerInfo?.name}</td>
+              <td className="border px-4 py-2">{order.cartItems.length}</td>
+              <td className="border px-4 py-2">
+                <Link to={`/admin/orders/${order._id}`} className="text-blue-600 underline">View</Link>
               </td>
             </tr>
           ))}
