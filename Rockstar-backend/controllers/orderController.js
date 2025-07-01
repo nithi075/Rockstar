@@ -1,62 +1,51 @@
-const Order = require("../models/orderModel");
-const Product = require("../models/productModel");
+const orderModel = require("../models/orderModel");
+const productModel = require("../models/productModel");
 const ErrorHandler = require("../utils/errorHandler");
 const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
 
-// CREATE ORDER
+// Create a new order
 exports.createOrder = catchAsyncErrors(async (req, res, next) => {
   const { cartItems, customerInfo } = req.body;
 
-  if (!cartItems || !customerInfo) {
-    return next(new ErrorHandler("Cart items and customer info are required", 400));
+  if (!cartItems || cartItems.length === 0) {
+    return next(new ErrorHandler("No items in cart", 400));
   }
 
-  const bulkOps = [];
-
-  for (const item of cartItems) {
-    const product = await Product.findById(item.product);
-    if (!product) {
-      return next(new ErrorHandler("Product not found", 404));
-    }
-
-    const stockItem = product.stock.find((s) => s.size === item.size);
-    if (!stockItem || stockItem.quantity < item.quantity) {
-      return next(new ErrorHandler(`Not enough stock for ${product.name} (${item.size})`, 400));
-    }
-
-    stockItem.quantity -= item.quantity;
-
-    bulkOps.push({
-      updateOne: {
-        filter: { _id: product._id, "stock.size": item.size },
-        update: { $inc: { "stock.$.quantity": -item.quantity } },
-      },
-    });
-  }
-
-  await Product.bulkWrite(bulkOps);
-
-  const order = await Order.create({
+  const order = await orderModel.create({
     cartItems,
     customerInfo,
     createdAt: Date.now(),
   });
 
+  // Update product stock
+  for (const item of cartItems) {
+    const product = await productModel.findById(item.product);
+    if (!product) continue;
+
+    const sizeStock = product.stock.find((s) => s.size === item.size);
+    if (sizeStock && sizeStock.quantity >= item.quantity) {
+      sizeStock.quantity -= item.quantity;
+      await product.save();
+    } else {
+      return next(new ErrorHandler(`Insufficient stock for ${product.name} - ${item.size}`, 400));
+    }
+  }
+
   res.status(201).json({ success: true, order });
 });
 
-// GET ALL ORDERS
-exports.getAllOrders = catchAsyncErrors(async (req, res) => {
-  const orders = await Order.find().populate("cartItems.product", "name image price");
+// Get all orders (admin only)
+exports.getAllOrders = catchAsyncErrors(async (req, res, next) => {
+  const orders = await orderModel.find().populate("cartItems.product", "name price image");
   res.status(200).json({ success: true, orders });
 });
 
-// GET SINGLE ORDER
+// Get single order by ID
 exports.getSingleOrder = catchAsyncErrors(async (req, res, next) => {
-  const order = await Order.findById(req.params.id).populate("cartItems.product", "name image price");
+  const order = await orderModel.findById(req.params.id).populate("cartItems.product", "name price image");
 
   if (!order) {
-    return next(new ErrorHandler("Order not found", 400));
+    return next(new ErrorHandler("Order not found", 404));
   }
 
   res.status(200).json({ success: true, order });
