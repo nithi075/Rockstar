@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const cartItemSchema = new mongoose.Schema({
     product: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Product',
+        ref: 'Product', // <-- This MUST match the name given in Product model's mongoose.model() call
         required: [true, 'Product ID is required for a cart item']
     },
     name: {
@@ -23,7 +23,7 @@ const cartItemSchema = new mongoose.Schema({
     size: {
         type: String
     }
-}, { _id: false });
+}, { _id: false }); // _id: false means Mongoose won't add an _id to each sub-document
 
 const orderSchema = new mongoose.Schema({
     cartItems: {
@@ -39,10 +39,6 @@ const orderSchema = new mongoose.Schema({
         default: 'pending',
         enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded']
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
     customerInfo: {
         name: {
             type: String,
@@ -57,7 +53,8 @@ const orderSchema = new mongoose.Schema({
             required: [true, 'Customer phone number is required']
         }
     }
-});
+}, { timestamps: true }); // Adds createdAt and updatedAt fields automatically
 
-// ✅ Check if 'Order' model exists before defining
-module.exports = mongoose.models.Order || mongoose.model('Order', orderSchema);
+// Export the Order model
+const orderModel = mongoose.model('Order', orderSchema);
+module.exports = orderModel;
