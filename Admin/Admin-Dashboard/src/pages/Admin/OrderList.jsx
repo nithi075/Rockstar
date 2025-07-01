@@ -1,68 +1,94 @@
+// src/pages/Admin/OrderList.jsx
 import React, { useEffect, useState } from "react";
-import axios from "../../axios";
-import { useParams } from "react-router-dom";
+import api from "../../axios";
+import { Link } from "react-router-dom";
+import "./OrderList.css"; // You'll define basic styles here
 
-export default function OrderDetails() {
-  const { orderId } = useParams(); // ✅ Correct name
-  const [order, setOrder] = useState(null);
+const OrderList = () => {
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 10;
 
   useEffect(() => {
-    const fetchOrder = async () => {
+    const fetchOrders = async () => {
       try {
-        const { data } = await axios.get(`/orders/${orderId}`); // ✅ Using correct ID
-        setOrder(data.order);
-      } catch (error) {
-        console.error("Failed to fetch order details", error);
-        alert("Access denied or order not found");
+        setLoading(true);
+        const { data } = await api.get(`/admin/orders?page=${currentPage}&limit=${limit}`);
+        setOrders(data.orders);
+        setTotalPages(data.totalPages);
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to fetch orders.");
       } finally {
         setLoading(false);
       }
     };
 
-    if (orderId) {
-      fetchOrder();
-    }
-  }, [orderId]);
+    fetchOrders();
+  }, [currentPage]);
 
-  if (loading) {
-    return (
-      <div className="custom-loader">
-        <div className="spinner"></div>
-        <p>Loading...</p>
-      </div>
-    );
-  }
+  const handlePrev = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
 
-  if (!order) {
-    return <p className="not-found">Order not found</p>;
-  }
+  const handleNext = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
 
   return (
-    <div className="order-details-container">
-      <h2>Order ID: {order._id}</h2>
-      <p><strong>Customer:</strong> {order.customerInfo.name}</p>
-      <p><strong>Email:</strong> {order.customerInfo.email}</p>
-      <p><strong>Phone:</strong> {order.customerInfo.phone}</p>
-      <p><strong>Date:</strong> {new Date(order.createdAt).toLocaleString()}</p>
+    <div className="order-list-container">
+      <h2 className="order-list-title">Order List</h2>
 
-      <h3>Items:</h3>
-      <ul className="item-list">
-        {order.cartItems.map((item, index) => (
-          <li key={index} className="item">
-            <img
-              src={`https://admin-backend-x8of.onrender.com${item.product?.image || ""}`}
-              alt={item.product?.name || "Product"}
-              className="item-image"
-            />
-            <div className="item-details">
-              <p>{item.product?.name} (Size: {item.size})</p>
-              <p>Qty: {item.quantity}</p>
-              <p>Total: ₹{item.price * item.quantity}</p>
-            </div>
-          </li>
-        ))}
-      </ul>
+      {loading ? (
+        <div className="loader">Loading Orders...</div>
+      ) : error ? (
+        <div className="error-message">{error}</div>
+      ) : orders.length === 0 ? (
+        <div className="empty-message">No orders found.</div>
+      ) : (
+        <>
+          <table className="order-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.map((order) => (
+                <tr key={order._id}>
+                  <td>
+                    <Link to={`/admin/orders/${order._id}`} className="order-link">
+                      {order._id}
+                    </Link>
+                  </td>
+                  <td>{order.customerInfo?.name || "N/A"}</td>
+                  <td>₹{order.totalPrice}</td>
+                  <td>{order.orderStatus}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <div className="pagination">
+            <button onClick={handlePrev} disabled={currentPage === 1}>
+              Previous
+            </button>
+            <span>
+              Page {currentPage} of {totalPages}
+            </span>
+            <button onClick={handleNext} disabled={currentPage === totalPages}>
+              Next
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
-}
+};
+
+export default OrderList;
