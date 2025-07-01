@@ -1,94 +1,66 @@
-// src/pages/Admin/AdminLoginPage.jsx
+import React, { useEffect, useState } from "react";
+import axios from "../../axios"; // your custom Axios instance
+import { useParams } from "react-router-dom";
 
-import React, { useState } from 'react';
-import api from '../../axios'; // <--- IMPORTANT: Import your custom Axios instance 'api'
-import { useNavigate } from 'react-router-dom';
+export default function OrderDetails() {
+  const { id } = useParams();
+  const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-const AdminLoginPage = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError(null);
-        setLoading(true);
-
-        try {
-            // <--- CRUCIAL CHANGE: Use your custom 'api' instance for the login request
-            // Use the relative path '/users/login' because 'api' already has the baseURL configured.
-            const response = await api.post('/users/login', { email, password });
-
-            if (response.data.success) {
-                // <--- CRUCIAL CHANGE: Store the received token in localStorage
-                localStorage.setItem('authToken', response.data.token);
-                // The api.interceptors.request.use in src/axios.js will now automatically pick this up
-                // for all subsequent requests made with the 'api' instance.
-
-                alert('Login Successful!');
-                console.log("Login Response Data:", response.data); // Keep this for debugging confirmation
-                navigate('/admin/dashboard'); // Redirect to admin dashboard on success
-            } else {
-                setError(response.data.message || 'Login failed. Please try again.');
-            }
-        } catch (err) {
-            console.error('Login error:', err);
-            // Access the error message from the backend if available
-            setError(err.response?.data?.message || 'An unexpected error occurred during login.');
-        } finally {
-            setLoading(false);
-        }
+  useEffect(() => {
+    const fetchOrder = async () => {
+      try {
+        const { data } = await axios.get(`/orders/${id}`);
+        setOrder(data.order);
+      } catch (error) {
+        console.error("Failed to fetch order details", error);
+        alert("Access denied or order not found");
+      } finally {
+        setLoading(false);
+      }
     };
 
-    return (
-        <div className="Login">
-            <div className="Login-page">
-                <h2>Admin Login</h2>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                        <label htmlFor="email" className="Login-email">Email address</label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                            className="email-input"
-                            placeholder="Enter your email"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="password" className="Password">Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                            className="Passwrd-input"
-                            placeholder="Enter your password"
-                        />
-                    </div>
-                    {error && (
-                        <div className="Error-password">
-                            {error}
-                        </div>
-                    )}
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="Login_button"
-                    >
-                        {loading ? 'Logging in...' : 'Login'}
-                    </button>
-                </form>
-            </div>
-        </div>
-    );
-};
+    fetchOrder();
+  }, [id]);
 
-export default AdminLoginPage;
+  if (loading) {
+    return (
+      <div className="custom-loader">
+        <div className="spinner"></div>
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  if (!order) {
+    return <p className="not-found">Order not found</p>;
+  }
+
+  return (
+    <div className="order-details-container">
+      <h2>Order ID: {order._id}</h2>
+      <p><strong>Customer:</strong> {order.customerInfo.name}</p>
+      <p><strong>Email:</strong> {order.customerInfo.email}</p>
+      <p><strong>Phone:</strong> {order.customerInfo.phone}</p>
+      <p><strong>Date:</strong> {new Date(order.createdAt).toLocaleString()}</p>
+
+      <h3>Items:</h3>
+      <ul className="item-list">
+        {order.cartItems.map((item, index) => (
+          <li key={index} className="item">
+            <img
+              src={`https://admin-backend-x8of.onrender.com${item.product?.image || ""}`}
+              alt={item.product?.name || "Product"}
+              className="item-image"
+            />
+            <div className="item-details">
+              <p>{item.product?.name} (Size: {item.size})</p>
+              <p>Qty: {item.quantity}</p>
+              <p>Total: ₹{item.price * item.quantity}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
