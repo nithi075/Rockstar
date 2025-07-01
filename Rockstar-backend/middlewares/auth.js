@@ -1,9 +1,7 @@
-// middlewares/auth.js
-
 const jwt = require("jsonwebtoken");
-const User = require("../models/user"); // ✅ Make sure the path is correct
+const User = require("../models/user");
 const ErrorHandler = require("../utils/errorHandler");
-const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
+const catchAsyncErrors = require("./catchAsyncErrors");
 
 // Check if user is authenticated
 exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
@@ -14,12 +12,13 @@ exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
   }
 
   const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+
   req.user = await User.findById(decodedData.id);
 
   next();
 });
 
-// Check role (Admin)
+// Authorize roles
 exports.authorizeRoles = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
@@ -30,6 +29,7 @@ exports.authorizeRoles = (...roles) => {
         )
       );
     }
+
     next();
   };
 };
