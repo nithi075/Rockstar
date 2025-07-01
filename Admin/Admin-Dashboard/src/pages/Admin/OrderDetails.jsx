@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "../../axios"; // your axios instance
+import axios from "../../axios"; // your custom Axios instance
 import { useParams } from "react-router-dom";
 
 export default function OrderDetails() {
@@ -23,34 +23,44 @@ export default function OrderDetails() {
     fetchOrder();
   }, [id]);
 
-  if (loading) return <p className="loader">Loading...</p>;
+  if (loading) {
+    return (
+      <div className="custom-loader">
+        <div className="spinner"></div>
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
-  return order ? (
-    <div className="order-details">
+  if (!order) {
+    return <p className="not-found">Order not found</p>;
+  }
+
+  return (
+    <div className="order-details-container">
       <h2>Order ID: {order._id}</h2>
-      <p>Customer: {order.customerInfo.name}</p>
-      <p>Email: {order.customerInfo.email}</p>
-      <p>Phone: {order.customerInfo.phone}</p>
-      <p>Date: {new Date(order.createdAt).toLocaleString()}</p>
+      <p><strong>Customer:</strong> {order.customerInfo.name}</p>
+      <p><strong>Email:</strong> {order.customerInfo.email}</p>
+      <p><strong>Phone:</strong> {order.customerInfo.phone}</p>
+      <p><strong>Date:</strong> {new Date(order.createdAt).toLocaleString()}</p>
 
       <h3>Items:</h3>
-      <ul>
+      <ul className="item-list">
         {order.cartItems.map((item, index) => (
-          <li key={index}>
+          <li key={index} className="item">
             <img
-              src={`https://admin-backend-x8of.onrender.com${item.product.image}`}
-              alt={item.product.name}
-              width="60"
+              src={`https://admin-backend-x8of.onrender.com${item.product?.image || ""}`}
+              alt={item.product?.name || "Product"}
+              className="item-image"
             />
-            <div>
-              {item.product.name} (Size: {item.size}) × {item.quantity} = ₹
-              {item.price * item.quantity}
+            <div className="item-details">
+              <p>{item.product?.name} (Size: {item.size})</p>
+              <p>Qty: {item.quantity}</p>
+              <p>Total: ₹{item.price * item.quantity}</p>
             </div>
           </li>
         ))}
       </ul>
     </div>
-  ) : (
-    <p>Order not found</p>
   );
 }
