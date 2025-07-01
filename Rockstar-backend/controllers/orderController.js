@@ -1,57 +1,68 @@
-const orderModel = require("../models/orderModel");
-const productModel = require("../models/productModel");
-const ErrorHandler = require("../utils/errorHandler");
-const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
+const orderModel = require('../models/orderModel');
+const productModel = require('../models/productModel');
 
-// Create order
-exports.createOrder = catchAsyncErrors(async (req, res, next) => {
-  const { cartItems, customerInfo } = req.body;
+// Create Order
+exports.createOrder = async (req, res) => {
+  try {
+    const { cartItems, customerInfo } = req.body;
 
-  if (!cartItems || cartItems.length === 0) {
-    return next(new ErrorHandler("No items in cart", 400));
-  }
-
-  const order = await orderModel.create({
-    cartItems,
-    customerInfo,
-    createdAt: Date.now(),
-  });
-
-  // Update stock
-  for (const item of cartItems) {
-    const product = await productModel.findById(item.product);
-    if (!product) continue;
-
-    const sizeStock = product.stock.find((s) => s.size === item.size);
-    if (sizeStock && sizeStock.quantity >= item.quantity) {
-      sizeStock.quantity -= item.quantity;
-      await product.save();
-    } else {
-      return next(
-        new ErrorHandler(
-          `Insufficient stock for ${product.name} - ${item.size}`,
-          400
-        )
-      );
+    if (!cartItems || cartItems.length === 0) {
+      return res.status(400).json({ success: false, message: 'Cart is empty' });
     }
-  }
 
-  res.status(201).json({ success: true, order });
-});
+    const order = await orderModel.create({
+      cartItems,
+      customerInfo,
+    });
+
+    res.status(201).json({ success: true, order });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 // Get all orders
-exports.getAllOrders = catchAsyncErrors(async (req, res, next) => {
-  const orders = await orderModel.find().populate("cartItems.product", "name price image");
-  res.status(200).json({ success: true, orders });
-});
+exports.getAllOrders = async (req, res) => {
+  try {
+    const orders = await orderModel
+      .find()
+      .sort({ createdAt: -1 })
+      .populate('cartItems.product', 'name price image');
+
+    res.status(200).json({ success: true, orders });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 // Get single order
-exports.getSingleOrder = catchAsyncErrors(async (req, res, next) => {
-  const order = await orderModel.findById(req.params.id).populate("cartItems.product", "name price image");
+exports.getOrderById = async (req, res) => {
+  try {
+    const order = await orderModel
+      .findById(req.params.id)
+      .populate('cartItems.product', 'name price image');
 
-  if (!order) {
-    return next(new ErrorHandler("Order not found", 404));
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    res.status(200).json({ success: true, order });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
+};
 
-  res.status(200).json({ success: true, order });
-});
+// Delete order (optional)
+exports.deleteOrder = async (req, res) => {
+  try {
+    const order = await orderModel.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    await order.deleteOne();
+    res.status(200).json({ success: true, message: 'Order deleted' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
