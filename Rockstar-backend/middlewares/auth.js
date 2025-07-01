@@ -1,19 +1,35 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
+const catchAsyncErrors = require("./catchAsyncErrors");
+const ErrorHandler = require("../utils/errorHandler");
 
-exports.isAuthenticatedUser = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
+exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
+  let token;
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ success: false, message: "Unauthorized, token missing" });
+  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+
+  if (!token) {
+    return next(new ErrorHandler("Login first to access this resource. (No token in header)", 401));
   }
 
   try {
-    const token = authHeader.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = await User.findById(decoded.id);
     next();
   } catch (error) {
-    return res.status(401).json({ success: false, message: "Unauthorized, invalid token" });
+    return next(new ErrorHandler("Invalid or Expired Token. Please login again.", 401));
   }
+});
+
+exports.authorizeRoles = (...roles) => {
+  return (req, res, next) => {
+    if (!req.user || !roles.includes(req.user.role)) {
+      return next(
+        new ErrorHandler(`Role (${req.user ? req.user.role : "unassigned"}) is not allowed to access this resource.`, 403)
+      );
+    }
+    next();
+  };
 };
