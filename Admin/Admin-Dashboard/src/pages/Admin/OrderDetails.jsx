@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import api from '../../axios';
+import api from '../../axios'; // Correct import of your custom axios instance
 
 export default function OrderDetails() {
   const { orderId } = useParams();
@@ -8,7 +8,8 @@ export default function OrderDetails() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    axios.get(`/admin/orders/${orderId}`)
+    // CHANGE axios.get TO api.get
+    api.get(`/admin/orders/${orderId}`) // <-- CORRECTED LINE
       .then(res => {
         setOrder(res.data.order);
       })
