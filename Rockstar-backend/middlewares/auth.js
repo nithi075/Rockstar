@@ -1,35 +1,46 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/User");
-const catchAsyncErrors = require("./catchAsyncErrors");
+const User = require("../models/userModel");
 const ErrorHandler = require("../utils/errorHandler");
+const catchAsyncErrors = require("./catchAsyncErrors");
 
+// 🔐 Middleware to check if user is authenticated
 exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
-  let token;
-
-  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
-    token = req.headers.authorization.split(" ")[1];
-  }
+  const { token } = req.cookies;
 
   if (!token) {
-    return next(new ErrorHandler("Login first to access this resource. (No token in header)", 401));
+    return next(new ErrorHandler("Please login to access this resource", 401));
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await User.findById(decoded.id);
+    const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = await User.findById(decodedData.id);
+
+    if (!req.user) {
+      return next(new ErrorHandler("User no longer exists", 401));
+    }
+
     next();
   } catch (error) {
-    return next(new ErrorHandler("Invalid or Expired Token. Please login again.", 401));
+    return next(new ErrorHandler("Invalid or expired token", 401));
   }
 });
 
-exports.authorizeRoles = (...roles) => {
+// 🛡️ Middleware to check if user is an admin
+exports.isAdmin = (requiredRole = "admin") => {
   return (req, res, next) => {
-    if (!req.user || !roles.includes(req.user.role)) {
+    if (!req.user) {
+      return next(new ErrorHandler("User not authenticated", 401));
+    }
+
+    if (req.user.role !== requiredRole) {
       return next(
-        new ErrorHandler(`Role (${req.user ? req.user.role : "unassigned"}) is not allowed to access this resource.`, 403)
+        new ErrorHandler(
+          `Role: ${req.user.role} is not authorized to access this resource`,
+          403
+        )
       );
     }
+
     next();
   };
 };
