@@ -1,66 +1,57 @@
-const orderModel = require("../models/orderModel");
-const productModel = require("../models/productModel");
+const orderModel = require('../models/orderModel');
+const productModel = require('../models/productModel');
+const ErrorHandler = require('../utils/errorHandler');
+const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
+const mongoose = require('mongoose');
 
-// CREATE order
-exports.createOrder = async (req, res) => {
-  try {
-    const { cartItems, customerInfo, totalAmount } = req.body;
+// Create Order
+exports.createOrder = catchAsyncErrors(async (req, res, next) => {
+  const { cartItems, customerInfo } = req.body;
 
-    if (!cartItems || cartItems.length === 0) {
-      return res.status(400).json({ message: "Cart is empty" });
+  if (!cartItems || !customerInfo) {
+    return next(new ErrorHandler("Missing cart items or customer info", 400));
+  }
+
+  // Validate stock and build bulk operations
+  const bulkOperations = [];
+
+  for (const item of cartItems) {
+    const product = await productModel.findById(item.product);
+
+    if (!product) return next(new ErrorHandler("Product not found", 404));
+    if (!product.stock[item.size] || product.stock[item.size] < item.quantity) {
+      return next(new ErrorHandler(`Insufficient stock for ${product.name} (Size: ${item.size})`, 400));
     }
 
-    // Reduce stock
-    for (const item of cartItems) {
-      const product = await productModel.findById(item.product);
-      if (!product) continue;
-
-      const sizeStock = product.size.find(s => s.size === item.size);
-      if (!sizeStock || sizeStock.stock < item.quantity) {
-        return res.status(400).json({ message: `Insufficient stock for ${product.name} (${item.size})` });
+    bulkOperations.push({
+      updateOne: {
+        filter: { _id: item.product },
+        update: { $inc: { [`stock.${item.size}`]: -item.quantity } }
       }
-
-      sizeStock.stock -= item.quantity;
-      await product.save();
-    }
-
-    const order = await orderModel.create({
-      cartItems,
-      customerInfo,
-      totalAmount,
     });
-
-    res.status(201).json(order);
-  } catch (err) {
-    console.error("Order creation failed:", err);
-    res.status(500).json({ message: "Server error" });
   }
-};
 
-// GET all orders
-exports.getAllOrders = async (req, res) => {
-  try {
-    const orders = await orderModel
-      .find()
-      .sort({ createdAt: -1 })
-      .populate("cartItems.product", "name price images");
+  await productModel.bulkWrite(bulkOperations);
 
-    res.status(200).json(orders);
-  } catch (err) {
-    res.status(500).json({ message: "Error fetching orders" });
-  }
-};
+  const order = await orderModel.create({
+    cartItems,
+    customerInfo,
+    createdAt: new Date()
+  });
 
-// GET order by ID
-exports.getOrderById = async (req, res) => {
-  try {
-    const order = await orderModel
-      .findById(req.params.id)
-      .populate("cartItems.product", "name price images");
+  res.status(201).json({ success: true, order });
+});
 
-    if (!order) return res.status(404).json({ message: "Order not found" });
-    res.status(200).json(order);
-  } catch (err) {
-    res.status(500).json({ message: "Error fetching order details" });
-  }
-};
+// Get All Orders
+exports.getAllOrders = catchAsyncErrors(async (req, res, next) => {
+  const orders = await orderModel.find().populate('cartItems.product', 'name price image');
+  res.status(200).json({ success: true, orders });
+});
+
+// Get Single Order
+exports.getSingleOrder = catchAsyncErrors(async (req, res, next) => {
+  const order = await orderModel.findById(req.params.id).populate('cartItems.product', 'name price image');
+
+  if (!order) return next(new ErrorHandler("Order not found", 404));
+  res.status(200).json({ success: true, order });
+});
