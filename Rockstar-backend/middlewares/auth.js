@@ -1,4 +1,4 @@
- const jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const catchAsyncErrors = require("./catchAsyncErrors");
 const ErrorHandler = require("../utils/errorHandler");
@@ -27,7 +27,7 @@ exports.authorizeRoles = (...roles) => {
   return (req, res, next) => {
     if (!req.user || !roles.includes(req.user.role)) {
       return next(
-        new ErrorHandler(Role (${req.user ? req.user.role : "unassigned"}) is not allowed to access this resource., 403)
+        new ErrorHandler(`Role (${req.user ? req.user.role : "unassigned"}) is not allowed to access this resource.`, 403)
       );
     }
     next();
