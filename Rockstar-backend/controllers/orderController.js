@@ -3,7 +3,7 @@ const productModel = require("../models/productModel");
 const ErrorHandler = require("../utils/errorHandler");
 const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
 
-// Create a new order
+// Create order
 exports.createOrder = catchAsyncErrors(async (req, res, next) => {
   const { cartItems, customerInfo } = req.body;
 
@@ -17,7 +17,7 @@ exports.createOrder = catchAsyncErrors(async (req, res, next) => {
     createdAt: Date.now(),
   });
 
-  // Update product stock
+  // Update stock
   for (const item of cartItems) {
     const product = await productModel.findById(item.product);
     if (!product) continue;
@@ -27,20 +27,25 @@ exports.createOrder = catchAsyncErrors(async (req, res, next) => {
       sizeStock.quantity -= item.quantity;
       await product.save();
     } else {
-      return next(new ErrorHandler(`Insufficient stock for ${product.name} - ${item.size}`, 400));
+      return next(
+        new ErrorHandler(
+          `Insufficient stock for ${product.name} - ${item.size}`,
+          400
+        )
+      );
     }
   }
 
   res.status(201).json({ success: true, order });
 });
 
-// Get all orders (admin only)
+// Get all orders
 exports.getAllOrders = catchAsyncErrors(async (req, res, next) => {
   const orders = await orderModel.find().populate("cartItems.product", "name price image");
   res.status(200).json({ success: true, orders });
 });
 
-// Get single order by ID
+// Get single order
 exports.getSingleOrder = catchAsyncErrors(async (req, res, next) => {
   const order = await orderModel.findById(req.params.id).populate("cartItems.product", "name price image");
 
