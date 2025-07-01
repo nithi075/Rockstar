@@ -2,55 +2,54 @@ const Order = require("../models/orderModel");
 const Product = require("../models/productModel");
 const ErrorHandler = require("../utils/errorHandler");
 const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
-const mongoose = require("mongoose");
 
-// CREATE ORDER
-exports.createOrder = catchAsyncErrors(async (req, res, next) => {
-  const { cartItems, customerInfo } = req.body;
+// Create new Order
+exports.newOrder = catchAsyncErrors(async (req, res, next) => {
+  const {
+    shippingInfo,
+    orderItems,
+    paymentInfo,
+    itemsPrice,
+    taxPrice,
+    shippingPrice,
+    totalPrice,
+  } = req.body;
 
-  if (!cartItems || cartItems.length === 0) {
-    return next(new ErrorHandler("No cart items provided", 400));
-  }
-
-  const bulkUpdates = [];
-
-  for (const item of cartItems) {
-    const product = await Product.findById(item.product);
-
-    if (!product) {
-      return next(new ErrorHandler("Product not found", 404));
-    }
-
-    const sizeStock = product.stock.find(s => s.size === item.size);
-    if (!sizeStock || sizeStock.quantity < item.quantity) {
-      return next(new ErrorHandler(`Insufficient stock for ${product.name} size ${item.size}`, 400));
-    }
-
-    bulkUpdates.push({
-      updateOne: {
-        filter: { _id: product._id, "stock.size": item.size },
-        update: { $inc: { "stock.$.quantity": -item.quantity } }
-      }
-    });
-  }
-
-  if (bulkUpdates.length > 0) {
-    await Product.bulkWrite(bulkUpdates);
-  }
-
-  const newOrder = await Order.create({ cartItems, customerInfo });
+  const order = await Order.create({
+    shippingInfo,
+    orderItems,
+    paymentInfo,
+    itemsPrice,
+    taxPrice,
+    shippingPrice,
+    totalPrice,
+    paidAt: Date.now(),
+    user: req.user._id,
+  });
 
   res.status(201).json({
     success: true,
-    message: "Order placed successfully",
-    order: newOrder
+    order,
   });
 });
 
-// GET ALL ORDERS (ADMIN)
-exports.getAllOrders = catchAsyncErrors(async (req, res, next) => {
-  const orders = await Order.find({})
-    .populate("cartItems.product", "name price image");
+// Get single Order
+exports.getSingleOrder = catchAsyncErrors(async (req, res, next) => {
+  const order = await Order.findById(req.params.id).populate("user", "name email");
+
+  if (!order) {
+    return next(new ErrorHandler("Order not found with this Id", 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    order,
+  });
+});
+
+// Get all orders for logged in user
+exports.myOrders = catchAsyncErrors(async (req, res, next) => {
+  const orders = await Order.find({ user: req.user._id });
 
   res.status(200).json({
     success: true,
@@ -58,17 +57,66 @@ exports.getAllOrders = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-// GET SINGLE ORDER
-exports.getOrderById = catchAsyncErrors(async (req, res, next) => {
-  const order = await Order.findById(req.params.id)
-    .populate("cartItems.product", "name price image");
+// Get all orders (Admin)
+exports.getAllOrders = catchAsyncErrors(async (req, res, next) => {
+  const orders = await Order.find();
 
-  if (!order) {
-    return next(new ErrorHandler("Order not found", 404));
-  }
+  let totalAmount = 0;
+
+  orders.forEach((order) => {
+    totalAmount += order.totalPrice;
+  });
 
   res.status(200).json({
     success: true,
-    order,
+    totalAmount,
+    orders,
+  });
+});
+
+// Update / Process order (Admin)
+exports.updateOrder = catchAsyncErrors(async (req, res, next) => {
+  const order = await Order.findById(req.params.id);
+
+  if (!order) {
+    return next(new ErrorHandler("Order not found with this Id", 404));
+  }
+
+  if (order.orderStatus === "Delivered") {
+    return next(new ErrorHandler("You have already delivered this order", 400));
+  }
+
+  order.orderItems.forEach(async (item) => {
+    await updateStock(item.product, item.quantity);
+  });
+
+  order.orderStatus = req.body.status;
+  order.deliveredAt = Date.now();
+
+  await order.save();
+
+  res.status(200).json({
+    success: true,
+  });
+});
+
+async function updateStock(id, quantity) {
+  const product = await Product.findById(id);
+  product.Stock -= quantity;
+  await product.save({ validateBeforeSave: false });
+}
+
+// Delete Order (Admin)
+exports.deleteOrder = catchAsyncErrors(async (req, res, next) => {
+  const order = await Order.findById(req.params.id);
+
+  if (!order) {
+    return next(new ErrorHandler("Order not found with this Id", 404));
+  }
+
+  await order.remove();
+
+  res.status(200).json({
+    success: true,
   });
 });
