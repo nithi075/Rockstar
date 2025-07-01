@@ -1,46 +1,78 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/user");
-const ErrorHandler = require("../utils/errorHandler");
-const catchAsyncErrors = require("./catchAsyncErrors");
+const jwt = require('jsonwebtoken');
 
-// 🔐 Middleware to check if user is authenticated
+const User = require('../models/User'); // Assuming your User model path
+
+const catchAsyncErrors = require('./catchAsyncErrors');
+
+const ErrorHandler = require('../utils/errorHandler');
+
+// Checks if user is authenticated
+
 exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
-  const { token } = req.cookies;
 
-  if (!token) {
-    return next(new ErrorHandler("Please login to access this resource", 401));
-  }
+// <--- CRUCIAL CHANGE STARTS HERE --->
 
-  try {
-    const decodedData = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await User.findById(decodedData.id);
+let token;
 
-    if (!req.user) {
-      return next(new ErrorHandler("User no longer exists", 401));
-    }
+
+
+// 1. Check if the Authorization header is present
+
+if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+
+    // 2. Extract the token from the "Bearer <token>" string
+
+    token = req.headers.authorization.split(' ')[1];
+
+}
+
+
+
+// If no token is found in the header, return 401
+
+if (!token) {
+
+    return next(new ErrorHandler('Login first to access this resource. (No token in header)', 401));
+
+}
+
+// <--- CRUCIAL CHANGE ENDS HERE --->
+
+
+
+try {
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    req.user = await User.findById(decoded.id);
 
     next();
-  } catch (error) {
-    return next(new ErrorHandler("Invalid or expired token", 401));
-  }
+
+} catch (error) {
+
+    // Handle cases where token is invalid (e.g., malformed, expired, invalid signature)
+
+    return next(new ErrorHandler('Invalid or Expired Token. Please login again.', 401));
+
+}
+
 });
 
-// 🛡️ Middleware to check if user is an admin
-exports.isAdmin = (requiredRole = "admin") => {
-  return (req, res, next) => {
-    if (!req.user) {
-      return next(new ErrorHandler("User not authenticated", 401));
-    }
+// Handling user roles
 
-    if (req.user.role !== requiredRole) {
-      return next(
-        new ErrorHandler(
-          `Role: ${req.user.role} is not authorized to access this resource`,
-          403
-        )
-      );
+exports.authorizeRoles = (...roles) => {
+
+return (req, res, next) => {
+
+    if (!req.user || !roles.includes(req.user.role)) { // Added !req.user check for robustness
+
+        return next(new ErrorHandler(`Role (${req.user ? req.user.role : 'unassigned'}) is not allowed to access this resource.`, 403));
+
     }
 
     next();
-  };
+
 };
+
+};
+
