@@ -3,14 +3,14 @@ import axios from "../../axios";
 import { useParams } from "react-router-dom";
 
 export default function OrderDetails() {
-  const { id } = useParams();
+  const { orderId } = useParams(); // ✅ Correct name
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const { data } = await axios.get(`/orders/${id}`);
+        const { data } = await axios.get(`/orders/${orderId}`); // ✅ Using correct ID
         setOrder(data.order);
       } catch (error) {
         console.error("Failed to fetch order details", error);
@@ -20,8 +20,10 @@ export default function OrderDetails() {
       }
     };
 
-    fetchOrder();
-  }, [id]);
+    if (orderId) {
+      fetchOrder();
+    }
+  }, [orderId]);
 
   if (loading) {
     return (
