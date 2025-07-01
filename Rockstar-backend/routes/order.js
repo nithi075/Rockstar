@@ -1,23 +1,25 @@
 const express = require('express');
 const router = express.Router();
+
 const {
-    createOrder,
-    getSingleOrder,
-    getAllOrders,
-    updateOrder,
-    deleteOrder
-} = require('../controllers/orderController'); // Ensure this path is correct
+  createOrder,
+  getSingleOrder,
+  getAllOrders,
+  updateOrder,
+  deleteOrder,
+} = require('../controllers/orderController');
 
-// Route for creating a new order
-// IMPORTANT: This route now uses '/order/new' as per your backend route definition.
-// Ensure your frontend also calls this specific '/api/v1/order/new' endpoint.
-router.route('/order/new').post(createOrder);
+const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 
-// Routes for fetching, updating, and deleting orders
-router.route('/order/:id').get(getSingleOrder); // Get a single order by ID
-router.route('/admin/orders').get(getAllOrders); // Get all orders (admin access)
-router.route('/admin/order/:id')
-    .put(updateOrder)   // Update order status (admin access)
-    .delete(deleteOrder); // Delete an order (admin access)
+// PUBLIC ROUTES
+router.post('/order/new', createOrder);
+router.get('/order/:id', getSingleOrder);
+
+// ADMIN ROUTES (Protected)
+router.get('/admin/orders', isAuthenticatedUser, authorizeRoles('admin'), getAllOrders);
+router
+  .route('/admin/order/:id')
+  .put(isAuthenticatedUser, authorizeRoles('admin'), updateOrder)
+  .delete(isAuthenticatedUser, authorizeRoles('admin'), deleteOrder);
 
 module.exports = router;
