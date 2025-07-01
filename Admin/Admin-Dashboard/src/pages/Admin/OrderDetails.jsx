@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import api from '../../axios'; // Correct import of your custom axios instance
+import api from '../../axios'; // Ensure this path is correct for your project structure
 
 export default function OrderDetails() {
   const { orderId } = useParams();
@@ -8,8 +8,8 @@ export default function OrderDetails() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    // CHANGE axios.get TO api.get
-    api.get(`/admin/orders/${orderId}`) // <-- CORRECTED LINE
+    // CORRECTED: Added '/orders' to match backend routing structure
+    api.get(`/orders/admin/orders/${orderId}`)
       .then(res => {
         setOrder(res.data.order);
       })
