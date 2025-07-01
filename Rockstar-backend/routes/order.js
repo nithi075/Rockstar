@@ -1,31 +1,17 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
-
 const {
-    createOrder,
-    getSingleOrder,
-    getAllOrders,
-    updateOrderStatusToDelivered,
-    updateOrderStatus,
-    deleteOrder
-} = require('../controllers/orderController');
+  createOrder,
+  getAllOrders,
+  getOrderById,
+} = require("../controllers/orderController");
+const { isAuthenticatedUser, isAdmin } = require("../middlewares/auth");
 
-// --- User Route ---
-router.post('/new', isAuthenticatedUser, createOrder);
+// Public - customer creates order
+router.post("/order/new", createOrder);
 
-// --- Admin Routes ---
-// Place this specific route BEFORE the generic /:id route
-router.put(
-    '/:id/deliver',
-    isAuthenticatedUser,
-    authorizeRoles('admin'),
-    updateOrderStatusToDelivered
-);
-
-router.get('/:id', isAuthenticatedUser, authorizeRoles('admin'), getSingleOrder);
-router.get('/', isAuthenticatedUser, authorizeRoles('admin'), getAllOrders);
-router.put('/:id', isAuthenticatedUser, authorizeRoles('admin'), updateOrderStatus);
-router.delete('/:id', isAuthenticatedUser, authorizeRoles('admin'), deleteOrder);
+// Admin routes
+router.get("/admin/orders", isAuthenticatedUser, isAdmin("admin"), getAllOrders);
+router.get("/admin/orders/:id", isAuthenticatedUser, isAdmin("admin"), getOrderById);
 
 module.exports = router;
