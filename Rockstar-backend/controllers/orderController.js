@@ -127,12 +127,10 @@ exports.updateOrderStatus = catchAsyncErrors(async (req, res, next) => {
 
     order.orderStatus = status;
 
-    // Reset deliveredAt if status is not Delivered
     if (status !== 'Delivered' && order.deliveredAt) {
         order.deliveredAt = undefined;
     }
 
-    // Set deliveredAt if status is changed to Delivered
     if (status === 'Delivered' && !order.deliveredAt) {
         order.deliveredAt = Date.now();
     }
