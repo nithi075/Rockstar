@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import api from '../../axios';
+import api from '../../axios'; // Correct import of your custom axios instance
 import { Link } from "react-router-dom";
 
 export default function OrderList() {
@@ -8,7 +8,8 @@ export default function OrderList() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    axios.get("/admin/orders")
+    // CHANGE axios.get TO api.get
+    api.get("/admin/orders") // <-- CORRECTED LINE
       .then(res => {
         setOrders(res.data.orders);
         setLoading(false);
