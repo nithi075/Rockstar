@@ -1,33 +1,28 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/User");
-const catchAsyncErrors = require("./catchAsyncErrors");
+const User = require("../models/user"); // ✅ Correct path to user model
 const ErrorHandler = require("../utils/errorHandler");
+const catchAsyncErrors = require("./catchAsyncErrors");
 
+// ✅ Middleware to check if user is authenticated
 exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
-  let token;
-
-  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
-    token = req.headers.authorization.split(" ")[1];
-  }
+  const { token } = req.cookies;
 
   if (!token) {
-    return next(new ErrorHandler("Login first to access this resource. (No token in header)", 401));
+    return next(new ErrorHandler("Please login to access this resource", 401));
   }
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await User.findById(decoded.id);
-    next();
-  } catch (error) {
-    return next(new ErrorHandler("Invalid or Expired Token. Please login again.", 401));
-  }
+  const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+  req.user = await User.findById(decodedData.id);
+
+  next();
 });
 
-exports.authorizeRoles = (...roles) => {
+// ✅ Middleware to check for admin role
+exports.isAdmin = (role) => {
   return (req, res, next) => {
-    if (!req.user || !roles.includes(req.user.role)) {
+    if (!req.user || req.user.role !== role) {
       return next(
-        new ErrorHandler(`Role (${req.user ? req.user.role : "unassigned"}) is not allowed to access this resource.`, 403)
+        new ErrorHandler(`Role: ${req.user?.role} is not allowed to access this resource`, 403)
       );
     }
     next();
