@@ -1,21 +1,16 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-
+const { isAuthenticatedUser, isAdmin } = require('../middlewares/auth');
 const {
   createOrder,
   getAllOrders,
-  getSingleOrder,
-} = require("../controllers/orderController");
+  getOrderById,
+  deleteOrder
+} = require('../controllers/orderController');
 
-const { isAuthenticatedUser, authorizeRoles } = require("../middlewares/auth");
-
-// Create new order
-router.post("/order/new", createOrder);
-
-// Admin: Get all orders
-router.get("/orders", isAuthenticatedUser, authorizeRoles("admin"), getAllOrders);
-
-// Admin: Get one order by ID
-router.get("/orders/:id", isAuthenticatedUser, authorizeRoles("admin"), getSingleOrder);
+router.post('/orders', createOrder);
+router.get('/orders', isAuthenticatedUser, isAdmin('admin'), getAllOrders);
+router.get('/orders/:id', isAuthenticatedUser, isAdmin('admin'), getOrderById);
+router.delete('/orders/:id', isAuthenticatedUser, isAdmin('admin'), deleteOrder);
 
 module.exports = router;
