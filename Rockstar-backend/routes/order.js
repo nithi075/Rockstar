@@ -7,13 +7,15 @@ const {
   getSingleOrder
 } = require('../controllers/orderController');
 
-const { isAuthenticatedUser, isAdmin } = require('../middlewares/auth');
+// Corrected: Use authorizeRoles instead of isAdmin
+const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 
 // Create order (accessible publicly or authenticated user)
 router.post('/order/new', createOrder);
 
 // Admin-only routes
-router.get('/admin/orders', isAuthenticatedUser, isAdmin('admin'), getAllOrders);
-router.get('/admin/orders/:id', isAuthenticatedUser, isAdmin('admin'), getSingleOrder);
+// Corrected: Replaced isAdmin('admin') with authorizeRoles('admin')
+router.get('/admin/orders', isAuthenticatedUser, authorizeRoles('admin'), getAllOrders);
+router.get('/admin/orders/:id', isAuthenticatedUser, authorizeRoles('admin'), getSingleOrder);
 
 module.exports = router;
