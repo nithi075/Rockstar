@@ -1,90 +1,56 @@
-// pages/Admin/OrderDetails.jsx
 import React, { useEffect, useState } from "react";
+import axios from "../../axios"; // your axios instance
 import { useParams } from "react-router-dom";
-import axios from "axios";
 
-const OrderDetails = () => {
-  const { orderId } = useParams();
+export default function OrderDetails() {
+  const { id } = useParams();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const { data } = await axios.get(`https://admin-backend-x8of.onrender.com/api/v1/orders/${orderId}`, {
-          withCredentials: true,
-        });
+        const { data } = await axios.get(`/orders/${id}`);
         setOrder(data.order);
-        setLoading(false);
-      } catch (err) {
-        console.error("Failed to fetch order details", err);
-        setError("Failed to load order details. " + (err.response?.data?.message || err.message));
+      } catch (error) {
+        console.error("Failed to fetch order details", error);
+        alert("Access denied or order not found");
+      } finally {
         setLoading(false);
       }
     };
+
     fetchOrder();
-  }, [orderId]);
+  }, [id]);
 
-  if (loading) return <p className="Order-loading">Loading order details...</p>;
-  if (error) return <p className="loading-error">{error}</p>;
-  if (!order) return <p className="order-notfound">Order not found.</p>;
+  if (loading) return <p className="loader">Loading...</p>;
 
-  return (
-    <div className="Order-Details">
-      <h2 className="Details">Order Details - #{order._id}</h2>
+  return order ? (
+    <div className="order-details">
+      <h2>Order ID: {order._id}</h2>
+      <p>Customer: {order.customerInfo.name}</p>
+      <p>Email: {order.customerInfo.email}</p>
+      <p>Phone: {order.customerInfo.phone}</p>
+      <p>Date: {new Date(order.createdAt).toLocaleString()}</p>
 
-      <div className="Info">
-        <h3 className="Cust-info">Customer Information:</h3>
-        <p><strong className="Cust-Name">Name:</strong> {order.customerInfo?.name}</p>
-        <p><strong className="Cust-Phone">Phone:</strong> {order.customerInfo?.phone}</p>
-        <p><strong className="Cust-Address">Address:</strong> {order.customerInfo?.address || 'N/A'}</p>
-        <p><strong className="Cust-OrderDate">Order Date:</strong> {new Date(order.createdAt).toLocaleString()}</p>
-        <p><strong className="Status">Current Status:</strong> 
-          <span className={
-            order.status === 'Delivered'
-              ? "status-delivered"
-              : order.status === 'Cancelled'
-              ? "status-cancelled"
-              : "status-processing"
-          }>
-            {order.status}
-          </span>
-        </p>
-      </div>
-
-      <h3 className="Order-items">Ordered Items:</h3>
-      <ul className="Order-details">
-        {order.cartItems.map((item) => (
-          <li key={item._id} className="Cust-id">
+      <h3>Items:</h3>
+      <ul>
+        {order.cartItems.map((item, index) => (
+          <li key={index}>
             <img
-              src={
-                item.product?.images?.[0]?.url
-                  ? `https://admin-backend-x8of.onrender.com/uploads/${item.product.images[0].url}`
-                  : "/placeholder.jpg"
-              }
-              width={100}
-              alt={item.product?.name || "Product Image"}
-              className="Cust-image"
+              src={`https://admin-backend-x8of.onrender.com${item.product.image}`}
+              alt={item.product.name}
+              width="60"
             />
-            <div className="More-cus-info">
-              <p className="more-name">{item.product?.name || 'Unknown Product'}</p>
-              <p className="more-size">Size: <span className="font-medium">{item.size}</span></p>
-              <p className="more-qty">Quantity: <span className="font-medium">{item.quantity}</span></p>
-              <p className="more-price">Price: ₹{item.price.toFixed(2)}</p>
-            </div>
-            <div className="more-item-price">
-              ₹{(item.price * item.quantity).toFixed(2)}
+            <div>
+              {item.product.name} (Size: {item.size}) × {item.quantity} = ₹
+              {item.price * item.quantity}
             </div>
           </li>
         ))}
       </ul>
-
-      <div className="order-reduce">
-        Total: ₹{order.cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2)}
-      </div>
     </div>
+  ) : (
+    <p>Order not found</p>
   );
-};
-
-export default OrderDetails;
+}
