@@ -1,78 +1,35 @@
-const jwt = require('jsonwebtoken');
+// middlewares/auth.js
 
-const User = require('../models/User'); // Assuming your User model path
+const jwt = require("jsonwebtoken");
+const User = require("../models/user"); // ✅ Make sure the path is correct
+const ErrorHandler = require("../utils/errorHandler");
+const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
 
-const catchAsyncErrors = require('./catchAsyncErrors');
-
-const ErrorHandler = require('../utils/errorHandler');
-
-// Checks if user is authenticated
-
+// Check if user is authenticated
 exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
+  const { token } = req.cookies;
 
-// <--- CRUCIAL CHANGE STARTS HERE --->
+  if (!token) {
+    return next(new ErrorHandler("Please login to access this resource", 401));
+  }
 
-let token;
+  const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+  req.user = await User.findById(decodedData.id);
 
-
-
-// 1. Check if the Authorization header is present
-
-if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-
-    // 2. Extract the token from the "Bearer <token>" string
-
-    token = req.headers.authorization.split(' ')[1];
-
-}
-
-
-
-// If no token is found in the header, return 401
-
-if (!token) {
-
-    return next(new ErrorHandler('Login first to access this resource. (No token in header)', 401));
-
-}
-
-// <--- CRUCIAL CHANGE ENDS HERE --->
-
-
-
-try {
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    req.user = await User.findById(decoded.id);
-
-    next();
-
-} catch (error) {
-
-    // Handle cases where token is invalid (e.g., malformed, expired, invalid signature)
-
-    return next(new ErrorHandler('Invalid or Expired Token. Please login again.', 401));
-
-}
-
+  next();
 });
 
-// Handling user roles
-
+// Check role (Admin)
 exports.authorizeRoles = (...roles) => {
-
-return (req, res, next) => {
-
-    if (!req.user || !roles.includes(req.user.role)) { // Added !req.user check for robustness
-
-        return next(new ErrorHandler(`Role (${req.user ? req.user.role : 'unassigned'}) is not allowed to access this resource.`, 403));
-
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new ErrorHandler(
+          `Role: ${req.user.role} is not allowed to access this resource`,
+          403
+        )
+      );
     }
-
     next();
-
+  };
 };
-
-};
-
