@@ -1,10 +1,7 @@
 const Product = require('../models/productModel');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
-const ErrorHandler = require('../utils/errorHandler'); // Make sure you have this utility
+const ErrorHandler = require('../utils/errorHandler');
 
-// @desc    Get all products
-// @route   GET /api/v1/products (with pagination, search, category filter, and sorting)
-// @access  Public
 exports.getAllProducts = catchAsyncErrors(async (req, res, next) => {
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 15;
@@ -30,18 +27,16 @@ exports.getAllProducts = catchAsyncErrors(async (req, res, next) => {
         }
     }
 
-    // --- NEW: Add Sorting Logic ---
-    const sortField = req.query.sortField || 'createdAt'; // Default sort field
-    const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1; // Default sort order is descending
+    const sortField = req.query.sortField || 'createdAt';
+    const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
 
     const sortOptions = {};
     sortOptions[sortField] = sortOrder;
-    // --- END NEW: Add Sorting Logic ---
 
-    const totalCount = await Product.countDocuments(query); // Use the combined query
+    const totalCount = await Product.countDocuments(query);
 
-    const products = await Product.find(query) // Use the combined query
-        .sort(sortOptions) // Apply dynamic sorting
+    const products = await Product.find(query)
+        .sort(sortOptions)
         .skip(skip)
         .limit(limit);
 
@@ -54,9 +49,6 @@ exports.getAllProducts = catchAsyncErrors(async (req, res, next) => {
     });
 });
 
-// @desc    Get Single Product
-// @route   GET /api/v1/product/:id
-// @access  Public
 exports.getProductById = catchAsyncErrors(async (req, res, next) => {
     const product = await Product.findById(req.params.id);
     if (!product) {
@@ -65,68 +57,70 @@ exports.getProductById = catchAsyncErrors(async (req, res, next) => {
     res.status(200).json({ success: true, product });
 });
 
-// @desc    Create Product
-// @route   POST /api/v1/product/new (or /api/v1/products)
-// @access  Private (e.g., Admin)
 exports.createProduct = catchAsyncErrors(async (req, res, next) => {
-    // CRITICAL FIX: Assign the authenticated user's ID to the product
-    // This assumes `isAuthenticatedUser` middleware populates `req.user`
     if (!req.user || !req.user._id) {
         return next(new ErrorHandler('User not authenticated for product creation', 401));
     }
     req.body.user = req.user._id;
 
+    // Handle images if uploaded via multer
+    if (req.files && req.files.length > 0) {
+        // You would typically upload these to a cloud storage service like Cloudinary
+        // For simplicity, here we'll just store paths if req.files exists
+        // In a real app, you'd process req.files and get secure URLs/public_ids
+        req.body.images = req.files.map(file => ({
+            public_id: file.filename, // Or a proper ID from Cloudinary
+            url: `/uploads/${file.filename}` // Or URL from Cloudinary
+        }));
+    } else {
+        // If no files, ensure images array is empty or remove it if not required
+        req.body.images = []; // Or handle based on your model's requirements
+    }
+
     const product = await Product.create(req.body);
     res.status(201).json({ success: true, product });
 });
 
-// @desc    Update Product
-// @route   PUT /api/v1/product/:id (or /api/v1/products/:id)
-// @access  Private (e.g., Admin)
 exports.updateProduct = catchAsyncErrors(async (req, res, next) => {
-    // <--- ADDED DEBUGGING LOGS HERE ---
-    console.log(`[UPDATE PRODUCT] Request received for ID: ${req.params.id}`);
-    console.log(`[UPDATE PRODUCT] Request Body:`, req.body);
-    // -----------------------------------
     try {
         let product = await Product.findById(req.params.id);
         if (!product) {
             return next(new ErrorHandler('Product not found', 404));
         }
 
-        // Handle image updates if applicable (not explicitly handled in this snippet)
-        // If your frontend sends images in req.body and not as form-data, ensure your model
-        // can handle direct assignment or you have separate logic for them here.
+        // Handle image updates (if new files are uploaded during update)
+        if (req.files && req.files.length > 0) {
+             // You might want to delete old images from storage first
+             const newImages = req.files.map(file => ({
+                public_id: file.filename,
+                url: `/uploads/${file.filename}`
+             }));
+             // Append new images or replace existing ones based on your logic
+             req.body.images = [...(req.body.images || []), ...newImages];
+        }
 
-        // Update the product fields from req.body
         product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-            new: true, // Return the modified document rather than the original
-            runValidators: true, // Run Mongoose validators on update
-            useFindAndModify: false, // Recommended to avoid deprecated function
+            new: true,
+            runValidators: true,
+            useFindAndModify: false,
         });
 
         res.status(200).json({ success: true, product });
 
     } catch (error) {
-        console.error("Error in updateProduct:", error); // This is the crucial error logging line
+        console.error("Error in updateProduct:", error);
         return next(new ErrorHandler(`Product update failed: ${error.message || 'Unknown error'}`, 500));
     }
 });
 
-// @desc    Delete Product
-// @route   DELETE /api/v1/product/:id (or /api/v1/products/:id)
-// @access  Private (e.g., Admin)
 exports.deleteProduct = catchAsyncErrors(async (req, res, next) => {
     const product = await Product.findById(req.params.id);
     if (!product) {
         return next(new ErrorHandler('Product not found', 404));
     }
 
-    // Ensure only the owner/admin can delete their products if user field is present
-    // if (product.user.toString() !== req.user.id && req.user.role !== 'admin') {
-    //    return next(new ErrorHandler(`User is not authorized to delete this product`, 403));
-    // }
+    // In a real app, you'd also delete associated images from cloud storage
 
-    await product.deleteOne(); // Use deleteOne for Mongoose 6+
+    await product.deleteOne();
     res.status(200).json({ success: true, message: 'Product deleted' });
 });
