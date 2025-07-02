@@ -22,7 +22,7 @@ const EditProduct = () => {
   // List of valid categories from your backend/models/productModel.js enum
   const categories = [
    
-    'Shirts', 'Jackets', 'T-Shirts', 'Mobiles','Track Pants','Formal Pants','Shorts'
+    'Shirts', 'Jackets', 'T-Shirts','Track Pants','Formal Pants','Shorts'
   ]; // <-- IMPORTANT: Ensure these categories match your backend productModel.js
 
   useEffect(() => {
