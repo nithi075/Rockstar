@@ -1,7 +1,7 @@
 // Rockstar-backend/middlewares/auth.js
 
 const jwt = require("jsonwebtoken");
-const User = require("../models/userModel"); // Adjust path if necessary
+const User = require("../models/User"); // Adjust path if necessary
 const ErrorHandler = require("../utils/errorHandler"); // Adjust path if necessary
 const catchAsyncErrors = require("./catchAsyncErrors"); // Adjust path if necessary (relative to this file)
 
