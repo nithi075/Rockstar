@@ -73,8 +73,8 @@ app.use('/uploads', express.static(uploadDir));
 
 // --- API Routes ---
 // These require statements will now correctly find the renamed files
-app.use('/api/v1/products', require('./routes/productRoutes'));
-app.use('/api/v1/orders', require('./routes/orderRoutes'));
+app.use('/api/v1/products', require('./routes/product'));
+app.use('/api/v1/orders', require('./routes/order'));
 app.use('/api/v1', require('./routes/userRoutes'));
 app.use('/api/v1/admin', require('./routes/adminDashboardRoutes'));
 
