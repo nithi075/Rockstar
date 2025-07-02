@@ -72,8 +72,8 @@ app.use('/uploads', express.static(uploadDir));
 
 
 // --- API Routes ---
-app.use('/api/v1/products', require('./routes/productRoutes'));
-app.use('/api/v1/orders', require('./routes/orderRoutes'));
+app.use('/api/v1/products', require('./routes/product'));
+app.use('/api/v1/orders', require('./routes/order'));
 // CORRECTED PATH: Changed '/api/v1' to '/api/v1/users' to match frontend's POST /api/v1/users/login
 app.use('/api/v1/users', require('./routes/userRoutes'));
 app.use('/api/v1/admin', require('./routes/adminDashboardRoutes'));
