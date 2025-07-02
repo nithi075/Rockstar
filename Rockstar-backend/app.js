@@ -7,6 +7,9 @@ const dotenv = require('dotenv');
 const path = require('path');
 const fs = require('fs'); // For checking/creating upload directory
 
+// Declare 'server' variable here so it's accessible globally
+let server; // <--- This line ensures 'server' is defined when uncaughtException handler runs
+
 // --- Load environment variables FIRST ---
 // Ensure this path is correct relative to where app.js is run
 dotenv.config({ path: './config/config.env' });
@@ -17,8 +20,8 @@ process.on('uncaughtException', (err) => {
     console.error(`❌ Uncaught Exception Error: ${err.message}`);
     console.error('Stack Trace:', err.stack);
     console.error('Shutting down the server due to uncaught exception');
-    // Ensure the server instance is captured to close it gracefully
-    if (server) { // 'server' will be defined later in app.listen()
+    // 'server' is now declared, so this check works
+    if (server) {
         server.close(() => {
             process.exit(1); // Exit with failure code
         });
@@ -28,8 +31,7 @@ process.on('uncaughtException', (err) => {
 });
 
 // --- Database Connection ---
-// CORRECTED PATH: changed from './config/database' to './config/connectDatabase'
-const connectDatabase = require('./config/connectDatabase'); // Make sure this exports a function named 'connectDatabase'
+const connectDatabase = require('./config/connectDatabase'); // This path is now correct
 connectDatabase(); // Call to connect to MongoDB
 
 // --- Initialize Express App ---
@@ -70,11 +72,11 @@ app.use('/uploads', express.static(uploadDir));
 
 
 // --- API Routes ---
-// Import and mount your route files
-app.use('/api/v1/products', require('./routes/productRoutes')); // Assuming productRoutes.js
-app.use('/api/v1/orders', require('./routes/orderRoutes'));      // Assuming orderRoutes.js
-app.use('/api/v1', require('./routes/userRoutes'));              // Assuming userRoutes.js for /api/v1/login, /api/v1/register
-app.use('/api/v1/admin', require('./routes/adminDashboardRoutes')); // Assuming adminDashboardRoutes.js
+// These require statements will now correctly find the renamed files
+app.use('/api/v1/products', require('./routes/productRoutes'));
+app.use('/api/v1/orders', require('./routes/orderRoutes'));
+app.use('/api/v1', require('./routes/userRoutes'));
+app.use('/api/v1/admin', require('./routes/adminDashboardRoutes'));
 
 
 // --- Health Check Route (Good for deployment monitoring) ---
@@ -90,7 +92,7 @@ app.use(errorMiddleware);
 // --- Start Server ---
 const PORT = process.env.PORT || 5000;
 // Capture the server instance returned by app.listen() for graceful shutdown
-const server = app.listen(PORT, () => {
+server = app.listen(PORT, () => { // Assign to the declared 'server' variable
     console.log(`✅ Server running in ${process.env.NODE_ENV} mode on http://localhost:${PORT}`);
     console.log(`JWT Secret (from env): ${process.env.JWT_SECRET ? 'Loaded' : 'NOT LOADED'}`);
     console.log(`FRONTEND_URL (from env): ${process.env.FRONTEND_URL ? 'Loaded' : 'NOT LOADED'}`);
@@ -102,7 +104,7 @@ process.on('unhandledRejection', (err) => {
     console.error(`❌ Unhandled Rejection Error: ${err.message}`);
     console.error('Stack Trace:', err.stack);
     console.error('Shutting down the server due to unhandled promise rejection');
-    // Close server gracefully then exit
+    // 'server' is now declared, so this check works
     if (server) {
         server.close(() => {
             process.exit(1); // Exit with failure code
