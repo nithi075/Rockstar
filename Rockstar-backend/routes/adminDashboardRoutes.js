@@ -11,8 +11,8 @@ const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 // --- VERIFY THESE CONTROLLER IMPORT PATHS ---
 // Based on your screenshot, these should be 'productControll' and 'orderControl'
 const { getDashboardStats } = require('../controllers/adminDashboardController'); // Confirmed this is correct now
-const { createProduct, updateProduct, deleteProduct } = require('../controllers/productControll'); // <-- Make sure it's 'productControll' if that's your filename!
-const { getAllOrders, updateOrder, deleteOrder } = require('../controllers/orderControl');     // <-- Make sure it's 'orderControl' if that's your filename!
+const { createProduct, updateProduct, deleteProduct } = require('../controllers/productController'); // <-- Make sure it's 'productControll' if that's your filename!
+const { getAllOrders, updateOrder, deleteOrder } = require('../controllers/orderController');     // <-- Make sure it's 'orderControl' if that's your filename!
 // --- END VERIFICATION ---
 
 
