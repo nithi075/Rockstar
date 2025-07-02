@@ -4,9 +4,6 @@ const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 const ErrorHandler = require('../utils/errorHandler');
 const mongoose = require('mongoose');
 
-// @desc    Create New Order
-// @route   POST /api/v1/order
-// @access  Public or Authenticated
 exports.createOrder = catchAsyncErrors(async (req, res, next) => {
     const { cartItems, customerInfo } = req.body;
 
@@ -40,7 +37,7 @@ exports.createOrder = catchAsyncErrors(async (req, res, next) => {
         const actualPrice = parseFloat(productDoc.price);
         let availableStock = 0;
 
-        if (size && Array.isArray(productDoc.sizes)) {
+        if (size && Array.isArray(productDoc.sizes) && productDoc.sizes.length > 0) {
             const sizeObj = productDoc.sizes.find(s => s.size === size);
             availableStock = sizeObj?.stock || 0;
 
@@ -50,12 +47,11 @@ exports.createOrder = catchAsyncErrors(async (req, res, next) => {
 
             bulkUpdates.push({
                 updateOne: {
-                    filter: { _id: product },
-                    update: { $inc: { 'sizes.$[elem].stock': -quantity } },
-                    arrayFilters: [{ 'elem.size': size }]
+                    filter: { _id: product, 'sizes.size': size }, // Filter by product ID AND size
+                    update: { $inc: { 'sizes.$.stock': -quantity } }, // Use positional operator for array update
                 }
             });
-        } else {
+        } else { // Handle products without sizes or if size is not specified
             availableStock = productDoc.stock;
             if (availableStock < quantity) {
                 return next(new ErrorHandler(`Insufficient stock for ${productDoc.name}`, 400));
@@ -98,9 +94,6 @@ exports.createOrder = catchAsyncErrors(async (req, res, next) => {
     });
 });
 
-// @desc    Get Single Order
-// @route   GET /api/v1/order/:id
-// @access  Public/Admin
 exports.getSingleOrder = catchAsyncErrors(async (req, res, next) => {
     const order = await Order.findById(req.params.id).populate('cartItems.product', 'name price images');
     if (!order) return next(new ErrorHandler('Order not found.', 404));
@@ -108,10 +101,9 @@ exports.getSingleOrder = catchAsyncErrors(async (req, res, next) => {
     res.status(200).json({ success: true, order });
 });
 
-// @desc    Get All Orders
-// @route   GET /api/v1/admin/orders
-// @access  Admin
 exports.getAllOrders = catchAsyncErrors(async (req, res, next) => {
+    // This is the one that was failing with 500, likely due to populate or data.
+    // The model names are now ensured consistent.
     const orders = await Order.find().populate('cartItems.product', 'name price');
     res.status(200).json({
         success: true,
@@ -120,9 +112,6 @@ exports.getAllOrders = catchAsyncErrors(async (req, res, next) => {
     });
 });
 
-// @desc    Update Order Status
-// @route   PUT /api/v1/admin/order/:id
-// @access  Admin
 exports.updateOrder = catchAsyncErrors(async (req, res, next) => {
     const { status } = req.body;
     if (!status) return next(new ErrorHandler('Status is required.', 400));
@@ -136,9 +125,6 @@ exports.updateOrder = catchAsyncErrors(async (req, res, next) => {
     res.status(200).json({ success: true, message: 'Order updated successfully.', order });
 });
 
-// @desc    Delete Order
-// @route   DELETE /api/v1/admin/order/:id
-// @access  Admin
 exports.deleteOrder = catchAsyncErrors(async (req, res, next) => {
     const order = await Order.findById(req.params.id);
     if (!order) return next(new ErrorHandler('Order not found.', 404));
