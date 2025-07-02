@@ -15,7 +15,7 @@ export default function OrderList() {
             setLoading(true);
             try {
                 // Ensure this endpoint matches your backend route for fetching all orders
-                const res = await api.get("/orders/admin/orders");
+                const res = await api.get("/admin/orders"); // Corrected endpoint if it's /admin/orders without the leading /orders
                 const sortedOrders = (res.data.orders || []).sort((a, b) =>
                     new Date(b.createdAt) - new Date(a.createdAt)
                 );
@@ -32,17 +32,19 @@ export default function OrderList() {
 
     const handleMarkAsDelivered = async (orderId) => {
         try {
-            // This endpoint corresponds to the backend updateOrderDeliverStatus
-            const res = await api.put(`/orders/${orderId}/deliver`, { status: 'Delivered' });
+            // ****** THIS IS THE CRUCIAL CHANGE ******
+            // It should now hit your backend's admin update order route: /admin/orders/:id
+            const res = await api.put(`/admin/orders/${orderId}`, { status: 'Delivered' });
             if (res.data.success) {
-                 setOrders(prevOrders =>
+                setOrders(prevOrders =>
                     prevOrders.map(order =>
+                        // Make sure 'orderStatus' is used here, matching your backend model
                         order._id === orderId ? { ...order, orderStatus: 'Delivered', deliveredAt: new Date() } : order // Update orderStatus
                     )
                 );
                 alert("Order marked as delivered successfully!");
             } else {
-                 alert("Failed to update status: " + (res.data.message || "Unknown error"));
+                alert("Failed to update status: " + (res.data.message || "Unknown error"));
             }
         } catch (err) {
             console.error("Failed to update status:", err);
