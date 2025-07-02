@@ -7,7 +7,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 const fs = require('fs'); // For checking/creating upload directory
 
-// Declare 'server' variable here so it's accessible globally
+// Declare 'server' variable here so it's accessible globally for graceful shutdown
 let server;
 
 // --- Load environment variables FIRST ---
@@ -72,11 +72,11 @@ app.use('/uploads', express.static(uploadDir));
 
 
 // --- API Routes ---
-// Corrected based on your specific instructions:
-app.use('/api/v1/products', require('./routes/product'));         // Uses product.js
-app.use('/api/v1/orders', require('./routes/order'));             // Uses order.js
-app.use('/api/v1/users', require('./routes/userRoutes'));         // Uses userRoutes.js (was already correct)
-app.use('/api/v1/admin', require('./routes/adminDashboardRoutes')); // Uses adminDashboardRoutes.js (as per your last instruction)
+// THESE ARE THE CORRECTED PATHS based on your latest instructions and file names:
+app.use('/api/v1/products', require('./routes/product'));            // Uses routes/product.js
+app.use('/api/v1/orders', require('./routes/order'));                // Uses routes/order.js
+app.use('/api/v1/users', require('./routes/userRoutes'));            // Uses routes/userRoutes.js (This was always consistent)
+app.use('/api/v1/admin', require('./routes/adminDashboardRoutes'));  // Uses routes/adminDashboardRoutes.js (As per your last confirmation)
 
 
 // --- Health Check Route (Good for deployment monitoring) ---
