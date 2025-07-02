@@ -8,7 +8,7 @@ const path = require('path');
 const fs = require('fs'); // For checking/creating upload directory
 
 // Declare 'server' variable here so it's accessible globally
-let server; // <--- This line ensures 'server' is defined when uncaughtException handler runs
+let server;
 
 // --- Load environment variables FIRST ---
 // Ensure this path is correct relative to where app.js is run
@@ -31,7 +31,7 @@ process.on('uncaughtException', (err) => {
 });
 
 // --- Database Connection ---
-const connectDatabase = require('./config/connectDatabase'); // This path is now correct
+const connectDatabase = require('./config/connectDatabase');
 connectDatabase(); // Call to connect to MongoDB
 
 // --- Initialize Express App ---
@@ -47,7 +47,7 @@ app.use(cookieParser()); // Parses cookies attached to the client request object
 app.use(cors({
     origin: [
         process.env.FRONTEND_URL, // From your .env file
-        'http://localhost:5173',  // Common frontend dev port
+        'http://localhost:5173',
         'http://localhost:5174',
         'http://localhost:5175',
         'https://rockstar-dashboard.onrender.com' // Your deployed frontend URL
@@ -72,10 +72,10 @@ app.use('/uploads', express.static(uploadDir));
 
 
 // --- API Routes ---
-// These require statements will now correctly find the renamed files
-app.use('/api/v1/products', require('./routes/product'));
-app.use('/api/v1/orders', require('./routes/order'));
-app.use('/api/v1', require('./routes/userRoutes'));
+app.use('/api/v1/products', require('./routes/productRoutes'));
+app.use('/api/v1/orders', require('./routes/orderRoutes'));
+// CORRECTED PATH: Changed '/api/v1' to '/api/v1/users' to match frontend's POST /api/v1/users/login
+app.use('/api/v1/users', require('./routes/userRoutes'));
 app.use('/api/v1/admin', require('./routes/adminDashboardRoutes'));
 
 
@@ -92,7 +92,7 @@ app.use(errorMiddleware);
 // --- Start Server ---
 const PORT = process.env.PORT || 5000;
 // Capture the server instance returned by app.listen() for graceful shutdown
-server = app.listen(PORT, () => { // Assign to the declared 'server' variable
+server = app.listen(PORT, () => {
     console.log(`✅ Server running in ${process.env.NODE_ENV} mode on http://localhost:${PORT}`);
     console.log(`JWT Secret (from env): ${process.env.JWT_SECRET ? 'Loaded' : 'NOT LOADED'}`);
     console.log(`FRONTEND_URL (from env): ${process.env.FRONTEND_URL ? 'Loaded' : 'NOT LOADED'}`);
