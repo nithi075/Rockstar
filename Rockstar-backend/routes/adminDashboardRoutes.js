@@ -1,28 +1,27 @@
 const express = require('express');
 const router = express.Router();
-const multer = require('multer'); // Import multer
-const path = require('path');     // Import path
-const fs = require('fs');         // Import fs (for ensuring directory)
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 const { getDashboardStats } = require('../controllers/adminDashboardController');
-const { createProduct } = require('../controllers/productController'); // <--- IMPORT createProduct controller
+const { createProduct, updateProduct, deleteProduct } = require('../controllers/productController');
+const { getAllOrders, updateOrder, deleteOrder } = require('../controllers/orderController');
 
-// --- Multer Configuration for this route ---
-// Ensure the uploads directory exists relative to the server.js root or project root
-const uploadDir = path.join(__dirname, '../uploads'); // Go up one level from 'routes', then into 'uploads'
+// --- Multer Configuration ---
+const uploadDir = path.join(__dirname, '../uploads');
 if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true }); // recursive: true creates parent folders if they don't exist
+    fs.mkdirSync(uploadDir, { recursive: true });
 }
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // This path is relative to the directory where your main server.js is executed
-  },
-  filename: (req, file, cb) => {
-    // Generate a unique filename to prevent collisions
-    cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
-  },
+    destination: (req, file, cb) => {
+        cb(null, uploadDir); // Use the resolved path
+    },
+    filename: (req, file, cb) => {
+        cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
+    },
 });
 
 const upload = multer({ storage: storage });
@@ -31,17 +30,30 @@ const upload = multer({ storage: storage });
 
 // --- ADMIN ROUTES ---
 
-// Existing Dashboard Route
+// Dashboard Stats
 router.get('/dashboard', isAuthenticatedUser, authorizeRoles('admin'), getDashboardStats);
 
-// NEW: Route for creating products
-// Frontend hits /api/v1/admin/products with POST
+// Product Management
 router.post(
-    '/products', // <--- This matches the '/products' part after '/api/v1/admin'
+    '/products',
     isAuthenticatedUser,
     authorizeRoles('admin'),
-    upload.array('images', 5), // Multer middleware to handle image uploads (max 5 images)
-    createProduct // Your controller function that handles product creation logic
+    upload.array('images', 5), // 'images' is the field name in your form/formData
+    createProduct
 );
+router.put(
+    '/products/:id',
+    isAuthenticatedUser,
+    authorizeRoles('admin'),
+    upload.array('images', 5), // Allow images on update too
+    updateProduct
+);
+router.delete('/products/:id', isAuthenticatedUser, authorizeRoles('admin'), deleteProduct);
+
+// Order Management
+router.get('/orders', isAuthenticatedUser, authorizeRoles('admin'), getAllOrders);
+router.put('/orders/:id', isAuthenticatedUser, authorizeRoles('admin'), updateOrder);
+router.delete('/orders/:id', isAuthenticatedUser, authorizeRoles('admin'), deleteOrder);
+
 
 module.exports = router;
