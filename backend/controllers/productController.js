@@ -1,205 +1,191 @@
-const productModel = require('../models/productModel'); // Ensure this path is correct
+const Product = require('../models/productModel');
+const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
+const ErrorHandler = require('../utils/errorHandler');
 
-// @desc    Get all products
-// @route   GET /api/v1/products (with pagination, search, category filter, and latest sorting)
-// @access  Public
-exports.getAllProducts = async (req, res, next) => {
-    try {
-        const query = {}; // Base query object for filtering
+// Optional: For local file deletion (if you implement deleting old images)
+// const fs = require('fs');
+// const path = require('path');
+// const util = require('util');
+// const unlinkFile = util.promisify(fs.unlink); // Promisify for async/await
 
-        // 1. Handle Keyword Search
-        if (req.query.keyword) {
-            query.name = { $regex: req.query.keyword, $options: 'i' };
-        }
+// --- Get All Products (Public & Admin) ---
+exports.getAllProducts = catchAsyncErrors(async (req, res, next) => {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 15;
+    const skip = (page - 1) * limit;
 
-        // 2. Handle Category Filtering
-        if (req.query.category) {
-            // Case-insensitive matching for the category field
-            query.category = new RegExp(`^${req.query.category}$`, 'i');        }
+    const keyword = req.query.keyword
+        ? { name: { $regex: req.query.keyword, $options: 'i' } }
+        : {};
 
-        // 3. Handle Price Filtering (if applicable)
-        if (req.query.minPrice || req.query.maxPrice) {
-            query.price = {};
-            if (req.query.minPrice) {
-                query.price.$gte = parseFloat(req.query.minPrice);
-            }
-            if (req.query.maxPrice) {
-                query.price.$lte = parseFloat(req.query.maxPrice);
-            }
-        }
+    const query = { ...keyword };
 
-        // --- Pagination Logic ---
-        const currentPage = parseInt(req.query.page) || 1;
-        // Default limit for products per page. This will determine how many
-        // products are sent from the backend. For "New Arrivals", you might
-        // want to ensure you get enough for your frontend's display (e.g., 8 to 12).
-        const productsPerPage = parseInt(req.query.limit) || 20; // Default 12 products per page
-        const skip = (currentPage - 1) * productsPerPage;
-
-        // Count total products matching the current filter (before pagination)
-        const totalProducts = await productModel.countDocuments(query);
-
-        // Find products matching the query, apply sorting, then pagination
-        // IMPORTANT: Sorting by importDate in descending order for "New Arrivals"
-        const products = await productModel.find(query)
-                                          .limit(productsPerPage)
-                                          .skip(skip)
-                                          .sort({ importDate: -1 }); // Sort by newest importDate
-
-        res.status(200).json({
-            success: true,
-            count: products.length,        // Number of products on the current page
-            totalProducts: totalProducts,  // Total number of products matching the query (for pagination)
-            products
-        });
-
-    } catch (error) {
-        console.error("Error fetching products:", error);
-        res.status(500).json({
-            success: false,
-            message: 'Server Error: Could not fetch products.',
-            error: error.message // Include error message for debugging in dev environment
-        });
+    if (req.query.category) {
+        query.category = new RegExp(`^${req.query.category}$`, 'i');
     }
-};
 
-// @desc    Get Single Product
-// @route   GET /api/v1/product/:id
-// @access  Public
-exports.getSingleProduct = async (req, res, next) => {
-    try {
-        const product = await productModel.findById(req.params.id);
-
-        if (!product) {
-            return res.status(404).json({
-                success: false,
-                message: 'Product not found with that ID.'
-            });
+    if (req.query.minPrice || req.query.maxPrice) {
+        query.price = {};
+        if (req.query.minPrice) {
+            query.price.$gte = parseFloat(req.query.minPrice);
         }
-
-        res.status(200).json({
-            success: true,
-            product
-        });
-    } catch (error) {
-        console.error("Error fetching single product:", error);
-        if (error.name === 'CastError') {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid Product ID format.'
-            });
+        if (req.query.maxPrice) {
+            query.price.$lte = parseFloat(req.query.maxPrice);
         }
-        res.status(500).json({
-            success: false,
-            message: 'Internal server error while fetching product.',
-            error: error.message
-        });
     }
-};
 
-// @desc    Create Product
-// @route   POST /api/v1/product/new
-// @access  Private (e.g., Admin)
-exports.createProduct = async (req, res, next) => {
-    try {
-        // When a new product is created, its importDate will automatically be set to Date.now
-        // by the Mongoose schema default.
-        const product = await productModel.create(req.body);
+    const sortField = req.query.sortField || 'createdAt';
+    const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
 
-        res.status(201).json({
-            success: true,
-            message: "Product created successfully!",
-            product
-        });
-    } catch (error) {
-        console.error("Error creating product:", error);
-        if (error.name === 'ValidationError') {
-            const messages = Object.values(error.errors).map(val => val.message);
-            return res.status(400).json({
-                success: false,
-                message: `Validation Error: ${messages.join(', ')}`
-            });
-        } else if (error.code === 11000) { // Duplicate key error
-            return res.status(400).json({
-                success: false,
-                message: `Duplicate field value entered for ${Object.keys(error.keyValue)[0]}: ${Object.values(error.keyValue)[0]}. Please use another value.`
-            });
-        }
-        res.status(500).json({
-            success: false,
-            message: "Failed to create product.",
-            error: error.message
-        });
+    const sortOptions = {};
+    sortOptions[sortField] = sortOrder;
+
+    const totalCount = await Product.countDocuments(query);
+
+    const products = await Product.find(query)
+        .sort(sortOptions)
+        .skip(skip)
+        .limit(limit);
+
+    res.status(200).json({
+        success: true,
+        products,
+        totalCount,
+        currentPage: page,
+        totalPages: Math.ceil(totalCount / limit),
+    });
+});
+
+// --- Get Single Product by ID (Public & Admin) ---
+exports.getProductById = catchAsyncErrors(async (req, res, next) => {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+        return next(new ErrorHandler('Product not found', 404));
     }
-};
+    res.status(200).json({ success: true, product });
+});
 
-// @desc    Update Product
-// @route   PUT /api/v1/product/:id
-// @access  Private (e.g., Admin)
-exports.updateProduct = async (req, res, next) => {
-    try {
-        let product = await productModel.findById(req.params.id);
-
-        if (!product) {
-            return res.status(404).json({ success: false, message: "Product not found for update." });
-        }
-
-        // When a product is updated, you might want to consider if its importDate
-        // should also be updated. For "New Arrivals" meaning "most recently added to store",
-        // updating importDate on every product update might not be desired.
-        // If an update *means* it's a new arrival (e.g., re-stocked), you'd explicitly
-        // set req.body.importDate = new Date(); before calling findByIdAndUpdate.
-        // As per the current schema, importDate only defaults on *creation*.
-        product = await productModel.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,           // Return the modified document rather than the original
-            runValidators: true, // Run Mongoose validators on update
-            useFindAndModify: false // Recommended to avoid deprecated function
-        });
-
-        res.status(200).json({
-            success: true,
-            message: "Product updated successfully!",
-            product
-        });
-    } catch (error) {
-        console.error("Error updating product:", error);
-        if (error.name === 'CastError') {
-            return res.status(400).json({ success: false, message: "Invalid Product ID format for update." });
-        } else if (error.name === 'ValidationError') {
-            const messages = Object.values(error.errors).map(val => val.message);
-            return res.status(400).json({ success: false, message: `Validation Error: ${messages.join(', ')}` });
-        } else if (error.code === 11000) { // Duplicate key error
-            return res.status(400).json({
-                success: false,
-                message: `Duplicate field value entered for ${Object.keys(error.keyValue)[0]}: ${Object.values(error.keyValue)[0]}. Please use another value.`
-            });
-        }
-        res.status(500).json({ success: false, message: "Failed to update product.", error: error.message });
+// --- Create Product (Admin Only) ---
+exports.createProduct = catchAsyncErrors(async (req, res, next) => {
+    // Assuming req.user is populated by isAuthenticatedUser middleware
+    if (!req.user || !req.user._id) {
+        return next(new ErrorHandler('User not authenticated for product creation', 401));
     }
-};
+    req.body.user = req.user._id;
 
-// @desc    Delete Product
-// @route   DELETE /api/v1/product/:id
-// @access  Private (e.g., Admin)
-exports.deleteProduct = async (req, res, next) => {
-    try {
-        const product = await productModel.findById(req.params.id);
-
-        if (!product) {
-            return res.status(404).json({ success: false, message: "Product not found for deletion." });
-        }
-
-        await product.deleteOne(); // Mongoose 6+ prefers deleteOne() on the document itself
-
-        res.status(200).json({
-            success: true,
-            message: "Product deleted successfully!"
-        });
-    } catch (error) {
-        console.error("Error deleting product:", error);
-        if (error.name === 'CastError') {
-            return res.status(400).json({ success: false, message: "Invalid Product ID format for deletion." });
-        }
-        res.status(500).json({ success: false, message: "Failed to delete product.", error: error.message });
+    let productImages = [];
+    // Handle images if uploaded via multer
+    if (req.files && req.files.length > 0) {
+        // In a real app with Cloudinary/S3, you'd upload files here
+        // and get back actual public_ids and secure URLs.
+        productImages = req.files.map(file => ({
+            public_id: file.filename, // Using filename as public_id for local storage
+            url: `/uploads/${file.filename}` // Local URL
+        }));
     }
-};
+    // If no files are uploaded, productImages will be an empty array,
+    // which is fine if your schema allows an empty 'images' array.
+    req.body.images = productImages;
+
+    const product = await Product.create(req.body);
+    res.status(201).json({ success: true, product });
+});
+
+// --- Update Product (Admin Only) ---
+exports.updateProduct = catchAsyncErrors(async (req, res, next) => {
+    let product = await Product.findById(req.params.id);
+
+    if (!product) {
+        return next(new ErrorHandler("Product not found for update.", 404));
+    }
+
+    // Create a mutable copy of req.body to safely manipulate image data
+    const updateData = { ...req.body };
+
+    // --- Image Handling Logic for Update ---
+    // This logic handles three scenarios for images during an update:
+    // 1. New image files are uploaded via multer (req.files).
+    // 2. The frontend explicitly sends an 'images' array in req.body (e.g., existing images, or new URLs).
+    // 3. No image-related data is sent, meaning existing images should be preserved.
+
+    if (req.files && req.files.length > 0) {
+        // Scenario 1: New image files are uploaded.
+        // You might want to delete old images from storage here first (if replacing all).
+        // Example for local storage:
+        // for (const img of product.images) {
+        //     try {
+        //         await unlinkFile(path.join(__dirname, '../uploads', img.public_id));
+        //     } catch (err) {
+        //         console.warn(`Failed to delete old image file: ${img.public_id}`, err);
+        //     }
+        // }
+
+        const newUploadedImages = req.files.map(file => ({
+            public_id: file.filename, // Replace with Cloudinary public_id if used
+            url: `/uploads/${file.filename}` // Replace with Cloudinary URL if used
+        }));
+
+        // Combine existing images (if sent in req.body.images) with newly uploaded ones.
+        // This assumes frontend sends all images (existing + new non-file ones) in req.body.images,
+        // and new files are appended. Adjust this logic if you want to completely replace.
+        updateData.images = [...(req.body.images || []), ...newUploadedImages];
+
+    } else if (updateData.images !== undefined) {
+        // Scenario 2: No new files are uploaded, but 'images' field is explicitly present in req.body.
+        // This implies the frontend is explicitly managing the image array (e.g., reordering, removing some existing images).
+        // We trust the frontend to send the complete, desired state of the 'images' array here.
+        // Mongoose validators will apply to this array. Frontend MUST send valid public_id and url for each.
+        // If the frontend sends an empty array here, and your schema requires images, it will fail validation.
+        // No explicit action needed here as `updateData.images` already holds the value from `req.body.images`.
+
+    } else {
+        // Scenario 3: No new files are uploaded AND 'images' field is NOT present in req.body.
+        // This indicates that images are NOT being updated by this request.
+        // To preserve the existing images on the product document, we explicitly delete 'images' from updateData.
+        // This prevents `findByIdAndUpdate` from trying to overwrite the valid existing images with an empty or malformed array.
+        delete updateData.images;
+    }
+
+    // You might have a `maxLength` validator on a `Number` type field like `stock` in your schema.
+    // If so, it causes validation errors. Remove it or change to `max`.
+    // Example: `stock: { type: Number, max: [99999, 'Stock cannot exceed 99999'], default: 0 }`
+
+    // Perform the update
+    product = await Product.findByIdAndUpdate(req.params.id, updateData, {
+        new: true,           // Return the modified document rather than the original
+        runValidators: true, // Run Mongoose validators on update (essential for catching schema violations)
+        useFindAndModify: false // Recommended to avoid deprecated function
+    });
+
+    res.status(200).json({
+        success: true,
+        message: "Product updated successfully!",
+        product
+    });
+});
+
+// --- Delete Product (Admin Only) ---
+exports.deleteProduct = catchAsyncErrors(async (req, res, next) => {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+        return next(new ErrorHandler("Product not found for deletion.", 404));
+    }
+
+    // Optional: Delete associated image files from local storage (or Cloudinary)
+    // Example for local storage:
+    // for (const image of product.images) {
+    //     try {
+    //         await unlinkFile(path.join(__dirname, '../uploads', image.public_id));
+    //     } catch (err) {
+    //         console.warn(`Could not delete old image file: ${image.public_id}. Error: ${err.message}`);
+    //     }
+    // }
+    // If using Cloudinary, use Cloudinary's destroy method here for each image's public_id.
+
+    await product.deleteOne(); // Mongoose 6+ prefers deleteOne() on the document itself
+
+    res.status(200).json({
+        success: true,
+        message: "Product deleted successfully!"
+    });
+});
