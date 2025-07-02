@@ -28,7 +28,8 @@ process.on('uncaughtException', (err) => {
 });
 
 // --- Database Connection ---
-const connectDatabase = require('./config/database'); // Make sure this exports a function named 'connectDatabase'
+// CORRECTED PATH: changed from './config/database' to './config/connectDatabase'
+const connectDatabase = require('./config/connectDatabase'); // Make sure this exports a function named 'connectDatabase'
 connectDatabase(); // Call to connect to MongoDB
 
 // --- Initialize Express App ---
@@ -71,8 +72,8 @@ app.use('/uploads', express.static(uploadDir));
 // --- API Routes ---
 // Import and mount your route files
 app.use('/api/v1/products', require('./routes/productRoutes')); // Assuming productRoutes.js
-app.use('/api/v1/orders', require('./routes/orderRoutes'));     // Assuming orderRoutes.js
-app.use('/api/v1', require('./routes/userRoutes'));             // Assuming userRoutes.js for /api/v1/login, /api/v1/register
+app.use('/api/v1/orders', require('./routes/orderRoutes'));      // Assuming orderRoutes.js
+app.use('/api/v1', require('./routes/userRoutes'));              // Assuming userRoutes.js for /api/v1/login, /api/v1/register
 app.use('/api/v1/admin', require('./routes/adminDashboardRoutes')); // Assuming adminDashboardRoutes.js
 
 
