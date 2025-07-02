@@ -4,23 +4,25 @@ const router = express.Router();
 const {
     createOrder,
     getSingleOrder,
-    getAllOrders, // This is now handled in adminRoutes
-    updateOrder,  // This is now handled in adminRoutes
-    deleteOrder,  // This is now handled in adminRoutes
+    getAllOrders,
+    updateOrder,
+    deleteOrder,
 } = require('../controllers/orderController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 
-// Public routes
-router.post('/order/new', createOrder);
-router.get('/order/:id', getSingleOrder);
+// Public routes for orders
+router.post('/order/new', isAuthenticatedUser, createOrder); // Added isAuthenticatedUser as typically creating an order requires being logged in
+router.get('/order/:id', isAuthenticatedUser, getSingleOrder); // Added isAuthenticatedUser as typically viewing an order requires being logged in
 
-// The admin routes for orders will be managed through adminRoutes.js for clarity
-// If you want all order management under '/api/v1/orders', uncomment these:
-// router.get('/admin/orders', isAuthenticatedUser, authorizeRoles('admin'), getAllOrders);
-// router.route('/admin/order/:id')
-//   .put(isAuthenticatedUser, authorizeRoles('admin'), updateOrder)
-//   .delete(isAuthenticatedUser, authorizeRoles('admin'), deleteOrder);
+// Admin routes for orders
+// These routes are mounted under '/api/v1/orders' in app.js
+// So, a request to '/api/v1/orders/admin/orders' will match router.get('/admin/orders')
+router.get('/admin/orders', isAuthenticatedUser, authorizeRoles('admin'), getAllOrders);
+
+router.route('/admin/order/:id')
+    .put(isAuthenticatedUser, authorizeRoles('admin'), updateOrder)
+    .delete(isAuthenticatedUser, authorizeRoles('admin'), deleteOrder);
 
 
 module.exports = router;
