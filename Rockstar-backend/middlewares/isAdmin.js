@@ -1,10 +1,10 @@
-const ErrorHandler = require('../utils/errorHandler');
-const catchAsyncErrors = require('./catchAsyncErrors');
+// In your adminDashboardRoutes.js (if you used isAdmin)
+const { isAuthenticatedUser } = require('../middlewares/auth'); // You'd still need this
+const { isAdmin } = require('../middlewares/isAdmin'); // New import
 
-exports.isAdmin = catchAsyncErrors((req, res, next) => {
-    if (req.user && req.user.role === 'admin') {
-        return next();
-    }
-
-    return next(new ErrorHandler('Access denied! Admins only.', 403));
-});
+router.get(
+    '/dashboard',
+    isAuthenticatedUser,
+    isAdmin, // <<< This is your new middleware
+    getDashboardStats
+);
