@@ -72,11 +72,11 @@ app.use('/uploads', express.static(uploadDir));
 
 
 // --- API Routes ---
-app.use('/api/v1/products', require('./routes/product'));
-app.use('/api/v1/orders', require('./routes/order'));
-// CORRECTED PATH: Changed '/api/v1' to '/api/v1/users' to match frontend's POST /api/v1/users/login
-app.use('/api/v1/users', require('./routes/userRoutes'));
-app.use('/api/v1/admin', require('./routes/adminDashboardRoutes'));
+// Corrected based on your specific instructions:
+app.use('/api/v1/products', require('./routes/product'));         // Uses product.js
+app.use('/api/v1/orders', require('./routes/order'));             // Uses order.js
+app.use('/api/v1/users', require('./routes/userRoutes'));         // Uses userRoutes.js (was already correct)
+app.use('/api/v1/admin', require('./routes/adminDashboardRoutes')); // Uses adminDashboardRoutes.js (as per your last instruction)
 
 
 // --- Health Check Route (Good for deployment monitoring) ---
