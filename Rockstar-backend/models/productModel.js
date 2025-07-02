@@ -1,103 +1,117 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs'); // Or 'bcrypt' if you're using the C++ bindings version
-const jwt = require('jsonwebtoken'); // IMPORTANT: Ensure 'jsonwebtoken' is imported here!
-const crypto = require('crypto'); // For password reset tokens (used in getResetPasswordToken)
 
-const userSchema = new mongoose.Schema({
+// Sub-schema for product reviews
+const reviewSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User', // IMPORTANT: This 'User' MUST match the name used in mongoose.model('User', ...)
+        required: true,
+    },
     name: {
         type: String,
-        required: [true, 'Please Enter Your Name'],
-        maxLength: [30, 'Name cannot exceed 30 characters'],
-        minLength: [4, 'Name should have more than 4 characters'],
+        required: true,
     },
-    email: {
+    rating: {
+        type: Number,
+        required: true,
+        min: [1, 'Rating must be at least 1'],
+        max: [5, 'Rating cannot be more than 5'],
+    },
+    comment: {
         type: String,
-        required: [true, 'Please Enter Your Email'],
-        unique: true,
-    },
-    password: {
-        type: String,
-        required: [true, 'Please Enter Your Password'],
-        minLength: [8, 'Password should be greater than 8 characters'],
-        select: false, // Important: Don't return password field by default when querying user
-    },
-    avatar: {
-        public_id: {
-            type: String,
-            // required: true, // Uncomment if avatar is mandatory
-        },
-        url: {
-            type: String,
-            // required: true, // Uncomment if avatar is mandatory
-        },
-    },
-    role: {
-        type: String,
-        default: 'user',
+        required: true,
     },
     createdAt: {
         type: Date,
         default: Date.now,
     },
-    resetPasswordToken: String,
-    resetPasswordExpire: Date,
 });
 
-// ----------------------------------------------------------------------
-// PASSWORD HASHING BEFORE SAVING (Pre-save hook)
-userSchema.pre('save', async function(next) {
-    if (!this.isModified('password')) {
-        return next();
-    }
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
+// Sub-schema for product sizes and their stock (if your product has sizes)
+const sizeSchema = new mongoose.Schema({
+    size: {
+        type: String,
+        required: [true, 'Size name is required (e.g., S, M, L, XL)'],
+        uppercase: true, // Standardize size names
+        trim: true,
+    },
+    stock: {
+        type: Number,
+        required: [true, 'Stock quantity for this size is required'],
+        default: 0,
+        min: [0, 'Stock cannot be negative'],
+    },
+}, { _id: false }); // No _id for sub-documents in the sizes array
+
+const productSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: [true, 'Please Enter product Name'],
+        trim: true, // Removes whitespace from both ends of a string
+        maxLength: [100, 'Product name cannot exceed 100 characters'],
+    },
+    description: {
+        type: String,
+        required: [true, 'Please Enter product Description'],
+    },
+    price: {
+        type: Number,
+        required: [true, 'Please Enter product Price'],
+        maxLength: [8, 'Price cannot exceed 8 digits'], // Example, adjust as needed
+        default: 0.0,
+    },
+    ratings: {
+        type: Number,
+        default: 0,
+    },
+    images: [
+        {
+            public_id: {
+                type: String,
+                required: true,
+            },
+            url: {
+                type: String,
+                required: true,
+            },
+        },
+    ],
+    category: {
+        type: String,
+        required: [true, 'Please Enter Product Category'],
+    },
+    // If products have multiple sizes with different stock, use this.
+    // If products just have one general stock, use the 'stock' field below.
+    sizes: {
+        type: [sizeSchema], // Array of size objects
+        // Not required if all products have a single 'stock' field
+        // If required, you'd add: required: [true, 'At least one size with stock is required']
+    },
+    // General stock for products that don't have different sizes,
+    // or as a fallback if 'sizes' array is empty/not used for a product.
+    // Make sure your controller logic correctly prioritizes 'sizes.stock' over 'stock'.
+    stock: {
+        type: Number,
+        required: [true, 'Please Enter product Stock'],
+        maxLength: [4, 'Stock cannot exceed 4 digits'], // Example, adjust as needed
+        default: 0,
+        min: [0, 'Stock cannot be negative'],
+    },
+    numOfReviews: {
+        type: Number,
+        default: 0,
+    },
+    reviews: [reviewSchema], // Array of review documents
+    user: { // The user who created this product (admin)
+        type: mongoose.Schema.ObjectId,
+        ref: 'User', // IMPORTANT: This 'User' MUST match the name used in mongoose.model('User', ...)
+        required: true,
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now,
+    },
 });
 
-// ----------------------------------------------------------------------
-// METHOD TO COMPARE PASSWORD (Used in login)
-userSchema.methods.comparePassword = async function(enteredPassword) {
-    return await bcrypt.compare(enteredPassword, this.password);
-};
-
-// ----------------------------------------------------------------------
-// JWT TOKEN (Used for session management after successful login)
-userSchema.methods.getJWTToken = function() {
-    console.log('getJWTToken: Inside getJWTToken method.');
-    console.log('getJWTToken: JWT_SECRET from env:', process.env.JWT_SECRET ? 'Defined' : 'UNDEFINED');
-    console.log('getJWTToken: JWT_EXPIRE from env:', process.env.JWT_EXPIRE ? 'Defined' : 'UNDEFINED');
-
-    if (!this._id) {
-        console.error("ERROR: User ID is missing when generating JWT!");
-        return null;
-    }
-
-    try {
-        const token = jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
-            expiresIn: process.env.JWT_EXPIRE,
-        });
-        console.log('getJWTToken: Successfully generated JWT.');
-        return token;
-    } catch (error) {
-        console.error('getJWTToken: Error generating JWT:', error.message);
-        throw error;
-    }
-};
-
-// ----------------------------------------------------------------------
-// Generating Password Reset Token (for 'Forgot Password' functionality)
-userSchema.methods.getResetPasswordToken = function() {
-    const resetToken = crypto.randomBytes(20).toString('hex');
-
-    this.resetPasswordToken = crypto
-        .createHash('sha256')
-        .update(resetToken)
-        .digest('hex');
-
-    this.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
-
-    return resetToken;
-};
-
-// Export the User model
-module.exports = mongoose.model('User', userSchema);
+// IMPORTANT: This must be 'Product' for consistency with orderModel and controllers
+module.exports = mongoose.model('Product', productSchema);
