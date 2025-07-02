@@ -1,3 +1,4 @@
+// config/database.js
 const mongoose = require('mongoose');
 
 const connectDatabase = () => {
@@ -8,10 +9,12 @@ const connectDatabase = () => {
     // if they are already part of your DB_URI string.
     mongoose.connect(process.env.DB_URI)
         .then(() => {
-            console.log(`MongoDB connected with server: ${mongoose.connection.host}`);
+            // Updated log message for consistency
+            console.log(`✅ MongoDB Connected with Server: ${mongoose.connection.host}`);
         })
         .catch((err) => {
-            console.error("MongoDB connection error:", err);
+            // Updated log message for consistency
+            console.error(`❌ MongoDB Connection Error: ${err.message}`);
             // It's crucial to exit the process if the database connection fails on startup
             // as the application cannot function without it.
             process.exit(1);
