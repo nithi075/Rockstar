@@ -1,7 +1,7 @@
 // Rockstar-backend/middlewares/auth.js
 
 const jwt = require('jsonwebtoken');
-const User = require('../models/User'); // Corrected: Path matches 'User.js' file name
+const User = require('../models/User'); // Correct: Path matches 'User.js' file name
 const catchAsyncErrors = require('./catchAsyncErrors');
 const ErrorHandler = require('../utils/errorHandler');
 
@@ -44,6 +44,7 @@ exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
     }
 });
 
+// THIS IS YOUR AUTHORIZATION MIDDLEWARE
 exports.authorizeRoles = (...roles) => {
     return (req, res, next) => {
         // Ensure req.user exists and has a role before checking
