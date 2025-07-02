@@ -1,135 +1,178 @@
+// orderController.js
+
 const Order = require('../models/orderModel');
 const Product = require('../models/productModel');
-const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
-const ErrorHandler = require('../utils/errorHandler');
-const mongoose = require('mongoose');
+const ErrorHander = require('../utils/errorHandler'); // Assuming you have this
+const catchAsyncErrors = require('../middleware/catchAsyncErrors'); // Assuming you have this
 
-exports.createOrder = catchAsyncErrors(async (req, res, next) => {
-    const { cartItems, customerInfo } = req.body;
+// 1. Create New Order
+exports.newOrder = catchAsyncErrors(async (req, res, next) => {
+  const {
+    shippingInfo,
+    orderItems, // Renamed from cartItems to orderItems as per common practice in MERN for orders
+    paymentInfo,
+    itemsPrice,
+    taxPrice,
+    shippingPrice,
+    totalPrice,
+  } = req.body;
 
-    if (!Array.isArray(cartItems) || cartItems.length === 0) {
-        return next(new ErrorHandler('Cart items are required.', 400));
-    }
+  // Validate that orderItems is not empty
+  if (!orderItems || orderItems.length === 0) {
+    return next(new ErrorHander("No order items found", 400));
+  }
 
-    if (!customerInfo?.name || !customerInfo?.address || !customerInfo?.phone) {
-        return next(new ErrorHandler('Customer information is incomplete.', 400));
-    }
+  const order = await Order.create({
+    shippingInfo,
+    orderItems,
+    paymentInfo,
+    itemsPrice,
+    taxPrice,
+    shippingPrice,
+    totalPrice,
+    paidAt: Date.now(),
+    user: req.user._id, // Assuming req.user is set by your auth middleware
+  });
 
-    let totalAmount = 0;
-    const itemsForOrder = [];
-    const bulkUpdates = [];
+  // Decrease product stock for each item
+  for (const item of order.orderItems) {
+    await updateStock(item.product, item.quantity); // Assuming item.product is the product _id
+  }
 
-    for (const item of cartItems) {
-        const { product, size, quantity } = item;
-
-        if (
-            !mongoose.Types.ObjectId.isValid(product) ||
-            !item.name || isNaN(item.price) || !quantity || quantity <= 0
-        ) {
-            return next(new ErrorHandler('Invalid cart item structure.', 400));
-        }
-
-        const productDoc = await Product.findById(product);
-        if (!productDoc) {
-            return next(new ErrorHandler(`Product not found: ${product}`, 404));
-        }
-
-        const actualPrice = parseFloat(productDoc.price);
-        let availableStock = 0;
-
-        if (size && Array.isArray(productDoc.sizes) && productDoc.sizes.length > 0) {
-            const sizeObj = productDoc.sizes.find(s => s.size === size);
-            availableStock = sizeObj?.stock || 0;
-
-            if (availableStock < quantity) {
-                return next(new ErrorHandler(`Insufficient stock for ${productDoc.name} (Size: ${size})`, 400));
-            }
-
-            bulkUpdates.push({
-                updateOne: {
-                    filter: { _id: product, 'sizes.size': size }, // Filter by product ID AND size
-                    update: { $inc: { 'sizes.$.stock': -quantity } }, // Use positional operator for array update
-                }
-            });
-        } else { // Handle products without sizes or if size is not specified
-            availableStock = productDoc.stock;
-            if (availableStock < quantity) {
-                return next(new ErrorHandler(`Insufficient stock for ${productDoc.name}`, 400));
-            }
-
-            bulkUpdates.push({
-                updateOne: {
-                    filter: { _id: product },
-                    update: { $inc: { stock: -quantity } }
-                }
-            });
-        }
-
-        totalAmount += actualPrice * quantity;
-
-        itemsForOrder.push({
-            product,
-            name: productDoc.name,
-            price: actualPrice,
-            quantity,
-            size: size || undefined,
-        });
-    }
-
-    const order = await Order.create({
-        cartItems: itemsForOrder,
-        amount: totalAmount.toFixed(2),
-        status: 'pending',
-        customerInfo
-    });
-
-    if (bulkUpdates.length > 0) {
-        await Product.bulkWrite(bulkUpdates, { ordered: true });
-    }
-
-    res.status(201).json({
-        success: true,
-        message: 'Order placed successfully!',
-        order
-    });
+  res.status(201).json({
+    success: true,
+    order,
+  });
 });
 
+// Helper function to update product stock
+async function updateStock(productId, quantity) {
+  const product = await Product.findById(productId);
+
+  if (!product) {
+    // This case should ideally be handled before order creation
+    // or signify a deleted product after order.
+    console.warn(`Product with ID ${productId} not found for stock update.`);
+    return;
+  }
+
+  product.stock -= quantity;
+
+  // Ensure stock doesn't go below zero (though frontend should prevent this)
+  if (product.stock < 0) {
+    product.stock = 0;
+  }
+
+  await product.save({ validateBeforeSave: false }); // Bypass validation if stock goes to 0 or less
+}
+
+
+// 2. Get Single Order Details -- Admin or the User who placed it
 exports.getSingleOrder = catchAsyncErrors(async (req, res, next) => {
-    const order = await Order.findById(req.params.id).populate('cartItems.product', 'name price images');
-    if (!order) return next(new ErrorHandler('Order not found.', 404));
-
-    res.status(200).json({ success: true, order });
-});
-
-exports.getAllOrders = catchAsyncErrors(async (req, res, next) => {
-    // This is the one that was failing with 500, likely due to populate or data.
-    // The model names are now ensured consistent.
-    const orders = await Order.find().populate('cartItems.product', 'name price');
-    res.status(200).json({
-        success: true,
-        count: orders.length,
-        orders
+  const order = await Order.findById(req.params.id)
+    .populate("user", "name email") // Populate user details
+    .populate({ // Populate product details within order items
+      path: 'orderItems.product',
+      select: 'name price images stock' // Select necessary product fields, including images
     });
+
+  if (!order) {
+    return next(new ErrorHander("Order not found with this Id", 404));
+  }
+
+  // Check if the user is an admin OR the user who placed the order
+  if (req.user.role !== "admin" && order.user._id.toString() !== req.user._id.toString()) {
+    return next(new ErrorHander(`You are not authorized to view this order`, 403));
+  }
+
+  res.status(200).json({
+    success: true,
+    order,
+  });
 });
 
+// 3. Get Logged In User Orders (My Orders)
+exports.myOrders = catchAsyncErrors(async (req, res, next) => {
+  const orders = await Order.find({ user: req.user._id })
+    .populate({
+      path: 'orderItems.product',
+      select: 'name images price' // Select images for user's order view
+    })
+    .sort({ createdAt: -1 }); // Latest orders first
+
+  res.status(200).json({
+    success: true,
+    orders,
+  });
+});
+
+// 4. Get All Orders -- ADMIN
+exports.getAllOrders = catchAsyncErrors(async (req, res, next) => {
+  const orders = await Order.find()
+    .populate("user", "name email") // Populate user who placed the order
+    .populate({ // Populate product details within order items
+      path: 'orderItems.product',
+      select: 'name images price' // <--- CRITICAL: Select 'images' from the Product model
+    })
+    .sort({ createdAt: -1 }); // Latest orders first
+
+  let totalAmount = 0;
+
+  orders.forEach((order) => {
+    totalAmount += order.totalPrice;
+  });
+
+  res.status(200).json({
+    success: true,
+    totalAmount,
+    orders,
+  });
+});
+
+// 5. Update Order Status -- ADMIN
 exports.updateOrder = catchAsyncErrors(async (req, res, next) => {
-    const { status } = req.body;
-    if (!status) return next(new ErrorHandler('Status is required.', 400));
+  const order = await Order.findById(req.params.id);
 
-    const order = await Order.findById(req.params.id);
-    if (!order) return next(new ErrorHandler('Order not found.', 404));
+  if (!order) {
+    return next(new ErrorHander("Order not found with this Id", 404));
+  }
 
-    order.status = status;
-    await order.save();
+  if (order.status === "Delivered") {
+    return next(new ErrorHander("You have already delivered this order", 400));
+  }
 
-    res.status(200).json({ success: true, message: 'Order updated successfully.', order });
+  // If status is "Shipped", we should not decrease stock again.
+  // We only decrease stock when the order is created or when it transitions to 'Shipped' for the first time.
+  // The provided `newOrder` already handles stock reduction, so we skip it here.
+  // If you want to deduct stock only on 'Shipped' status, remove stock update from `newOrder` and add it here.
+
+  order.status = req.body.status; // Set new status from request body
+
+  if (req.body.status === "Delivered") {
+    order.deliveredAt = Date.now();
+  }
+
+  await order.save({ validateBeforeSave: false });
+
+  res.status(200).json({
+    success: true,
+    order, // Return the updated order for frontend to reflect
+  });
 });
 
+
+// 6. Delete Order -- ADMIN
 exports.deleteOrder = catchAsyncErrors(async (req, res, next) => {
-    const order = await Order.findById(req.params.id);
-    if (!order) return next(new ErrorHandler('Order not found.', 404));
+  const order = await Order.findById(req.params.id);
 
-    await order.deleteOne();
+  if (!order) {
+    return next(new ErrorHander("Order not found with this Id", 404));
+  }
 
-    res.status(200).json({ success: true, message: 'Order deleted successfully.' });
+  await order.deleteOne(); // Use deleteOne() for Mongoose 6+
+
+  res.status(200).json({
+    success: true,
+    message: "Order Deleted Successfully",
+  });
 });
