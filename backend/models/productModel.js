@@ -1,3 +1,5 @@
+// models/productModel.js (Option 1: public_id IS REQUIRED)
+
 const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema({
@@ -5,17 +7,13 @@ const productSchema = new mongoose.Schema({
     name: {
         type: String,
         required: [true, 'Please enter product name'],
-        trim: true, // Remove whitespace from both ends of a string
+        trim: true,
         maxLength: [100, 'Product name cannot exceed 100 characters']
     },
     price: {
         type: Number,
         required: [true, 'Please enter product price'],
-        // You might want to adjust maxLength for price, as it refers to string length.
-        // For numbers, consider min/max validators instead.
-        // maxLength: [5, 'Product price cannot exceed 5 characters'], // Consider removing or changing this for numbers
-        default: 0.0,
-        min: [0, 'Price cannot be negative'] // Example: min price validation
+        min: [0, 'Price cannot be negative']
     },
     description: {
         type: String,
@@ -23,36 +21,24 @@ const productSchema = new mongoose.Schema({
     },
     images: [
         {
-            public_id: { // If you integrate with a cloud storage like Cloudinary
+            public_id: { // This is the unique identifier from your image hosting (e.g., Cloudinary)
                 type: String,
-                // required: true // Make required if you enforce images
+                required: true // <--- UNCOMMENTED: public_id is now REQUIRED
             },
             url: { // The actual URL of the image
                 type: String,
-                required: true // Image URL should be required
+                required: true
             }
         }
     ],
     category: {
         type: String,
         required: [true, 'Please select category for this product'],
-        // Example of allowed categories, you can expand this
         enum: {
             values: [
-                'Electronics',
-                'Cameras',
-                'Laptops',
-                'Accessories',
-                'Headphones',
-                'Food',
-                'Books',
-                'Clothes/Shoes',
-                'Beauty/Health',
-                'Sports',
-                'Outdoor',
-                'Home',
-                'T-Shirts', // Added based on your sample data
-                'Mobiles'
+                'Electronics', 'Cameras', 'Laptops', 'Accessories', 'Headphones',
+                'Food', 'Books', 'Clothes/Shoes', 'Beauty/Health', 'Sports',
+                'Outdoor', 'Home', 'T-Shirts', 'Mobiles'
             ],
             message: 'Please select correct category for product'
         }
@@ -61,10 +47,12 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please enter product seller']
     },
-    stock: { // Overall stock, if not managed by sizes
+    stock: {
         type: Number,
         required: [true, 'Please enter product stock'],
-        maxLength: [5, 'Product stock cannot exceed 5 characters'],
+        // maxLength is for strings, not numbers. Remove or change to max if needed for value.
+        // For numbers, 'max' validator is appropriate for the value itself.
+        // maxLength: [5, 'Product stock cannot exceed 5 characters'], // Consider removing this line
         default: 0
     },
     numOfReviews: {
@@ -73,7 +61,7 @@ const productSchema = new mongoose.Schema({
     },
     reviews: [
         {
-            user: { // Reference to the User model if you have one
+            user: {
                 type: mongoose.Schema.ObjectId,
                 ref: 'User',
                 required: true
@@ -92,27 +80,26 @@ const productSchema = new mongoose.Schema({
             }
         }
     ],
-    ratings: { // Average rating calculated from reviews
+    ratings: {
         type: Number,
         default: 0
     },
-    user: { // User who created this product (e.g., admin)
+    user: {
         type: mongoose.Schema.ObjectId,
         ref: 'User',
         required: true
     },
-    // --- Custom fields from your data ---
-    customId: { // Your unique product identifier, e.g., "rockstarZippedColarTshirt06"
+    customId: {
         type: String,
-        unique: true, // Ensure customId is unique
-        sparse: true // Allows null values, but ensures uniqueness for non-null values
+        unique: true,
+        sparse: true
     },
-    sizes: [ // If products have different sizes with different stock levels
+    sizes: [
         {
             size: {
                 type: String,
                 required: true,
-                enum: ['S', 'M', 'L', 'XL', 'XXL', 'XS'] // Example sizes
+                enum: ['S', 'M', 'L', 'XL', 'XXL', 'XS']
             },
             stock: {
                 type: Number,
@@ -122,13 +109,12 @@ const productSchema = new mongoose.Schema({
             }
         }
     ],
-    // --- The crucial importDate field ---
     importDate: {
-        type: Date, // <--- THIS IS THE KEY: It must be a BSON Date type
-        default: Date.now // Automatically sets the current date/time on creation
+        type: Date,
+        default: Date.now
     }
 }, {
-    timestamps: true // Adds `createdAt` and `updatedAt` fields automatically
+    timestamps: true
 });
 
 module.exports = mongoose.model('Product', productSchema);
