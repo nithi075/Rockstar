@@ -71,31 +71,8 @@ export default function OrderDetails() {
                 {order.deliveredAt && <p className="mb-2"><strong className="font-semibold text-gray-700">Delivered At:</strong> {new Date(order.deliveredAt).toLocaleString()}</p>}
             </div>
 
-            {/* Payment Information Section */}
-            <div className="mb-6 p-4 border rounded-md bg-white shadow-sm">
-                <h3 className="text-xl font-semibold mb-3 text-gray-800">Payment Information:</h3>
-                <p className="mb-2"><strong className="font-semibold text-gray-700">Payment ID:</strong> <span className="font-mono text-sm text-gray-700">{order.paymentInfo?.id || 'N/A'}</span></p>
-                <p className="mb-2"><strong className="font-semibold text-gray-700">Payment Status:</strong>
-                    <span className={`font-semibold ${
-                        order.paymentInfo?.status === "succeeded" ? "text-green-600" : "text-red-600"
-                    }`}>
-                        {order.paymentInfo?.status || 'N/A'}
-                    </span>
-                </p>
-            </div>
+       
 
-            {/* Pricing Summary Section */}
-            <div className="mb-6 p-4 border rounded-md bg-white shadow-sm">
-                <h3 className="text-xl font-semibold mb-3 text-gray-800">Pricing Summary:</h3>
-                {/* Displaying values from backend, falling back to calculated total if itemsPrice is 0 */}
-                <p className="mb-2"><strong className="font-semibold text-gray-700">Items Price:</strong> ₹{(order.itemsPrice > 0 ? order.itemsPrice : calculatedItemsTotal).toFixed(2)}</p>
-                <p className="mb-2"><strong className="font-semibold text-gray-700">Tax Price:</strong> ₹{order.taxPrice?.toFixed(2)}</p>
-                <p className="mb-2"><strong className="font-semibold text-gray-700">Shipping Price:</strong> ₹{order.shippingPrice?.toFixed(2)}</p>
-                <p className="text-lg font-bold text-gray-900 mt-3">
-                    {/* Fallback for total price if backend sends 0 for totalPrice */}
-                    <strong>Total Price:</strong> ₹{(order.totalPrice > 0 ? order.totalPrice : calculatedItemsTotal + (order.taxPrice || 0) + (order.shippingPrice || 0)).toFixed(2)}
-                </p>
-            </div>
 
             {/* Ordered Items Section */}
             <div>
