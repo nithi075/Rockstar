@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../../axios";
 import { Link } from "react-router-dom";
-import "./OrderList.css"; // You'll define basic styles here
+import "./OrderList.css";
 
 const OrderList = () => {
   const [orders, setOrders] = useState([]);
@@ -16,7 +16,7 @@ const OrderList = () => {
     const fetchOrders = async () => {
       try {
         setLoading(true);
-        const { data } = await api.get(/admin/orders?page=${currentPage}&limit=${limit});
+        const { data } = await api.get(`/admin/orders?page=${currentPage}&limit=${limit}`);
         setOrders(data.orders);
         setTotalPages(data.totalPages);
       } catch (err) {
@@ -62,7 +62,7 @@ const OrderList = () => {
               {orders.map((order) => (
                 <tr key={order._id}>
                   <td>
-                    <Link to={/admin/orders/${order._id}} className="order-link">
+                    <Link to={`/admin/orders/${order._id}`} className="order-link">
                       {order._id}
                     </Link>
                   </td>
