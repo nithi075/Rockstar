@@ -83,6 +83,7 @@ export default function OrderDetails() {
                             <li key={item._id || index} className="border p-4 rounded-md flex items-center gap-6 bg-white shadow-sm">
                                 <img
                                     // Construct the image URL: BACKEND_STATIC_ASSETS_BASE_URL + /uploads/ + item.product.images[0].url
+                                    width={100}
                                     src={item.product?.images?.[0]?.url ? `${BACKEND_STATIC_ASSETS_BASE_URL}/uploads/${item.product.images[0].url}` : 'https://via.placeholder.com/64'}
                                     alt={item.product?.name || "Product Image"}
                                     className="w-20 h-20 object-cover rounded-md border"
