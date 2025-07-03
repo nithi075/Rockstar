@@ -1,135 +1,124 @@
-const Order = require('../models/orderModel');
-const Product = require('../models/productModel');
+const Order = require("../models/orderModel");
+const Product = require("../models/productModel");
 
-// Create New Order
+// Create a new order
 exports.createOrder = async (req, res) => {
-    try {
-        const { cartItems, customerInfo } = req.body;
+  try {
+    const { cartItems, customerInfo } = req.body;
 
-        if (!cartItems || cartItems.length === 0) {
-            return res.status(400).json({ success: false, message: "No items in cart." });
-        }
-
-        // Validate & update stock
-        for (const item of cartItems) {
-            const product = await Product.findById(item.product);
-            if (!product) {
-                return res.status(404).json({ success: false, message: `Product not found: ${item.product}` });
-            }
-
-            const sizeStock = product.stock.find(s => s.size === item.size);
-            if (!sizeStock || sizeStock.quantity < item.quantity) {
-                return res.status(400).json({ success: false, message: `Insufficient stock for ${product.name} (${item.size})` });
-            }
-
-            sizeStock.quantity -= item.quantity;
-            await product.save();
-        }
-
-        const order = await Order.create({
-            cartItems,
-            customerInfo,
-            totalAmount: cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0),
-        });
-
-        res.status(201).json({ success: true, order });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+    if (!cartItems || cartItems.length === 0) {
+      return res.status(400).json({ message: "Cart items are required" });
     }
+
+    // Check stock
+    for (const item of cartItems) {
+      const product = await Product.findById(item.product);
+      if (!product) return res.status(404).json({ message: "Product not found" });
+
+      const sizeStock = product.sizes.find((s) => s.size === item.size);
+      if (!sizeStock || sizeStock.quantity < item.quantity) {
+        return res.status(400).json({
+          message: `Insufficient stock for ${product.name} - Size ${item.size}`,
+        });
+      }
+    }
+
+    // Update stock
+    const bulkOps = cartItems.map((item) => ({
+      updateOne: {
+        filter: { _id: item.product, "sizes.size": item.size },
+        update: { $inc: { "sizes.$.quantity": -item.quantity } },
+      },
+    }));
+    await Product.bulkWrite(bulkOps);
+
+    // Create order
+    const order = await Order.create({ cartItems, customerInfo });
+    res.status(201).json(order);
+  } catch (error) {
+    console.error("Create Order Error:", error);
+    res.status(500).json({ message: "Failed to create order", error });
+  }
 };
 
-// Get All Orders with Pagination (Admin)
+// Get all orders (admin) with pagination
 exports.getAllOrders = async (req, res) => {
-    try {
-        const page = Number(req.query.page) || 1;
-        const limit = Number(req.query.limit) || 10;
-        const skip = (page - 1) * limit;
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
 
-        const orders = await Order.find()
-            .sort({ createdAt: -1 })
-            .skip(skip)
-            .limit(limit)
-            .populate({
-                path: 'cartItems.product',
-                select: 'name price images'
-            });
+    const totalOrders = await Order.countDocuments();
+    const orders = await Order.find()
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .populate("cartItems.product", "name price images");
 
-        const totalOrders = await Order.countDocuments();
-
-        res.status(200).json({
-            success: true,
-            orders,
-            totalOrders,
-            currentPage: page,
-            totalPages: Math.ceil(totalOrders / limit),
-        });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
+    res.status(200).json({
+      success: true,
+      totalOrders,
+      currentPage: page,
+      totalPages: Math.ceil(totalOrders / limit),
+      orders,
+    });
+  } catch (error) {
+    console.error("Get All Orders Error:", error);
+    res.status(500).json({ message: "Failed to fetch orders", error });
+  }
 };
 
-// Get Single Order
-exports.getSingleOrder = async (req, res) => {
-    try {
-        const order = await Order.findById(req.params.id).populate({
-            path: 'cartItems.product',
-            select: 'name price images'
-        });
+// Get single order by ID
+exports.getOrderById = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id).populate(
+      "cartItems.product",
+      "name price images"
+    );
 
-        if (!order) {
-            return res.status(404).json({ success: false, message: "Order not found" });
-        }
-
-        res.status(200).json({ success: true, order });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
+    if (!order) return res.status(404).json({ message: "Order not found" });
+    res.status(200).json({ success: true, order });
+  } catch (error) {
+    console.error("Get Order Error:", error);
+    res.status(500).json({ message: "Failed to get order", error });
+  }
 };
 
-// Update Order Status (Admin)
-exports.updateOrderStatus = async (req, res) => {
-    try {
-        const { status } = req.body;
-        const order = await Order.findById(req.params.id);
+// Update order status (admin)
+exports.updateOrder = async (req, res) => {
+  try {
+    const { status } = req.body;
 
-        if (!order) {
-            return res.status(404).json({ success: false, message: "Order not found" });
-        }
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: "Order not found" });
 
-        order.status = status || order.status;
-        await order.save();
+    order.status = status;
+    await order.save();
 
-        res.status(200).json({ success: true, order });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
+    res.status(200).json({ success: true, message: "Order status updated", order });
+  } catch (error) {
+    console.error("Update Order Error:", error);
+    res.status(500).json({ message: "Failed to update order", error });
+  }
 };
 
-// Delete Order (Admin)
+// Delete order (admin)
 exports.deleteOrder = async (req, res) => {
-    try {
-        const order = await Order.findById(req.params.id);
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: "Order not found" });
 
-        if (!order) {
-            return res.status(404).json({ success: false, message: "Order not found" });
-        }
+    // OPTIONAL: Restore stock if needed
+    // for (const item of order.cartItems) {
+    //   await Product.updateOne(
+    //     { _id: item.product, "sizes.size": item.size },
+    //     { $inc: { "sizes.$.quantity": item.quantity } }
+    //   );
+    // }
 
-        // Optionally restore stock
-        for (const item of order.cartItems) {
-            const product = await Product.findById(item.product);
-            if (product) {
-                const sizeStock = product.stock.find(s => s.size === item.size);
-                if (sizeStock) {
-                    sizeStock.quantity += item.quantity;
-                    await product.save();
-                }
-            }
-        }
-
-        await order.remove();
-
-        res.status(200).json({ success: true, message: "Order deleted successfully" });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
+    await order.remove();
+    res.status(200).json({ success: true, message: "Order deleted" });
+  } catch (error) {
+    console.error("Delete Order Error:", error);
+    res.status(500).json({ message: "Failed to delete order", error });
+  }
 };
