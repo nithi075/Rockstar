@@ -6,19 +6,22 @@ export default function OrderList() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [ordersPerPage] = useState(10); // Number of orders to display per page
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const res = await api.get("/admin/orders");
-        // Sort orders by creation date if a 'createdAt' field exists in your API response
+        // Sort orders by creation date (assuming 'createdAt' field exists)
+        // This ensures the most recent orders are displayed first.
         const sortedOrders = (res.data.orders || []).sort((a, b) =>
           new Date(b.createdAt) - new Date(a.createdAt)
         );
         setOrders(sortedOrders);
       } catch (err) {
         console.error("Error fetching orders: ", err);
-        setError("Failed to fetch orders.");
+        setError("Failed to fetch orders. " + (err.response?.data?.message || err.message));
       } finally {
         setLoading(false);
       }
@@ -35,22 +38,36 @@ export default function OrderList() {
 
     try {
       // Assuming your backend has an endpoint to update order status, e.g., PUT /admin/orders/:id/status
-      // You might need to adjust this endpoint based on your actual API.
-      await api.put(`/admin/orders/${orderId}/status`, { orderStatus: 'Delivered' });
+      // The `api` instance from "../../axios" should be correctly configured for your backend URL.
+      const res = await api.put(`/admin/orders/${orderId}/status`, { orderStatus: 'Delivered' });
 
-      // Update the local state to reflect the change
-      setOrders(prevOrders =>
-        prevOrders.map(order =>
-          order._id === orderId ? { ...order, orderStatus: 'Delivered' } : order
-        )
-      );
-      alert('Order marked as Delivered successfully!');
+      if (res.status === 200) { // Check if the update was successful
+        // Update the local state to reflect the change
+        setOrders(prevOrders =>
+          prevOrders.map(order =>
+            order._id === orderId ? { ...order, orderStatus: 'Delivered' } : order
+          )
+        );
+        alert('Order marked as Delivered successfully!');
+      } else {
+        alert('Failed to mark order as Delivered. Server responded with an unexpected status.');
+      }
     } catch (err) {
       console.error("Error marking order as delivered: ", err);
-      setError("Failed to mark order as delivered.");
-      alert("Failed to mark order as delivered. Please try again.");
+      // More specific error message if available from the backend
+      setError("Failed to mark order as delivered. " + (err.response?.data?.message || err.message || "Please try again."));
+      alert("Failed to mark order as delivered: " + (err.response?.data?.message || err.message || "An unknown error occurred."));
     }
   };
+
+  // Logic for pagination
+  const indexOfLastOrder = currentPage * ordersPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+  const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
+
+  const totalPages = Math.ceil(orders.length / ordersPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   if (loading) return <p className="p-4 text-center text-lg text-gray-700">Loading orders...</p>;
   if (error) return <p className="p-4 text-center text-lg text-red-600">{error}</p>;
@@ -75,7 +92,7 @@ export default function OrderList() {
                 </tr>
               </thead>
               <tbody>
-                {orders.map((order) =>
+                {currentOrders.map((order) => // Use currentOrders for pagination
                   order.cartItems.map((item, idx) => {
                     const imageUrl =
                       item.product?.images?.[0]?.url
@@ -129,6 +146,25 @@ export default function OrderList() {
               </tbody>
             </table>
           </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="p-4 flex justify-center items-center space-x-2 bg-gray-100 border-t border-gray-200">
+              {[...Array(totalPages).keys()].map(number => (
+                <button
+                  key={number + 1}
+                  onClick={() => paginate(number + 1)}
+                  className={`px-4 py-2 rounded-lg font-semibold transition duration-300 ease-in-out ${
+                    currentPage === number + 1
+                      ? 'bg-blue-600 text-white shadow-md'
+                      : 'bg-white text-blue-600 border border-blue-300 hover:bg-blue-50'
+                  }`}
+                >
+                  {number + 1}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
