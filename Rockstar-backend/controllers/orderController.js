@@ -38,7 +38,7 @@ exports.createOrder = async (req, res) => {
     }
 };
 
-// Admin: Get All Orders with Pagination
+// Get All Orders with Pagination (Admin)
 exports.getAllOrders = async (req, res) => {
     try {
         const page = Number(req.query.page) || 1;
@@ -87,7 +87,7 @@ exports.getSingleOrder = async (req, res) => {
 };
 
 // Update Order Status (Admin)
-exports.updateOrder = async (req, res) => {
+exports.updateOrderStatus = async (req, res) => {
     try {
         const { status } = req.body;
         const order = await Order.findById(req.params.id);
