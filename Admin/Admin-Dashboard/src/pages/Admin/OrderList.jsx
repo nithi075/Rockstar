@@ -36,11 +36,10 @@ export default function OrderList() {
     }
 
     try {
-      // --- START OF CHANGE ---
-      // IMPORTANT: Changed URL from `/admin/orders/${orderId}/status` to `/admin/order/${orderId}`
-      // IMPORTANT: Changed request body key from `orderStatus` to `status`
-      const res = await api.put(`/admin/order/${orderId}`, { status: 'Delivered' });
-      // --- END OF CHANGE ---
+      // --- THE KEY CHANGE IS HERE ---
+      // Added '/api/v1' prefix to match your backend's full route path (e.g., app.use('/api/v1', orderRoutes))
+      // And ensured the path is /admin/order/:id (singular) with 'status' in the body.
+      const res = await api.put(`/api/v1/admin/order/${orderId}`, { status: 'Delivered' });
 
       if (res.status === 200) { // Check if the update was successful
         // Update the local state to reflect the change
