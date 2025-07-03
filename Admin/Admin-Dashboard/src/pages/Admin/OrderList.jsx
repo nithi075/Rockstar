@@ -1,26 +1,28 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 import { Link } from "react-router-dom";
-import api from "../../axios"; // Assuming this is your configured axios instance
 
 export default function OrderList() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [ordersPerPage] = useState(10); // Number of orders to display per page
+  const [ordersPerPage] = useState(10); // Display 10 orders per page
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await api.get("/admin/orders");
+        // Using `api` from the first example, assuming it's configured for your backend
+        // If not, you might need to adjust the base URL for axios.
+        const res = await axios.get("/admin/orders"); // Assuming /admin/orders for admin panel
         // Sort orders by creation date (assuming 'createdAt' field exists)
-        // This ensures the most recent orders are displayed first.
         const sortedOrders = (res.data.orders || []).sort((a, b) =>
           new Date(b.createdAt) - new Date(a.createdAt)
         );
         setOrders(sortedOrders);
       } catch (err) {
-        console.error("Error fetching orders: ", err);
+        console.error("Error fetching orders:", err);
         setError("Failed to fetch orders. " + (err.response?.data?.message || err.message));
       } finally {
         setLoading(false);
@@ -31,46 +33,39 @@ export default function OrderList() {
   }, []);
 
   const handleMarkAsDelivered = async (orderId) => {
-    // Confirmation dialog for better UX
-    if (!window.confirm("Are you sure you want to mark this order as Delivered?")) {
-      return;
-    }
-
     try {
-      // Assuming your backend has an endpoint to update order status, e.g., PUT /admin/orders/:id/status
-      // The `api` instance from "../../axios" should be correctly configured for your backend URL.
-      const res = await api.put(`/admin/orders/${orderId}/status`, { orderStatus: 'Delivered' });
-
-      if (res.status === 200) { // Check if the update was successful
-        // Update the local state to reflect the change
-        setOrders(prevOrders =>
-          prevOrders.map(order =>
-            order._id === orderId ? { ...order, orderStatus: 'Delivered' } : order
-          )
-        );
-        alert('Order marked as Delivered successfully!');
-      } else {
-        alert('Failed to mark order as Delivered. Server responded with an unexpected status.');
-      }
+      // Assuming an API endpoint like /admin/orders/:id/deliver for marking as delivered
+      await axios.put(`/admin/orders/${orderId}/deliver`, { status: 'Delivered' });
+      // Update the order status in the local state
+      setOrders(prevOrders =>
+        prevOrders.map(order =>
+          order._id === orderId ? { ...order, status: 'Delivered', orderStatus: 'Delivered' } : order // Ensure both 'status' and 'orderStatus' are updated if applicable
+        )
+      );
+      alert('Order marked as Delivered!');
     } catch (err) {
-      console.error("Error marking order as delivered: ", err);
-      // More specific error message if available from the backend
-      setError("Failed to mark order as delivered. " + (err.response?.data?.message || err.message || "Please try again."));
-      alert("Failed to mark order as delivered: " + (err.response?.data?.message || err.message || "An unknown error occurred."));
+      console.error("Error marking order as delivered:", err);
+      alert("Failed to mark order as delivered. " + (err.response?.data?.message || err.message));
     }
   };
 
-  // Logic for pagination
+  const calculateTotalAmount = (cartItems) => {
+    return cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2);
+  };
+
+  // Calculate orders to display on the current page
   const indexOfLastOrder = currentPage * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
   const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
 
+  // Calculate total pages
   const totalPages = Math.ceil(orders.length / ordersPerPage);
 
+  // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  if (loading) return <p className="p-4 text-center text-lg text-gray-700">Loading orders...</p>;
-  if (error) return <p className="p-4 text-center text-lg text-red-600">{error}</p>;
+  if (loading) return <p className="p-4 text-lg text-gray-700">Loading orders...</p>;
+  if (error) return <p className="p-4 text-lg text-red-600">{error}</p>;
 
   return (
     <div className="container mx-auto p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen">
@@ -84,65 +79,60 @@ export default function OrderList() {
             <table className="min-w-full leading-normal">
               <thead>
                 <tr className="bg-gray-200 text-gray-700 uppercase text-sm font-semibold">
-                  <th className="py-3 px-6 text-left border-b border-gray-300">Image</th>
-                  <th className="py-3 px-6 text-left border-b border-gray-300">Product Name</th>
-                  <th className="py-3 px-6 text-left border-b border-gray-300">Price</th>
+                  <th className="py-3 px-6 text-left border-b border-gray-300">Product Image</th>
+                  <th className="py-3 px-6 text-left border-b border-gray-300">Customer Name</th>
+                  <th className="py-3 px-6 text-left border-b border-gray-300">Total Items</th>
+                  <th className="py-3 px-6 text-left border-b border-gray-300">Total Amount</th>
                   <th className="py-3 px-6 text-left border-b border-gray-300">Status</th>
                   <th className="py-3 px-6 text-left border-b border-gray-300">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {currentOrders.map((order) => // Use currentOrders for pagination
-                  order.cartItems.map((item, idx) => {
-                    const imageUrl =
-                      item.product?.images?.[0]?.url
-                        ? `https://admin-backend-x8of.onrender.com/uploads/${item.product.images[0].url}`
-                        : "/placeholder.jpg"; // fallback image
-
-                    return (
-                      <tr key={order._id + "-" + idx} className="hover:bg-gray-100 border-b border-gray-200">
-                        <td className="py-4 px-6">
-                          <img
-                            width={50}
-                            src={imageUrl}
-                            alt={item.name}
-                            className="w-16 h-16 object-cover rounded-md shadow"
-                          />
-                        </td>
-                        <td className="py-4 px-6 text-gray-800 font-medium">{item.name}</td>
-                        <td className="py-4 px-6 text-gray-700 font-semibold">₹{item.price}</td>
-                        <td className="py-4 px-6">
-                          <span className={`px-3 py-1 text-sm font-semibold rounded-full capitalize ${
-                              order.orderStatus === 'Delivered' ? 'bg-green-100 text-green-800' :
-                              order.orderStatus === 'Cancelled' ? 'bg-red-100 text-red-800' :
-                              'bg-blue-100 text-blue-800'
-                          }`}>
-                            {order.orderStatus}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6">
-                          <div className="flex space-x-3 items-center">
-                            <Link
-                              to={`/admin/orders/${order._id}`}
-                              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1.5 px-3 rounded text-sm transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-                            >
-                              View Details
-                            </Link>
-                            {/* Show Mark as Delivered button only if status is not Delivered or Cancelled */}
-                            {(order.orderStatus !== 'Delivered' && order.orderStatus !== 'Cancelled') && (
-                              <button
-                                onClick={() => handleMarkAsDelivered(order._id)}
-                                className="bg-green-500 hover:bg-green-600 text-white font-bold py-1.5 px-3 rounded text-sm transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
-                              >
-                                Mark Delivered
-                              </button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
+                {currentOrders.map(order => (
+                  <tr key={order._id} className="hover:bg-gray-100 border-b border-gray-200">
+                    <td className="py-4 px-6">
+                      {order.cartItems && order.cartItems.length > 0 && order.cartItems[0].product?.images?.[0]?.url ? (
+                        <img
+                          src={`https://admin-backend-x8of.onrender.com/uploads/${order.cartItems[0].product.images[0].url}`} // Using the specified backend URL
+                          alt={order.cartItems[0].product?.name || "Product Image"}
+                          className="w-16 h-16 object-cover rounded-md shadow"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 bg-gray-200 flex items-center justify-center rounded-md text-gray-500 text-xs text-center">No Image</div>
+                      )}
+                    </td>
+                    <td className="py-4 px-6 text-gray-800 font-medium">{order.customerInfo?.name || 'N/A'}</td>
+                    <td className="py-4 px-6 text-gray-700">{order.cartItems?.length || 0}</td>
+                    <td className="py-4 px-6 text-gray-700 font-semibold">₹{calculateTotalAmount(order.cartItems || [])}</td>
+                    <td className="py-4 px-6">
+                      <span className={`px-3 py-1 text-sm font-semibold rounded-full capitalize ${
+                          order.status === 'Delivered' || order.orderStatus === 'Delivered' ? 'bg-green-100 text-green-800' :
+                          order.status === 'Cancelled' || order.orderStatus === 'Cancelled' ? 'bg-red-100 text-red-800' :
+                          'bg-blue-100 text-blue-800'
+                      }`}>
+                        {order.status || order.orderStatus || 'Pending'}
+                      </span>
+                    </td>
+                    <td className="py-4 px-6">
+                      <div className="flex space-x-3 items-center">
+                        <Link
+                          to={`/admin/orders/${order._id}`}
+                          className="text-blue-600 hover:text-blue-800 font-medium transition duration-150 ease-in-out"
+                        >
+                          View
+                        </Link>
+                        {(order.status !== 'Delivered' && order.status !== 'Cancelled' && order.orderStatus !== 'Delivered' && order.orderStatus !== 'Cancelled') && (
+                          <button
+                            onClick={() => handleMarkAsDelivered(order._id)}
+                            className="bg-green-500 hover:bg-green-600 text-white font-bold py-1.5 px-3 rounded text-sm transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+                          >
+                            Mark as Delivered
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
