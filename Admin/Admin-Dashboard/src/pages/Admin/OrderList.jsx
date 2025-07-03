@@ -1,87 +1,109 @@
 // src/pages/Admin/OrderList.jsx
-import React, { useEffect, useState } from "react";
-import api from "../../axios";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import api from "../../axios";
 
-
-const OrderList = () => {
+export default function OrderList() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const limit = 10;
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        setLoading(true);
-        const { data } = await api.get(`/admin/orders?page=${currentPage}&limit=${limit}`);
-        setOrders(data.orders);
-        setTotalPages(data.totalPages);
-      } catch (err) {
-        setError(err.response?.data?.message || "Failed to fetch orders.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrders();
-  }, [currentPage]);
-
-  const handlePrev = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  const fetchOrders = async (page = 1) => {
+    try {
+      setLoading(true);
+      const { data } = await api.get(`/api/v1/admin/orders?page=${page}&limit=10`);
+      setOrders(data.orders);
+      setTotalPages(data.totalPages || Math.ceil(data.totalOrders / 10));
+    } catch (err) {
+      setError("Failed to fetch orders.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleNext = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  useEffect(() => {
+    fetchOrders(currentPage);
+  }, [currentPage]);
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
   };
 
   return (
-    <div className="order-list-container">
-      <h2 className="order-list-title">Order List</h2>
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Orders</h1>
 
       {loading ? (
-        <div className="loader">Loading Orders...</div>
+        <p>Loading orders...</p>
       ) : error ? (
-        <div className="error-message">{error}</div>
+        <p className="text-red-500">{error}</p>
       ) : orders.length === 0 ? (
-        <div className="empty-message">No orders found.</div>
+        <p>No orders found.</p>
       ) : (
         <>
-          <table className="order-table">
-            <thead>
-              <tr>
-                <th>Order ID</th>
-                <th>Customer</th>
-                <th>Amount</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.map((order) => (
-                <tr key={order._id}>
-                  <td>
-                    <Link to={`/admin/orders/${order._id}`} className="order-link">
-                      {order._id}
-                    </Link>
-                  </td>
-                  <td>{order.customerInfo?.name || "N/A"}</td>
-                  <td>₹{order.totalPrice}</td>
-                  <td>{order.orderStatus}</td>
+          <div className="overflow-x-auto">
+            <table className="min-w-full table-auto border border-gray-300">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-4 py-2 border">Image</th>
+                  <th className="px-4 py-2 border">Name</th>
+                  <th className="px-4 py-2 border">Status</th>
+                  <th className="px-4 py-2 border">Date</th>
+                  <th className="px-4 py-2 border">Details</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {orders.map((order) => (
+                  <tr key={order._id} className="text-center">
+                    <td className="border px-2 py-2">
+                      <img
+                        src={order.orderItems[0]?.image}
+                        alt="product"
+                        className="w-12 h-12 object-cover mx-auto"
+                      />
+                    </td>
+                    <td className="border px-4 py-2">{order.orderItems[0]?.name}</td>
+                    <td className="border px-4 py-2">{order.orderStatus}</td>
+                    <td className="border px-4 py-2">
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="border px-4 py-2">
+                      <Link
+                        to={`/admin/orders/${order._id}`}
+                        className="text-blue-600 underline"
+                      >
+                        View
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-          <div className="pagination">
-            <button onClick={handlePrev} disabled={currentPage === 1}>
-              Previous
+          {/* Pagination */}
+          <div className="flex justify-center items-center mt-4 gap-2">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-3 py-1 border rounded bg-gray-200 disabled:opacity-50"
+            >
+              Prev
             </button>
+
             <span>
               Page {currentPage} of {totalPages}
             </span>
-            <button onClick={handleNext} disabled={currentPage === totalPages}>
+
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 border rounded bg-gray-200 disabled:opacity-50"
+            >
               Next
             </button>
           </div>
@@ -89,6 +111,4 @@ const OrderList = () => {
       )}
     </div>
   );
-};
-
-export default OrderList;
+}
