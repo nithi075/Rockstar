@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
-import api from "../../axios"; // Your custom axios instance
+import api from "../../axios"; // Your custom axios instance with baseURL: "https://admin-backend-x8of.onrender.com/api/v1"
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify"; // Assuming you have react-toastify setup for notifications
+
+// Define your backend's base URL for static files (like images).
+// THIS IS A CRITICAL LINE FOR YOUR IMAGE FIX.
+// Make sure this matches the domain where your backend is deployed and serving /uploads.
+const BACKEND_BASE_URL = "https://admin-backend-x8of.onrender.com"; // <-- VERIFY THIS URL IS CORRECT
 
 export default function OrderList() {
   const [orders, setOrders] = useState([]);
@@ -16,20 +21,31 @@ export default function OrderList() {
     setLoading(true);
     setError("");
     try {
+      // Corrected API endpoint path based on your backend routing and axios baseURL
+      // Backend route: /api/v1/orders/admin/orders
+      // Axios baseURL: /api/v1
+      // So, the path here is: /orders/admin/orders
       const res = await api.get(`/orders/admin/orders?page=${page}&limit=${limit}`);
+
       setOrders(res.data.orders);
+      // IMPORTANT: Your backend's `getAllOrders` (in orderController.js) currently
+      // returns `orders` and `totalAmount`. For pagination to work correctly,
+      // the backend needs to return `totalCount` or `totalPages` with the orders.
+      // This line assumes your backend will eventually provide `totalPages` or `totalCount`.
       setTotalPages(res.data.totalPages || Math.ceil(res.data.totalCount / limit) || 1);
+
     } catch (err) {
       console.error("Error fetching orders:", err);
+      // Log the full error object for detailed debugging (e.g., err.response)
       console.error("Full error object:", err.response || err.message || err);
-      setError("Failed to load orders. Please try again.");
+      setError("Failed to load orders. Please try again."); // User-friendly error message
     } finally {
-      setLoading(false);
+      setLoading(false); // Set loading to false once fetching is complete (success or error)
     }
   };
 
   useEffect(() => {
-    fetchOrders(currentPage);
+    fetchOrders(currentPage); // Fetch orders whenever currentPage changes
   }, [currentPage]);
 
   const handlePrev = () => {
@@ -93,19 +109,19 @@ export default function OrderList() {
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Image</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Price</th> {/* Changed from Total Price */}
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Price</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th> {/* Changed from Action */}
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {orders.map((order) => (
                   <tr key={order._id}>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                      {/* Display image of the first product in cartItems if available */}
                       {order.cartItems && order.cartItems.length > 0 && order.cartItems[0].product && order.cartItems[0].product.images && order.cartItems[0].product.images.length > 0 ? (
                         <img
-                          src={order.cartItems[0].product.images[0].url}
+                          // FIX FOR IMAGE 404: Prepending the backend base URL
+                          src={`${BACKEND_BASE_URL}${order.cartItems[0].product.images[0].url}`}
                           alt={order.cartItems[0].product.name || "Product Image"}
                           className="w-16 h-16 object-cover rounded-md"
                         />
@@ -115,7 +131,6 @@ export default function OrderList() {
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{order.customerInfo?.name || "N/A"}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                      {/* Display price of the first product in cartItems */}
                       ₹{order.cartItems && order.cartItems.length > 0 && order.cartItems[0].product ? order.cartItems[0].product.price : "N/A"}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
@@ -139,7 +154,7 @@ export default function OrderList() {
                       </Link>
                       <button
                         onClick={() => handleDeliverOrder(order._id)}
-                        disabled={order.status === "Delivered" || updatingOrderId === order._id} // Disable if delivered or currently updating
+                        disabled={order.status === "Delivered" || updatingOrderId === order._id}
                         className={`px-3 py-1 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-opacity-50
                           ${order.status === "Delivered" || updatingOrderId === order._id
                             ? "bg-gray-400 cursor-not-allowed"
@@ -155,7 +170,6 @@ export default function OrderList() {
             </table>
           </div>
 
-          {/* Pagination Controls */}
           {totalPages > 1 && (
             <div className="flex justify-between items-center mt-6">
               <button
