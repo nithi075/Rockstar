@@ -1,11 +1,17 @@
-const mongoose = require("mongoose");
+// models/orderModel.js
+const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User', // this must match your actual user model name
+    required: true
+  },
   cartItems: [
     {
       product: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Product", // THIS is critical for populate()
+        ref: "Product",
         required: true,
       },
       name: String,
@@ -17,10 +23,14 @@ const orderSchema = new mongoose.Schema({
   customerInfo: {
     name: String,
     email: String,
-    phone: String,
     address: String,
+    phone: String,
   },
-  orderDate: {
+  status: {
+    type: String,
+    default: "Processing",
+  },
+  createdAt: {
     type: Date,
     default: Date.now,
   },
