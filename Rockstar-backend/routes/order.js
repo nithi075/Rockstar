@@ -15,23 +15,23 @@ const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 // 🛒 Customer Routes
 // =======================
 
-// Create a new order (customer only)
+// Create a new order (customer)
 router.post('/order/new', isAuthenticatedUser, createOrder);
 
-// Get single order by ID (customer or admin)
+// Get single order (admin or customer)
 router.get('/order/:id', isAuthenticatedUser, getSingleOrder);
 
 // =======================
 // 🔐 Admin Routes
 // =======================
 
-// Get all orders with pagination, search, and filters (admin only)
-router.get(
-  '/admin/orders',
-  isAuthenticatedUser,
-  authorizeRoles('admin'),
-  getAllOrders
-);
+// Get all orders
+router.get('/admin/orders', isAuthenticatedUser, authorizeRoles('admin'), getAllOrders);
 
-// Update order status (admin only)
-ro
+// Update order status
+router.put('/admin/order/:id', isAuthenticatedUser, authorizeRoles('admin'), updateOrderStatus);
+
+// Delete an order
+router.delete('/admin/order/:id', isAuthenticatedUser, authorizeRoles('admin'), deleteOrder);
+
+module.exports = router;
