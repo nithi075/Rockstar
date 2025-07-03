@@ -10,6 +10,9 @@ export default function OrderList() {
   const [ordersPerPage] = useState(10); // Number of orders to display per page
 
   useEffect(() => {
+    // Keep this as /admin/orders if that's how your backend handles fetching all admin orders
+    // If your backend's getAllOrders route is now just `router.get('/', ...)` in routes/order.js,
+    // then this line should be: `const res = await api.get("/orders");`
     const fetchOrders = async () => {
       try {
         const res = await api.get("/admin/orders");
@@ -30,19 +33,18 @@ export default function OrderList() {
   }, []);
 
   const handleMarkAsDelivered = async (orderId) => {
-    // Confirmation dialog for better UX
     if (!window.confirm("Are you sure you want to mark this order as Delivered?")) {
       return;
     }
 
     try {
-      // --- THE KEY CHANGE IS HERE ---
-      // Added '/api/v1' prefix to match your backend's full route path (e.g., app.use('/api/v1', orderRoutes))
-      // And ensured the path is /admin/order/:id (singular) with 'status' in the body.
-      const res = await api.put(`/admin/order/${orderId}`, { status: 'Delivered' });
+      // *** THE CRITICAL CHANGE IS HERE ***
+      // You need to add 'orders' after the initial 'api/v1' (which comes from baseURL)
+      // and before '/admin/order'.
+      const res = await api.put(`/orders/admin/order/${orderId}`, { status: 'Delivered' });
+      //                                ^^^^^^ ADDED THIS!
 
-      if (res.status === 200) { // Check if the update was successful
-        // Update the local state to reflect the change
+      if (res.status === 200) {
         setOrders(prevOrders =>
           prevOrders.map(order =>
             order._id === orderId ? { ...order, orderStatus: 'Delivered' } : order
