@@ -1,122 +1,110 @@
+// src/pages/Admin/OrderList.jsx
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import api from "../../axios"; // Your custom axios instance
-import { toast } from "react-toastify";
+import api from "../../axios";
 
-const BACKEND_BASE_URL = "https://admin-backend-x8of.onrender.com"; // Replace with localhost if testing locally
+const BACKEND_IMAGE_URL = "https://admin-backend-x8of.onrender.com/uploads";
 
 export default function OrderList() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchOrders = async () => {
+      setLoading(true);
       try {
-        const res = await api.get(`/api/v1/orders?page=${currentPage}`);
-        setOrders(res.data.orders || []);
+        const res = await api.get(`/admin/orders?page=${page}`);
+        setOrders(res.data.orders);
         setTotalPages(res.data.totalPages || 1);
+        setError("");
       } catch (err) {
-        console.error("Error fetching orders:", err);
-        setError("Failed to load orders");
-        toast.error("Failed to fetch orders");
+        setError("Error fetching orders");
+        console.error("Error fetching orders: ", err.response?.data || err.message);
       } finally {
         setLoading(false);
       }
     };
 
     fetchOrders();
-  }, [currentPage]);
-
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-
-  if (loading) return <div className="text-center p-4">Loading...</div>;
-  if (error) return <div className="text-red-500 text-center">{error}</div>;
+  }, [page]);
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Order List</h2>
-      <div className="overflow-x-auto">
-        <table className="w-full table-auto border border-gray-200">
-          <thead className="bg-gray-100">
-            <tr className="text-left">
-              <th className="p-2">Order ID</th>
-              <th className="p-2">Image</th>
-              <th className="p-2">Customer</th>
-              <th className="p-2">Amount</th>
-              <th className="p-2">Status</th>
-              <th className="p-2">Date</th>
-              <th className="p-2">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order) => {
-              const productImage = order.cartItems[0]?.product?.image;
-              const fullImageUrl = productImage
-                ? `${BACKEND_BASE_URL}/${productImage.replace(/\\/g, "/")}`
-                : "";
+    <div className="p-4">
+      <h1 className="text-xl font-bold mb-4">Orders</h1>
 
-              return (
-                <tr key={order._id} className="border-t border-gray-200">
-                  <td className="p-2">{order._id}</td>
-                  <td className="p-2">
-                    {fullImageUrl ? (
-                      <img
-                        src={fullImageUrl}
-                        alt="product"
-                        className="w-16 h-16 object-cover rounded"
-                      />
-                    ) : (
-                      "No image"
-                    )}
-                  </td>
-                  <td className="p-2">{order.customerInfo?.name || "N/A"}</td>
-                  <td className="p-2">₹{order.amount}</td>
-                  <td className="p-2 capitalize">{order.status}</td>
-                  <td className="p-2">
-                    {new Date(order.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="p-2">
-                    <Link
-                      to={`/admin/orders/${order._id}`}
-                      className="text-blue-600 underline"
-                    >
-                      View
-                    </Link>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+      {loading ? (
+        <p>Loading...</p>
+      ) : error ? (
+        <p className="text-red-500">{error}</p>
+      ) : (
+        <>
+          <table className="min-w-full bg-white shadow rounded-lg overflow-hidden">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-4 py-2 text-left">Image</th>
+                <th className="px-4 py-2 text-left">Product</th>
+                <th className="px-4 py-2 text-left">Size</th>
+                <th className="px-4 py-2 text-left">Amount</th>
+                <th className="px-4 py-2 text-left">Status</th>
+                <th className="px-4 py-2 text-left">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.map((order) =>
+                order.cartItems.map((item, idx) => {
+                  const imageName = item.product?.images?.[0]?.url || "placeholder.jpg";
+                  const imageUrl = `${BACKEND_IMAGE_URL}/Products/${imageName}`;
+                  return (
+                    <tr key={order._id + idx} className="border-t">
+                      <td className="px-4 py-2">
+                        <img
+                          src={imageUrl}
+                          alt={item.name}
+                          className="w-16 h-16 object-cover rounded"
+                        />
+                      </td>
+                      <td className="px-4 py-2">{item.name}</td>
+                      <td className="px-4 py-2">{item.size}</td>
+                      <td className="px-4 py-2">₹{item.price * item.quantity}</td>
+                      <td className="px-4 py-2">{order.status || "Pending"}</td>
+                      <td className="px-4 py-2">
+                        <Link
+                          to={`/admin/orders/${order._id}`}
+                          className="text-blue-500 hover:underline"
+                        >
+                          View
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
 
-      {/* Pagination */}
-      <div className="flex justify-center items-center mt-6 gap-4">
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="px-3 py-1 border rounded disabled:opacity-50"
-        >
-          Prev
-        </button>
-        <span className="text-sm">
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="px-3 py-1 border rounded disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>
+          {/* Pagination Controls */}
+          <div className="flex justify-between mt-4">
+            <button
+              onClick={() => setPage((p) => Math.max(p - 1, 1))}
+              disabled={page === 1}
+              className="bg-gray-200 px-4 py-2 rounded disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <span>Page {page} of {totalPages}</span>
+            <button
+              onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+              disabled={page === totalPages}
+              className="bg-gray-200 px-4 py-2 rounded disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }
