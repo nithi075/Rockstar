@@ -140,20 +140,23 @@ exports.updateOrder = catchAsyncErrors(async (req, res, next) => {
         return next(new ErrorHandler("Order not found with this Id", 404));
     }
 
+    // *** CRITICAL FIX: Changed 'order.status' to 'order.orderStatus' ***
     // Use order.orderStatus for consistency with your schema
     // Prevent status updates if already delivered or cancelled
-    if (order.status === "Delivered" || order.status === "Cancelled") { // Changed from order.orderStatus to order.status based on your schema
-        return next(new ErrorHandler(`Order has already been ${order.status}. No further updates allowed.`, 400));
+    if (order.orderStatus === "Delivered" || order.orderStatus === "Cancelled") {
+        return next(new ErrorHandler(`Order has already been ${order.orderStatus}. No further updates allowed.`, 400));
     }
 
+    // *** CRITICAL FIX: Changed 'order.status' to 'order.orderStatus' ***
     // If the status is changing to 'Delivered', set deliveredAt timestamp
     // Use req.body.status as sent from the frontend
-    if (req.body.status === "Delivered" && order.status !== "Delivered") {
+    if (req.body.status === "Delivered" && order.orderStatus !== "Delivered") {
         order.deliveredAt = Date.now();
     }
 
+    // *** CRITICAL FIX: Changed 'order.status' to 'order.orderStatus' ***
     // Update the orderStatus field in your Mongoose model
-    order.status = req.body.status; // Set new status from request body, using 'status' as per your schema
+    order.orderStatus = req.body.status; // Set new status from request body, using 'orderStatus' as per your schema
 
     await order.save({ validateBeforeSave: false });
 
