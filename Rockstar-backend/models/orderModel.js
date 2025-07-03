@@ -1,11 +1,9 @@
-// Rockstar-backend/models/orderModel.js
-
 const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
-    user: { // <--- THIS IS THE MISSING FIELD
+    user: {
         type: mongoose.Schema.ObjectId,
-        ref: 'User', // IMPORTANT: 'User' must match the name you used when defining your User model (e.g., mongoose.model('User', userSchema))
+        ref: 'User',
         required: true,
     },
     shippingInfo: {
@@ -21,10 +19,10 @@ const orderSchema = new mongoose.Schema({
             name: { type: String, required: true },
             price: { type: Number, required: true },
             quantity: { type: Number, required: true },
-            image: { type: String, required: true }, // Assuming image URL is stored directly
+            image: { type: String, required: true }, // This is the field we are now using on the frontend
             product: {
                 type: mongoose.Schema.ObjectId,
-                ref: 'Product', // IMPORTANT: 'Product' must match your Product model name
+                ref: 'Product',
                 required: true,
             },
         },
@@ -53,12 +51,12 @@ const orderSchema = new mongoose.Schema({
         default: 0,
         required: true,
     },
-    orderStatus: { // You might have 'status' or 'orderStatus'
+    orderStatus: {
         type: String,
         required: true,
         default: 'Processing',
     },
-    deliveredAt: Date, // Timestamp for delivery
+    deliveredAt: Date,
     createdAt: {
         type: Date,
         default: Date.now,
