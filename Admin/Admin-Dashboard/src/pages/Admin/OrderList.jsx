@@ -14,7 +14,6 @@ export default function OrderList() {
       try {
         const res = await api.get("/admin/orders");
         // Sort orders by creation date (assuming 'createdAt' field exists)
-        // This ensures the most recent orders are displayed first.
         const sortedOrders = (res.data.orders || []).sort((a, b) =>
           new Date(b.createdAt) - new Date(a.createdAt)
         );
@@ -37,9 +36,11 @@ export default function OrderList() {
     }
 
     try {
-      // Assuming your backend has an endpoint to update order status, e.g., PUT /admin/orders/:id/status
-      // The `api` instance from "../../axios" should be correctly configured for your backend URL.
-      const res = await api.put(`/admin/orders/${orderId}/status`, { orderStatus: 'Delivered' });
+      // --- START OF CHANGE ---
+      // IMPORTANT: Changed URL from `/admin/orders/${orderId}/status` to `/admin/order/${orderId}`
+      // IMPORTANT: Changed request body key from `orderStatus` to `status`
+      const res = await api.put(`/admin/order/${orderId}`, { status: 'Delivered' });
+      // --- END OF CHANGE ---
 
       if (res.status === 200) { // Check if the update was successful
         // Update the local state to reflect the change
@@ -54,7 +55,6 @@ export default function OrderList() {
       }
     } catch (err) {
       console.error("Error marking order as delivered: ", err);
-      // More specific error message if available from the backend
       setError("Failed to mark order as delivered. " + (err.response?.data?.message || err.message || "Please try again."));
       alert("Failed to mark order as delivered: " + (err.response?.data?.message || err.message || "An unknown error occurred."));
     }
