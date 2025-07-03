@@ -12,7 +12,13 @@ export default function OrderList() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await api.get("/admin/orders");
+        const res = await api.get("/api/v1/admin/orders"); // Ensure this GET path is correct for fetching ALL orders
+        // Note: If you changed your backend GET all orders route to just '/',
+        // it would be `/api/v1/orders` here. Please verify your backend for 'getAllOrders' route.
+        // I'm keeping `/api/v1/admin/orders` for fetching assuming your GET all route for admin is separate.
+        // If your backend's getAllOrders route is now just `router.get('/', ...)` in routes/order.js,
+        // then this line should be: `const res = await api.get("/api/v1/orders");`
+
         // Sort orders by creation date (assuming 'createdAt' field exists)
         const sortedOrders = (res.data.orders || []).sort((a, b) =>
           new Date(b.createdAt) - new Date(a.createdAt)
@@ -36,10 +42,10 @@ export default function OrderList() {
     }
 
     try {
-      // --- THE KEY CHANGE IS HERE ---
-      // Added '/api/v1' prefix to match your backend's full route path (e.g., app.use('/api/v1', orderRoutes))
-      // And ensured the path is /admin/order/:id (singular) with 'status' in the body.
-      const res = await api.put(`/api/v1/admin/order/${orderId}`, { status: 'Delivered' });
+      // *** THIS IS THE CRITICAL CHANGE ***
+      // URL is now `/api/v1/orders/${orderId}` to match the new backend route structure
+      // Request body sends `status: 'Delivered'`
+      const res = await api.put(`/api/v1/orders/${orderId}`, { status: 'Delivered' });
 
       if (res.status === 200) { // Check if the update was successful
         // Update the local state to reflect the change
