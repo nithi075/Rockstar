@@ -1,45 +1,37 @@
-const Order = require('../models/orderModel');
-const Product = require('../models/productModel');
-const ErrorHandler = require('../utils/errorHandler');
-const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
+const Order = require("../models/orderModel");
+const Product = require("../models/productModel");
+const ErrorHandler = require("../utils/errorHandler");
+const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
 
-// Create new order
-exports.newOrder = catchAsyncErrors(async (req, res, next) => {
-  const {
-    cartItems,
-    customerInfo,
-    paymentInfo,
-    itemsPrice,
-    taxPrice,
-    shippingPrice,
-    totalPrice,
-  } = req.body;
+// Create a new order
+exports.createOrder = catchAsyncErrors(async (req, res, next) => {
+  const { cartItems, customerInfo } = req.body;
 
-  const order = await Order.create({
-    cartItems,
-    customerInfo,
-    paymentInfo,
-    itemsPrice,
-    taxPrice,
-    shippingPrice,
-    totalPrice,
-    orderStatus: "Processing",
-    paidAt: Date.now(),
-  });
+  if (!cartItems || cartItems.length === 0) {
+    return next(new ErrorHandler("No cart items provided", 400));
+  }
 
-  // Reduce stock per item size
-  const bulkOps = cartItems.map(item => ({
+  const bulkOps = cartItems.map((item) => ({
     updateOne: {
-      filter: { _id: item.product },
+      filter: {
+        _id: item.product,
+        [`stock.${item.size}`]: { $gte: item.quantity },
+      },
       update: {
         $inc: {
           [`stock.${item.size}`]: -item.quantity,
-        }
-      }
-    }
+        },
+      },
+    },
   }));
 
-  await Product.bulkWrite(bulkOps);
+  const bulkWriteResult = await Product.bulkWrite(bulkOps, { ordered: true });
+
+  const order = await Order.create({
+    user: req.user._id, // ✅ Save the user ID from the token
+    cartItems,
+    customerInfo,
+  });
 
   res.status(201).json({
     success: true,
@@ -47,79 +39,27 @@ exports.newOrder = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-// Get single order by ID
-exports.getSingleOrder = catchAsyncErrors(async (req, res, next) => {
-  const order = await Order.findById(req.params.id)
-    .populate('cartItems.product', 'name price image')
-    .lean();
-
-  if (!order) {
-    return next(new ErrorHandler("Order not found", 404));
-  }
-
-  res.status(200).json({
-    success: true,
-    order,
-  });
-});
-
 // Get all orders (admin)
 exports.getAllOrders = catchAsyncErrors(async (req, res, next) => {
-  const page = parseInt(req.query.page) || 1;
-  const limit = 10;
-  const skip = (page - 1) * limit;
-
-  const totalOrders = await Order.countDocuments();
-
   const orders = await Order.find()
-    .populate('cartItems.product', 'name price image')
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit)
-    .lean();
+    .populate("cartItems.product", "name price image")
+    .populate("user", "name email"); // ✅ Populate user info
 
   res.status(200).json({
     success: true,
     orders,
-    currentPage: page,
-    totalPages: Math.ceil(totalOrders / limit),
   });
 });
 
-// Update order status by admin
-exports.updateOrderStatusAdmin = catchAsyncErrors(async (req, res, next) => {
-  const order = await Order.findById(req.params.id);
+// Get a single order by ID
+exports.getOrderById = catchAsyncErrors(async (req, res, next) => {
+  const order = await Order.findById(req.params.id)
+    .populate("cartItems.product", "name price image")
+    .populate("user", "name email");
 
   if (!order) {
     return next(new ErrorHandler("Order not found", 404));
   }
-
-  if (order.orderStatus === "Delivered") {
-    return next(new ErrorHandler("Order already delivered", 400));
-  }
-
-  order.orderStatus = "Delivered";
-  order.deliveredAt = Date.now();
-
-  await order.save();
-
-  res.status(200).json({
-    success: true,
-    message: "Order marked as delivered",
-    order,
-  });
-});
-
-// Update any order (optional for future)
-exports.updateOrder = catchAsyncErrors(async (req, res, next) => {
-  const order = await Order.findById(req.params.id);
-
-  if (!order) {
-    return next(new ErrorHandler("Order not found", 404));
-  }
-
-  Object.assign(order, req.body);
-  await order.save();
 
   res.status(200).json({
     success: true,
@@ -127,7 +67,25 @@ exports.updateOrder = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-// Delete order (admin only)
+// Update order status
+exports.updateOrderStatus = catchAsyncErrors(async (req, res, next) => {
+  const order = await Order.findById(req.params.id);
+
+  if (!order) {
+    return next(new ErrorHandler("Order not found", 404));
+  }
+
+  order.status = req.body.status || order.status;
+
+  await order.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Order status updated",
+  });
+});
+
+// Delete order
 exports.deleteOrder = catchAsyncErrors(async (req, res, next) => {
   const order = await Order.findById(req.params.id);
 
@@ -139,18 +97,6 @@ exports.deleteOrder = catchAsyncErrors(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-    message: "Order deleted successfully",
-  });
-});
-
-// Get logged-in user's orders (optional)
-exports.myOrders = catchAsyncErrors(async (req, res, next) => {
-  const orders = await Order.find({ "customerInfo.email": req.user.email })
-    .populate('cartItems.product', 'name price image')
-    .sort({ createdAt: -1 });
-
-  res.status(200).json({
-    success: true,
-    orders,
+    message: "Order deleted",
   });
 });
