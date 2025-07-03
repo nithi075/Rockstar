@@ -1,155 +1,110 @@
 import { useEffect, useState } from "react";
+import axios from "../../axios";
 import { Link } from "react-router-dom";
-import api from "../../axios";
 
 export default function OrderList() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
 
-  const ordersPerPage = 10;
-
-  useEffect(() => {
-    const fetchOrders = async () => {
-      setLoading(true);
-      try {
-        const res = await api.get("/orders/admin/orders");
-        const sortedOrders = (res.data.orders || []).sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
-        setOrders(sortedOrders);
-      } catch (err) {
-        setError("Failed to fetch orders. " + (err.response?.data?.message || err.message));
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrders();
-  }, []);
-
-  const handleMarkAsDelivered = async (orderId) => {
+  const fetchOrders = async () => {
     try {
-      await api.put(`/orders/${orderId}/deliver`, { status: "Delivered" });
-      setOrders((prev) =>
-        prev.map((order) =>
-          order._id === orderId ? { ...order, status: "Delivered" } : order
-        )
-      );
-      alert("Order marked as delivered!");
+      const { data } = await axios.get("/api/v1/orders/admin/orders", {
+        withCredentials: true,
+      });
+      setOrders(data.orders);
     } catch (err) {
-      alert("Failed to update status. " + (err.response?.data?.message || err.message));
+      console.error(err);
+      setError("Failed to fetch orders.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const calculateTotalAmount = (cartItems) =>
-    cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2);
+  const handleStatusUpdate = async (orderId) => {
+    try {
+      await axios.put(
+        `/api/v1/orders/admin/order/${orderId}`,
+        { status: "Delivered" },
+        { withCredentials: true }
+      );
+      fetchOrders(); // Refresh orders after update
+    } catch (err) {
+      console.error("Failed to update order status:", err);
+      alert("Failed to update status.");
+    }
+  };
 
-  const indexOfLastOrder = currentPage * ordersPerPage;
-  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
-  const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
-  const totalPages = Math.ceil(orders.length / ordersPerPage);
+  useEffect(() => {
+    fetchOrders();
+  }, []);
 
-  if (loading) return <p className="Load-order">Loading orders...</p>;
-  if (error) return <p className="error-order">{error}</p>;
+  if (loading) return <div className="text-center mt-8">Loading orders...</div>;
+  if (error) return <div className="text-red-600 text-center mt-8">{error}</div>;
 
   return (
-    <div className="Order-details">
-      <h1 className="o-list">Order List</h1>
-      {orders.length === 0 ? (
-        <p>No orders found.</p>
-      ) : (
-        <div className="pro-order-list">
-          <table className="order-table">
-            <thead className="order-table-list">
-              <tr>
-                <th className="order-id-header">Order ID</th>
-                <th className="order-pro-img">Product Image</th>
-                <th className="order-cust-name">Customer Name</th>
-                <th className="order-list">Total Items</th>
-                <th className="order-total-amount">Total Amount</th>
-                <th className="order-status">Status</th>
-                <th className="order-action">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentOrders.map((order) => (
-                <tr key={order._id} className="details-order">
-                  <td className="order-id">
-                    {order.customId ? order.customId : order._id.substring(0, 10) + "..."}
-                  </td>
-                  <td className="order-img">
-                    {order.cartItems?.[0]?.image?.url ? (
-                      <img
-                        src={
-                          order.cartItems[0].image.url.startsWith("http")
-                            ? order.cartItems[0].image.url
-                            : `https://admin-backend-x8of.onrender.com/uploads/${order.cartItems[0].image.url}`
-                        }
-                        alt={order.cartItems[0].name || "Product Image"}
-                        className="ord-img"
-                      />
-                    ) : (
-                      <div className="order-no-img">No Image</div>
-                    )}
-                  </td>
-                  <td className="order-info-name">{order.customerInfo?.name || "N/A"}</td>
-                  <td className="order-length-cartitems">{order.cartItems?.length || 0}</td>
-                  <td className="cart-total-amount">
-                    ₹{calculateTotalAmount(order.cartItems || [])}
-                  </td>
-                  <td className="order-status">
-                    <span
-                      className={`order-current-status ${
-                        order.status === "Delivered"
-                          ? "deliverd-order"
-                          : order.status === "Cancelled"
-                          ? "cancelled-order"
-                          : "bg-blue-100 text-blue-800"
-                      }`}
+    <div className="p-4">
+      <h1 className="text-xl font-bold mb-4">Order List</h1>
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white shadow-md rounded-lg">
+          <thead>
+            <tr className="bg-gray-100 text-left text-sm font-medium text-gray-700">
+              <th className="p-3">Order ID</th>
+              <th className="p-3">Product</th>
+              <th className="p-3">Customer</th>
+              <th className="p-3">Status</th>
+              <th className="p-3">Amount</th>
+              <th className="p-3">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {orders.map((order) => (
+              <tr key={order._id} className="border-b hover:bg-gray-50 text-sm">
+                <td className="p-3">{order._id.slice(-6)}</td>
+                <td className="p-3 flex items-center gap-2">
+                  {order.cartItems?.[0]?.product?.image && (
+                    <img
+                      src={order.cartItems[0].product.image}
+                      alt="product"
+                      className="w-10 h-10 object-cover rounded"
+                    />
+                  )}
+                  <span>{order.cartItems?.[0]?.product?.name || "N/A"}</span>
+                </td>
+                <td className="p-3">{order.customerInfo?.name || "N/A"}</td>
+                <td className="p-3">
+                  <span
+                    className={`px-2 py-1 rounded text-xs ${
+                      order.status === "Delivered"
+                        ? "bg-green-200 text-green-800"
+                        : "bg-yellow-200 text-yellow-800"
+                    }`}
+                  >
+                    {order.status}
+                  </span>
+                </td>
+                <td className="p-3">₹{order.totalAmount}</td>
+                <td className="p-3 space-x-2">
+                  <Link
+                    to={`/admin/orders/${order._id}`}
+                    className="text-blue-600 underline"
+                  >
+                    View
+                  </Link>
+                  {order.status !== "Delivered" && (
+                    <button
+                      onClick={() => handleStatusUpdate(order._id)}
+                      className="bg-green-500 text-white px-2 py-1 rounded text-xs"
                     >
-                      {order.status}
-                    </span>
-                  </td>
-                  <td className="order-action-cell">
-                    <div className="order-admin">
-                      <Link to={`/admin/orders/${order._id}`} className="order-view">
-                        View
-                      </Link>
-                      {order.status !== "Delivered" && order.status !== "Cancelled" && (
-                        <button
-                          onClick={() => handleMarkAsDelivered(order._id)}
-                          className="order-delivered"
-                        >
-                          Delivered
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="pagination">
-              {[...Array(totalPages)].map((_, i) => (
-                <button
-                  key={i + 1}
-                  onClick={() => setCurrentPage(i + 1)}
-                  className={`page-number ${
-                    currentPage === i + 1 ? "more-than-one" : "less-than-one"
-                  }`}
-                >
-                  {i + 1}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+                      Mark as Delivered
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
