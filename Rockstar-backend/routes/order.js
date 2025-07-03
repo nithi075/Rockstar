@@ -1,29 +1,37 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
 
 const {
   createOrder,
   getAllOrders,
-  getOrderById,
+  getSingleOrder,
   updateOrderStatus,
   deleteOrder,
-} = require("../controllers/orderController");
+} = require('../controllers/orderController');
 
-const { isAuthenticatedUser, authorizeRoles } = require("../middlewares/auth");
+const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 
-// Create new order (User)
-router.post("/new", isAuthenticatedUser, createOrder);
+// =======================
+// 🛒 Customer Routes
+// =======================
 
-// Get all orders (Admin)
-router.get("/admin", isAuthenticatedUser, authorizeRoles("admin"), getAllOrders);
+// Create a new order (customer only)
+router.post('/order/new', isAuthenticatedUser, createOrder);
 
-// Get order by ID (User/Admin)
-router.get("/:id", isAuthenticatedUser, getOrderById);
+// Get single order by ID (customer or admin)
+router.get('/order/:id', isAuthenticatedUser, getSingleOrder);
 
-// Update order status (Admin)
-router.put("/:id", isAuthenticatedUser, authorizeRoles("admin"), updateOrderStatus);
+// =======================
+// 🔐 Admin Routes
+// =======================
 
-// Delete order (Admin)
-router.delete("/:id", isAuthenticatedUser, authorizeRoles("admin"), deleteOrder);
+// Get all orders with pagination, search, and filters (admin only)
+router.get(
+  '/admin/orders',
+  isAuthenticatedUser,
+  authorizeRoles('admin'),
+  getAllOrders
+);
 
-module.exports = router;
+// Update order status (admin only)
+ro
