@@ -8,7 +8,11 @@ export default function OrderDetails() {
     const [error, setError] = useState("");
 
     useEffect(() => {
-        api.get(`/orders/admin/orders/${orderId}`)
+        // *** CRITICAL FIX: Changed the API endpoint to match your backend route structure ***
+        // Backend expects: /api/v1/orders/:id
+        // Your axios base URL already provides /api/v1
+        // So, the path relative to baseURL should be /orders/:id
+        api.get(`/orders/${orderId}`) // <-- THIS IS THE CHANGE
             .then(res => {
                 setOrder(res.data.order);
             })
@@ -72,11 +76,9 @@ export default function OrderDetails() {
             <div>
                 <h3 className="text-2xl font-semibold mb-4 text-gray-800">Order Items:</h3>
                 <ul className="space-y-4">
-                    {/* Corrected: Use 'orderItems' array from the backend response */}
                     {order.orderItems && order.orderItems.length > 0 ? (
                         order.orderItems.map((item, index) => (
                             <li key={index} className="border p-4 rounded-md flex items-center gap-6 bg-white shadow-sm">
-                                {/* Image access: Prioritize product.images array, then item.image (direct string) */}
                                 <img
                                     src={item.product?.images?.[0]?.url || item.image || 'https://via.placeholder.com/64'} // Fallback to a placeholder image
                                     alt={item.product?.name || item.name}
@@ -86,7 +88,6 @@ export default function OrderDetails() {
                                     <p className="text-lg font-semibold text-gray-800">
                                         <strong>{item.product?.name || item.name}</strong>
                                     </p>
-                                    {/* Removed 'Size' as it's not in your schema */}
                                     <p className="text-gray-600">Quantity: {item.quantity}</p>
                                     <p className="text-gray-700">Price: ₹{(item.price * item.quantity).toFixed(2)} (<span className="font-medium">₹{item.price?.toFixed(2)}/item</span>)</p>
                                     {item.product?._id && ( // Optional: Link to product details if ID exists
