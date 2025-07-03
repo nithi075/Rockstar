@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../../axios";
 import { Link } from "react-router-dom";
-import "./OrderList.css";
+
 
 const OrderList = () => {
   const [orders, setOrders] = useState([]);
