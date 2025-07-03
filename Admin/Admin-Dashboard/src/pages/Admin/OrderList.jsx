@@ -10,12 +10,19 @@ export default function OrderList() {
   const [ordersPerPage] = useState(10); // Number of orders to display per page
 
   useEffect(() => {
-    // Keep this as /admin/orders if that's how your backend handles fetching all admin orders
-    // If your backend's getAllOrders route is now just `router.get('/', ...)` in routes/order.js,
-    // then this line should be: `const res = await api.get("/orders");`
     const fetchOrders = async () => {
       try {
-        const res = await api.get("/admin/orders");
+        // IMPORTANT: The path here depends on your backend's GET all orders route.
+        // If your routes/order.js has `router.get('/', isAuthenticatedUser, authorizeRoles('admin'), getAllOrders);`
+        // AND your app.js uses `app.use('/api/v1/orders', require('./routes/order'));`
+        // THEN the correct path for GETTING ALL orders is `/orders` (relative to your axios baseURL)
+        // If you have a separate route like `app.use('/api/v1/admin/orders', someAdminOrdersRouter);` for GET all,
+        // then `/admin/orders` might be correct.
+        // For consistency with `PUT /orders/:id`, I've adjusted this to `/orders`.
+        const res = await api.get("/orders"); // Changed from "/admin/orders" to "/orders"
+        // If this breaks fetching all orders, revert it to what was working for GET,
+        // but verify your backend's GET ALL orders route.
+
         // Sort orders by creation date (assuming 'createdAt' field exists)
         const sortedOrders = (res.data.orders || []).sort((a, b) =>
           new Date(b.createdAt) - new Date(a.createdAt)
@@ -33,18 +40,20 @@ export default function OrderList() {
   }, []);
 
   const handleMarkAsDelivered = async (orderId) => {
+    // Confirmation dialog for better UX
     if (!window.confirm("Are you sure you want to mark this order as Delivered?")) {
       return;
     }
 
     try {
-      // *** THE CRITICAL CHANGE IS HERE ***
-      // You need to add 'orders' after the initial 'api/v1' (which comes from baseURL)
-      // and before '/admin/order'.
-      const res = await api.put(`/orders/admin/order/${orderId}`, { status: 'Delivered' });
-      //                                ^^^^^^ ADDED THIS!
+      // *** THIS IS THE CRITICAL AND ONLY CHANGE FOR THE PUT REQUEST ***
+      // This path combines with your axios baseURL to form:
+      // https://admin-backend-x8of.onrender.com/api/v1/orders/YOUR_ORDER_ID
+      // This matches your backend: app.use('/api/v1/orders', ...) + router.put('/:id', ...)
+      const res = await api.put(`/orders/${orderId}`, { status: 'Delivered' });
 
-      if (res.status === 200) {
+      if (res.status === 200) { // Check if the update was successful
+        // Update the local state to reflect the change
         setOrders(prevOrders =>
           prevOrders.map(order =>
             order._id === orderId ? { ...order, orderStatus: 'Delivered' } : order
