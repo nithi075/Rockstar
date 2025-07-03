@@ -1,5 +1,3 @@
-// controllers/orderController.js
-
 const Order = require('../models/orderModel'); // Adjust path if necessary
 const Product = require('../models/productModel'); // Adjust path if necessary
 const ErrorHandler = require('../utils/errorHandler'); // Adjust path if necessary
@@ -12,7 +10,6 @@ async function updateStock(productId, quantity) {
     if (!product) {
         // This case should ideally be handled before order creation
         // or signify a deleted product after order.
-        // FIX: Changed to backticks for template literal
         console.warn(`Product with ID ${productId} not found for stock update.`);
         return;
     }
@@ -46,7 +43,7 @@ exports.newOrder = catchAsyncErrors(async (req, res, next) => {
 
     const order = await Order.create({
         shippingInfo,
-        orderItems,
+        orderItems, // This expects 'orderItems' from the frontend
         paymentInfo,
         itemsPrice,
         taxPrice,
@@ -57,12 +54,11 @@ exports.newOrder = catchAsyncErrors(async (req, res, next) => {
     });
 
     // Decrease product stock for each item
-    for (const item of order.orderItems) {
+    for (const item of order.orderItems) { // This iterates through 'orderItems' from the created order
         // Check if item.product exists (it should be an ObjectId if populated correctly)
         if (item.product) {
             await updateStock(item.product, item.quantity); // Assuming item.product is the product _id
         } else {
-            // FIX: Changed to backticks for template literal
             console.warn(`Order item missing product ID: ${item.name}`);
         }
     }
@@ -79,7 +75,7 @@ exports.getSingleOrder = catchAsyncErrors(async (req, res, next) => {
     const order = await Order.findById(req.params.id)
         .populate("user", "name email") // Populate user details
         .populate({ // Populate product details within order items
-            path: 'orderItems.product', // Path to the product reference in orderItems array
+            path: 'cartItems.product', // Changed from 'orderItems.product' to 'cartItems.product' as per your schema
             select: 'name price images stock' // Select necessary product fields, including images
         });
 
@@ -89,7 +85,6 @@ exports.getSingleOrder = catchAsyncErrors(async (req, res, next) => {
 
     // Check if the user is an admin OR the user who placed the order
     if (req.user.role !== "admin" && order.user._id.toString() !== req.user._id.toString()) {
-        // FIX: Changed to backticks for template literal
         return next(new ErrorHandler(`You are not authorized to view this order`, 403));
     }
 
@@ -103,7 +98,7 @@ exports.getSingleOrder = catchAsyncErrors(async (req, res, next) => {
 exports.myOrders = catchAsyncErrors(async (req, res, next) => {
     const orders = await Order.find({ user: req.user._id })
         .populate({
-            path: 'orderItems.product',
+            path: 'cartItems.product', // Changed from 'orderItems.product' to 'cartItems.product' as per your schema
             select: 'name images price' // Select images for user's order view
         })
         .sort({ createdAt: -1 }); // Latest orders first
@@ -119,7 +114,7 @@ exports.getAllOrders = catchAsyncErrors(async (req, res, next) => {
     const orders = await Order.find()
         .populate("user", "name email") // Populate user who placed the order
         .populate({ // Populate product details within order items
-            path: 'orderItems.product', // CRITICAL: Path to the product reference in orderItems array
+            path: 'cartItems.product', // <--- THIS WAS THE CAUSE OF THE LATEST 500 ERROR. Changed from 'orderItems.product' to 'cartItems.product'
             select: 'name images price' // CRITICAL: Select 'images' from the Product model
         })
         .sort({ createdAt: -1 }); // Latest orders first
@@ -147,19 +142,18 @@ exports.updateOrder = catchAsyncErrors(async (req, res, next) => {
 
     // Use order.orderStatus for consistency with your schema
     // Prevent status updates if already delivered or cancelled
-    if (order.orderStatus === "Delivered" || order.orderStatus === "Cancelled") {
-        // FIX: Changed to backticks for template literal
-        return next(new ErrorHandler(`Order has already been ${order.orderStatus}. No further updates allowed.`, 400));
+    if (order.status === "Delivered" || order.status === "Cancelled") { // Changed from order.orderStatus to order.status based on your schema
+        return next(new ErrorHandler(`Order has already been ${order.status}. No further updates allowed.`, 400));
     }
 
     // If the status is changing to 'Delivered', set deliveredAt timestamp
     // Use req.body.status as sent from the frontend
-    if (req.body.status === "Delivered" && order.orderStatus !== "Delivered") {
+    if (req.body.status === "Delivered" && order.status !== "Delivered") {
         order.deliveredAt = Date.now();
     }
 
     // Update the orderStatus field in your Mongoose model
-    order.orderStatus = req.body.status; // Set new status from request body
+    order.status = req.body.status; // Set new status from request body, using 'status' as per your schema
 
     await order.save({ validateBeforeSave: false });
 
