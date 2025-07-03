@@ -11,17 +11,11 @@ const {
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 
-// =======================
-// 🛒 Customer Routes
-// =======================
-
+// Customer Routes
 router.post('/order/new', isAuthenticatedUser, createOrder);
 router.get('/order/:id', isAuthenticatedUser, getSingleOrder);
 
-// =======================
-// 🔐 Admin Routes
-// =======================
-
+// Admin Routes
 router.get('/admin/orders', isAuthenticatedUser, authorizeRoles('admin'), getAllOrders);
 router.put('/admin/order/:id', isAuthenticatedUser, authorizeRoles('admin'), updateOrderStatus);
 router.delete('/admin/order/:id', isAuthenticatedUser, authorizeRoles('admin'), deleteOrder);
