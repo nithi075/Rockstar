@@ -1,156 +1,145 @@
+// pages/Admin/OrderList.jsx
 import { useEffect, useState } from "react";
-import axios from "../../axios"; // ✅ Corrected import
 import { Link } from "react-router-dom";
+import api from "../../axios"; // ✅ correct import
 
 export default function OrderList() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-
-  const fetchOrders = async (page = 1) => {
-    try {
-      setLoading(true);
-      const { data } = await axios.get(`/api/v1/admin/orders?page=${page}`);
-      setOrders(data.orders);
-      setTotalPages(data.totalPages || 1);
-    } catch (err) {
-      setError("Failed to fetch orders.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const ordersPerPage = 10;
 
   useEffect(() => {
-    fetchOrders(currentPage);
-  }, [currentPage, success]);
+    const fetchOrders = async () => {
+      try {
+        const res = await api.get("/orders/admin/orders");
+        const sortedOrders = (res.data.orders || []).sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setOrders(sortedOrders);
+      } catch (err) {
+        setError("Failed to fetch orders. " + (err.response?.data?.message || err.message));
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleStatusUpdate = async (orderId, newStatus) => {
+    fetchOrders();
+  }, []);
+
+  const handleMarkAsDelivered = async (orderId) => {
     try {
-      await axios.put(`/api/v1/admin/orders/${orderId}`, {
-        status: newStatus,
-      });
-      setSuccess(!success); // trigger re-fetch
+      await api.put(`/orders/${orderId}/deliver`, { status: "Delivered" });
+      setOrders((prev) =>
+        prev.map((order) =>
+          order._id === orderId ? { ...order, status: "Delivered" } : order
+        )
+      );
+      alert("Order marked as Delivered!");
     } catch (err) {
-      setError("Failed to update status.");
+      alert("Failed to update status. " + (err.response?.data?.message || err.message));
     }
   };
 
-  const getStatusClass = (status) => {
-    switch (status) {
-      case "Delivered":
-        return "text-green-600 font-semibold";
-      case "Pending":
-        return "text-yellow-600 font-semibold";
-      case "Cancelled":
-        return "text-red-600 font-semibold";
-      default:
-        return "";
-    }
-  };
+  const calculateTotalAmount = (cartItems = []) =>
+    cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2);
+
+  const indexOfLastOrder = currentPage * ordersPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+  const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
+  const totalPages = Math.ceil(orders.length / ordersPerPage);
+
+  const paginate = (page) => setCurrentPage(page);
+
+  if (loading) return <p className="Load-order">Loading orders...</p>;
+  if (error) return <p className="error-order">{error}</p>;
 
   return (
-    <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4">Orders</h2>
-      {loading ? (
-        <p>Loading orders...</p>
-      ) : error ? (
-        <p className="text-red-600">{error}</p>
+    <div className="Order-details">
+      <h1 className="o-list">Order List</h1>
+      {orders.length === 0 ? (
+        <p>No orders found.</p>
       ) : (
-        <>
-          <table className="min-w-full table-auto border border-gray-300">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="px-4 py-2">Order ID</th>
-                <th className="px-4 py-2">Image</th>
-                <th className="px-4 py-2">Product Name</th>
-                <th className="px-4 py-2">Amount</th>
-                <th className="px-4 py-2">Status</th>
-                <th className="px-4 py-2">Customer</th>
-                <th className="px-4 py-2">Date</th>
-                <th className="px-4 py-2">Actions</th>
+        <div className="pro-order-list">
+          <table className="order-table">
+            <thead className="order-table-list">
+              <tr>
+                <th className="order-pro-img">Product Image</th>
+                <th className="order-cust-name">Customer Name</th>
+                <th className="order-list">Total Items</th>
+                <th className="order-total-amount">Total Amount</th>
+                <th className="order-status">Status</th>
+                <th className="order-action">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => {
-                const product = order.cartItems?.[0]?.product;
-                const imageUrl = product?.images?.[0]?.url;
-
-                return (
-                  <tr key={order._id} className="border-t">
-                    <td className="px-4 py-2">{order._id}</td>
-                    <td className="px-4 py-2">
-                      {imageUrl ? (
-                        <img
-                          src={`https://admin-backend-x8of.onrender.com/uploads/${imageUrl}`}
-                          alt={product?.name || "Product"}
-                          width={50}
-                          height={50}
-                          className="rounded"
-                        />
-                      ) : (
-                        <img
-                          src="/placeholder.jpg"
-                          alt="No product"
-                          width={50}
-                          height={50}
-                          className="rounded"
-                        />
-                      )}
-                    </td>
-                    <td className="px-4 py-2">{product?.name || "N/A"}</td>
-                    <td className="px-4 py-2">₹{order.totalAmount}</td>
-                    <td className={`px-4 py-2 ${getStatusClass(order.orderStatus)}`}>
-                      {order.orderStatus}
-                    </td>
-                    <td className="px-4 py-2">{order.customerInfo?.name || "N/A"}</td>
-                    <td className="px-4 py-2">
-                      {new Date(order.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-4 py-2 space-x-2">
-                      <select
-                        value={order.orderStatus}
-                        onChange={(e) =>
-                          handleStatusUpdate(order._id, e.target.value)
-                        }
-                        className="border px-2 py-1 rounded"
-                      >
-                        <option value="Pending">Pending</option>
-                        <option value="Delivered">Delivered</option>
-                        <option value="Cancelled">Cancelled</option>
-                      </select>
-                      <Link
-                        to={`/admin/order/${order._id}`}
-                        className="text-blue-600 underline"
-                      >
+              {currentOrders.map((order) => (
+                <tr key={order._id} className="details-order">
+                  <td className="order-img">
+                    {order.cartItems?.[0]?.product?.images?.[0]?.url ? (
+                      <img
+                        src={`http://localhost:5000/uploads/${order.cartItems[0].product.images[0].url}`}
+                        alt={order.cartItems[0].product?.name || "Product"}
+                        className="ord-img"
+                      />
+                    ) : (
+                      <div className="order-no-img">No Image</div>
+                    )}
+                  </td>
+                  <td className="order-info-name">{order.customerInfo?.name || "N/A"}</td>
+                  <td className="order-length-cartitems">{order.cartItems?.length || 0}</td>
+                  <td className="cart-total-amount">₹{calculateTotalAmount(order.cartItems)}</td>
+                  <td className="order-status">
+                    <span
+                      className={`order-current-status ${
+                        order.status === "Delivered"
+                          ? "deliverd-order"
+                          : order.status === "Cancelled"
+                          ? "cancelled-order"
+                          : "bg-blue-100 text-blue-800"
+                      }`}
+                    >
+                      {order.status}
+                    </span>
+                  </td>
+                  <td className="order-id">
+                    <div className="order-admin">
+                      <Link to={`/admin/orders/${order._id}`} className="order-view">
                         View
                       </Link>
-                    </td>
-                  </tr>
-                );
-              })}
+                      {order.status !== "Delivered" && order.status !== "Cancelled" && (
+                        <button
+                          onClick={() => handleMarkAsDelivered(order._id)}
+                          className="order-delivered"
+                        >
+                          Delivered
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
 
-          {/* Pagination Controls */}
-          <div className="flex justify-center mt-4 space-x-2">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                className={`px-3 py-1 rounded ${
-                  currentPage === page
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-black"
-                }`}
-                onClick={() => setCurrentPage(page)}
-              >
-                {page}
-              </button>
-            ))}
-          </div>
-        </>
+          {totalPages > 1 && (
+            <div className="pagination">
+              {[...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i + 1}
+                  onClick={() => paginate(i + 1)}
+                  className={`page-number ${
+                    currentPage === i + 1 ? "more-than-one" : "less-than-one"
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
