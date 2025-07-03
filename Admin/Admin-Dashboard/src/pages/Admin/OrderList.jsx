@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import './OrderList.css'; // Don't forget to create this CSS file and import it!
+// Don't forget to create this CSS file and import it!
 
 export default function OrderList() {
   const [orders, setOrders] = useState([]);
