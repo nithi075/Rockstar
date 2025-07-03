@@ -32,7 +32,6 @@ exports.createOrder = async (req, res) => {
     }));
     await Product.bulkWrite(bulkOps);
 
-    // Create order
     const order = await Order.create({ cartItems, customerInfo });
     res.status(201).json(order);
   } catch (error) {
@@ -67,8 +66,8 @@ exports.getAllOrders = async (req, res) => {
   }
 };
 
-// Get single order by ID
-exports.getOrderById = async (req, res) => {
+// Get single order
+exports.getSingleOrder = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id).populate(
       "cartItems.product",
@@ -84,7 +83,7 @@ exports.getOrderById = async (req, res) => {
 };
 
 // Update order status (admin)
-exports.updateOrder = async (req, res) => {
+exports.updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
 
@@ -101,19 +100,11 @@ exports.updateOrder = async (req, res) => {
   }
 };
 
-// Delete order (admin)
+// Delete order
 exports.deleteOrder = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
     if (!order) return res.status(404).json({ message: "Order not found" });
-
-    // OPTIONAL: Restore stock if needed
-    // for (const item of order.cartItems) {
-    //   await Product.updateOne(
-    //     { _id: item.product, "sizes.size": item.size },
-    //     { $inc: { "sizes.$.quantity": item.quantity } }
-    //   );
-    // }
 
     await order.remove();
     res.status(200).json({ success: true, message: "Order deleted" });
