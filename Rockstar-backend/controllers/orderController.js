@@ -1,4 +1,6 @@
- const Order = require('../models/orderModel'); // Adjust path if necessary
+// controllers/orderController.js
+
+const Order = require('../models/orderModel'); // Adjust path if necessary
 const Product = require('../models/productModel'); // Adjust path if necessary
 const ErrorHandler = require('../utils/errorHandler'); // Adjust path if necessary
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors'); // Changed to 'middlewares'
@@ -10,7 +12,8 @@ async function updateStock(productId, quantity) {
     if (!product) {
         // This case should ideally be handled before order creation
         // or signify a deleted product after order.
-        console.warn(Product with ID ${productId} not found for stock update.);
+        // FIX: Changed to backticks for template literal
+        console.warn(`Product with ID ${productId} not found for stock update.`);
         return;
     }
 
@@ -59,7 +62,8 @@ exports.newOrder = catchAsyncErrors(async (req, res, next) => {
         if (item.product) {
             await updateStock(item.product, item.quantity); // Assuming item.product is the product _id
         } else {
-            console.warn(Order item missing product ID: ${item.name});
+            // FIX: Changed to backticks for template literal
+            console.warn(`Order item missing product ID: ${item.name}`);
         }
     }
 
@@ -85,7 +89,8 @@ exports.getSingleOrder = catchAsyncErrors(async (req, res, next) => {
 
     // Check if the user is an admin OR the user who placed the order
     if (req.user.role !== "admin" && order.user._id.toString() !== req.user._id.toString()) {
-        return next(new ErrorHandler(You are not authorized to view this order, 403));
+        // FIX: Changed to backticks for template literal
+        return next(new ErrorHandler(`You are not authorized to view this order`, 403));
     }
 
     res.status(200).json({
@@ -143,7 +148,8 @@ exports.updateOrder = catchAsyncErrors(async (req, res, next) => {
     // Use order.orderStatus for consistency with your schema
     // Prevent status updates if already delivered or cancelled
     if (order.orderStatus === "Delivered" || order.orderStatus === "Cancelled") {
-        return next(new ErrorHandler(Order has already been ${order.orderStatus}. No further updates allowed., 400));
+        // FIX: Changed to backticks for template literal
+        return next(new ErrorHandler(`Order has already been ${order.orderStatus}. No further updates allowed.`, 400));
     }
 
     // If the status is changing to 'Delivered', set deliveredAt timestamp
