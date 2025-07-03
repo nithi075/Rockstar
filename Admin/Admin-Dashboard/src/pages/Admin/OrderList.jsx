@@ -61,6 +61,7 @@ export default function OrderList() {
                     <tr key={order._id + "-" + idx} className="border-t">
                       <td className="p-2 border">
                         <img
+                          width={50}
                           src={imageUrl}
                           alt={item.name}
                           className="w-16 h-16 object-cover rounded"
