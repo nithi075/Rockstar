@@ -28,10 +28,10 @@ export default function OrderList() {
     try {
       setUpdating(orderId);
       await axios.put(`/admin/orders/${orderId}`, { status: "Delivered" });
-      await fetchOrders(); // refresh orders list
+      await fetchOrders();
     } catch (err) {
-      console.error("Failed to mark as delivered:", err);
-      alert("Failed to update order status.");
+      console.error("Failed to update status:", err);
+      alert("Failed to update status.");
     } finally {
       setUpdating("");
     }
@@ -57,9 +57,10 @@ export default function OrderList() {
         </thead>
         <tbody>
           {orders.map((order) => {
-            const firstItem = order.cartItems[0];
-            const imageUrl = firstItem?.product?.images?.[0]
-              ? `http://localhost:5000/uploads/${firstItem.product.images[0]}`
+            const firstItem = order.orderItems?.[0];
+            const imageFile = firstItem?.product?.images?.[0];
+            const imageUrl = imageFile
+              ? `http://localhost:5000/uploads/${imageFile}`
               : "https://via.placeholder.com/50";
 
             return (
@@ -69,14 +70,19 @@ export default function OrderList() {
                     src={imageUrl}
                     alt="product"
                     className="w-12 h-12 object-cover mx-auto"
+                    onError={(e) => {
+                      e.target.src = "https://via.placeholder.com/50";
+                    }}
                   />
                 </td>
-                <td className="px-4 py-2">{order.customerInfo?.name || "N/A"}</td>
-                <td className="px-4 py-2">₹{order.totalAmount}</td>
+                <td className="px-4 py-2">{order.user?.name || "N/A"}</td>
+                <td className="px-4 py-2">
+                  ₹{order.totalPrice !== undefined ? order.totalPrice : "N/A"}
+                </td>
                 <td className="px-4 py-2">
                   {new Date(order.createdAt).toLocaleString()}
                 </td>
-                <td className="px-4 py-2">{order.cartItems.length}</td>
+                <td className="px-4 py-2">{order.orderItems?.length || 0}</td>
                 <td className="px-4 py-2">
                   {order.orderStatus === "Delivered" ? (
                     <span className="text-green-600 font-semibold">Delivered</span>
