@@ -9,7 +9,7 @@ const {
     deleteOrder,
     updateOrderStatusAdmin // Make sure this function exists in your controller if you use it
 } = require('../controllers/orderController');
-const { isAuthenticatedUser, authorizeRoles } = require('../middleware/auth');
+const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 
 // User routes (assuming these are already in place and correct)
 router.route("/order/new").post(isAuthenticatedUser, newOrder);
