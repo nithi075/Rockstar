@@ -1,6 +1,5 @@
-// pages/Admin/OrderList.jsx
 import { useEffect, useState } from "react";
-import api from "../../axios"; // Assuming this 'api' instance has a baseURL set (e.g., https://admin-backend-x8of.onrender.com)
+import api from "../../axios"; // This 'api' instance's baseURL is "https://admin-backend-x8of.onrender.com/api/v1"
 import { Link } from "react-router-dom";
 
 export default function OrderList() {
@@ -11,30 +10,20 @@ export default function OrderList() {
 
   const fetchOrders = async (page) => {
     try {
-      // FIX: Changed the API endpoint path to match backend routing
-      // If your 'api' (axios instance) has a baseURL like 'https://admin-backend-x8of.onrender.com/api/v1',
-      // then change this to: `/orders/admin/orders`
-      // If your 'api' has a baseURL like 'https://admin-backend-x8of.onrender.com/',
-      // then change this to: `/api/v1/orders/admin/orders`
-      // Based on your `app.js` and `routes/order.js`, the full path is '/api/v1/orders/admin/orders'
-      // Determine your `api` (axios) baseURL to choose the correct one below.
-
-      // Assuming your `api` (axios) baseURL is just the root (e.g., "https://admin-backend-x8of.onrender.com")
-      const res = await api.get(`/api/v1/orders/admin/orders?page=${page}&limit=${limit}`, {
+      // CORRECTED LINE: The path is now `/orders/admin/orders`
+      // because your `api` (Axios) baseURL already includes `/api/v1`.
+      // Your backend's full route is `/api/v1/orders/admin/orders`.
+      // So, you only need to provide the `/orders/admin/orders` part here.
+      const res = await api.get(`/orders/admin/orders?page=${page}&limit=${limit}`, {
         withCredentials: true,
       });
 
-      // If your `api` (axios) baseURL is "https://admin-backend-x8of.onrender.com/api/v1"
-      // then use:
-      // const res = await api.get(`/orders/admin/orders?page=${page}&limit=${limit}`, {
-      //   withCredentials: true,
-      // });
-
       setOrders(res.data.orders);
-      setTotalPages(res.data.totalPages);
+      // Ensure your backend sends `totalPages` or `totalCount` so you can calculate `totalPages`
+      setTotalPages(res.data.totalPages || Math.ceil(res.data.totalCount / limit));
     } catch (err) {
       console.error("Error fetching orders:", err);
-      // It's good practice to log the full error object to see network response
+      // Log the full error object for more details, especially err.response for server errors
       console.error("Full error object:", err.response || err.message || err);
     }
   };
