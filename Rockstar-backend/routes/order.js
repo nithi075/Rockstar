@@ -1,3 +1,5 @@
+// routes/order.js
+
 const express = require('express');
 const router = express.Router();
 const {
@@ -7,22 +9,24 @@ const {
     getAllOrders,
     updateOrder,
     deleteOrder,
-    updateOrderStatusAdmin
+    updateOrderStatusAdmin, // Make sure this is exported in orderController.js
 } = require('../controllers/orderController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 
-// ---- USER ROUTES ----
-router.route("/order/new").post(isAuthenticatedUser, newOrder);
-router.route("/order/:id").get(isAuthenticatedUser, getSingleOrder);
-router.route("/orders/me").get(isAuthenticatedUser, myOrders);
+// 🧑‍💻 USER ROUTES
+router.post("/order/new", isAuthenticatedUser, newOrder);
+router.get("/order/:id", isAuthenticatedUser, getSingleOrder);
+router.get("/orders/me", isAuthenticatedUser, myOrders);
 
-// ---- ADMIN ROUTES ----
-router.route("/admin/orders").get(isAuthenticatedUser, authorizeRoles("admin"), getAllOrders);
-router.route("/admin/orders/:id").get(isAuthenticatedUser, authorizeRoles("admin"), getSingleOrder);
-router.route("/admin/orders/:id").delete(isAuthenticatedUser, authorizeRoles("admin"), deleteOrder);
+// 🔐 ADMIN ROUTES
+router.get("/admin/orders", isAuthenticatedUser, authorizeRoles("admin"), getAllOrders);
+router.get("/admin/orders/:id", isAuthenticatedUser, authorizeRoles("admin"), getSingleOrder);
 
-// Use whichever function you implemented in your controller
-router.route("/admin/orders/:id/deliver").put(isAuthenticatedUser, authorizeRoles("admin"), updateOrderStatusAdmin);
+// ✅ FIXED: Make sure the handler exists
+router.put("/admin/orders/:id/deliver", isAuthenticatedUser, authorizeRoles("admin"), updateOrderStatusAdmin);
+
+// ✅ Optional: Allow admins to delete orders
+router.delete("/admin/orders/:id", isAuthenticatedUser, authorizeRoles("admin"), deleteOrder);
 
 module.exports = router;
