@@ -96,11 +96,7 @@ export default function OrderDetails() {
                                     {item.size && <p className="text-gray-600">Size: <span className="font-medium">{item.size}</span></p>}
                                     <p className="text-gray-600">Quantity: <span className="font-medium">{item.quantity}</span></p>
                                     <p className="text-gray-700">Price: <span className="font-medium">₹{item.price.toFixed(2)}/item</span></p>
-                                    {item.product?._id && ( // Optional: Link to product details if ID exists
-                                        <Link to={`/admin/product/${item.product._id}`} className="text-blue-500 hover:underline text-sm">
-                                            View Product
-                                        </Link>
-                                    )}
+                                   
                                 </div>
                                 <div className="text-right text-lg font-bold text-gray-800">
                                     ₹{(item.price * item.quantity).toFixed(2)}
