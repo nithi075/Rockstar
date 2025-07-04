@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react"; // Added useCallback
 import { Link } from "react-router-dom";
 import api from "../../axios"; // Assuming this is your configured axios instance
-import './OrderList.css'; // Make sure you import your CSS file
+
 
 export default function OrderList() {
   const [orders, setOrders] = useState([]);
