@@ -4042,7 +4042,7 @@
   }
 
   .order-id-details {
-    font-size: 2em;
+    font-size: 1.3em;
     margin-bottom: 25px;
   }
 
@@ -4106,7 +4106,7 @@
 
   .order-customer-info,
   .Ordered-items {
-    font-size: 1.3em;
+    font-size: 0.9em;
     margin-bottom: 10px;
     padding-bottom: 8px;
   }
@@ -4147,4 +4147,5 @@
   .total-items-cost {
     font-size: 1.3em;
   }
+
 }
