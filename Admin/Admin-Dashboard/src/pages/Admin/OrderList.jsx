@@ -79,26 +79,26 @@ export default function OrderList() {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  if (loading) return <p className="p-4 text-center text-lg text-gray-700">Loading orders...</p>;
-  if (error) return <p className="p-4 text-center text-lg text-red-600">{error}</p>;
+  if (loading) return <p className="Loading-Order">Loading orders...</p>;
+  if (error) return <p className="Loading-error">{error}</p>;
 
   return (
-    <div className="container mx-auto p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen">
-      <h1 className="text-3xl font-extrabold text-gray-900 mb-6 border-b-2 pb-3">Order List</h1>
+    <div className="Order-List-Details">
+      <h1 className="Order-List-info">Order List</h1>
 
       {orders.length === 0 ? (
-        <p className="text-center text-gray-500 text-xl py-10">No orders found.</p>
+        <p className="No-Order-Found">No orders found.</p>
       ) : (
-        <div className="shadow-lg rounded-lg overflow-hidden bg-white">
-          <div className="overflow-x-auto">
-            <table className="min-w-full leading-normal">
+        <div className="order-details-list">
+          <div className="order-det-list">
+            <table className="order-list-table">
               <thead>
-                <tr className="bg-gray-200 text-gray-700 uppercase text-sm font-semibold">
-                  <th className="py-3 px-6 text-left border-b border-gray-300">Image</th>
-                  <th className="py-3 px-6 text-left border-b border-gray-300">Product Name</th>
-                  <th className="py-3 px-6 text-left border-b border-gray-300">Price</th>
-                  <th className="py-3 px-6 text-left border-b border-gray-300">Status</th>
-                  <th className="py-3 px-6 text-left border-b border-gray-300">Actions</th>
+                <tr className="orderList-details">
+                  <th className="orderList-images">Image</th>
+                  <th className="orderList-Product-Name">Product Name</th>
+                  <th className="order-list-Price">Price</th>
+                  <th className="order-list-status">Status</th>
+                  <th className="order-list-action">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -110,8 +110,8 @@ export default function OrderList() {
                         : "/placeholder.jpg"; // fallback image
 
                     return (
-                      <tr key={order._id + "-" + idx} className="hover:bg-gray-100 border-b border-gray-200">
-                        <td className="py-4 px-6">
+                      <tr key={order._id + "-" + idx} className="orders-List-Img">
+                        <td className="orders-img">
                           <img
                             width={50}
                             src={imageUrl}
@@ -119,22 +119,22 @@ export default function OrderList() {
                             className="w-16 h-16 object-cover rounded-md shadow"
                           />
                         </td>
-                        <td className="py-4 px-6 text-gray-800 font-medium">{item.name}</td>
-                        <td className="py-4 px-6 text-gray-700 font-semibold">₹{item.price}</td>
-                        <td className="py-4 px-6">
-                          <span className={`px-3 py-1 text-sm font-semibold rounded-full capitalize ${
-                              order.orderStatus === 'Delivered' ? 'bg-green-100 text-green-800' :
-                              order.orderStatus === 'Cancelled' ? 'bg-red-100 text-red-800' :
-                              'bg-blue-100 text-blue-800'
+                        <td className="order-item-name">{item.name}</td>
+                        <td className="order-item-price">₹{item.price}</td>
+                        <td className="order-list-status">
+                          <span className={`order-current-status ${
+                              order.orderStatus === 'Delivered' ? 'order-success-color' :
+                              order.orderStatus === 'Cancelled' ? 'order-delivered-color' :
+                              
                           }`}>
                             {order.orderStatus}
                           </span>
                         </td>
-                        <td className="py-4 px-6">
-                          <div className="flex space-x-3 items-center">
+                        <td className="order-table-items">
+                          <div className="table-items-of-order">
                             <Link
                               to={`/admin/orders/${order._id}`}
-                              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1.5 px-3 rounded text-sm transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                              className="view-details"
                             >
                               View Details
                             </Link>
@@ -142,7 +142,7 @@ export default function OrderList() {
                             {(order.orderStatus !== 'Delivered' && order.orderStatus !== 'Cancelled') && (
                               <button
                                 onClick={() => handleMarkAsDelivered(order._id)}
-                                className="bg-green-500 hover:bg-green-600 text-white font-bold py-1.5 px-3 rounded text-sm transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+                                className="delivery-button"
                               >
                                 Mark Delivered
                               </button>
@@ -159,15 +159,15 @@ export default function OrderList() {
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="p-4 flex justify-center items-center space-x-2 bg-gray-100 border-t border-gray-200">
+            <div className="order-page">
               {[...Array(totalPages).keys()].map(number => (
                 <button
                   key={number + 1}
                   onClick={() => paginate(number + 1)}
-                  className={`px-4 py-2 rounded-lg font-semibold transition duration-300 ease-in-out ${
+                  className={`current-page ${
                     currentPage === number + 1
-                      ? 'bg-blue-600 text-white shadow-md'
-                      : 'bg-white text-blue-600 border border-blue-300 hover:bg-blue-50'
+                      ? 'more-than-one'
+                      : 'less-than-one'
                   }`}
                 >
                   {number + 1}
