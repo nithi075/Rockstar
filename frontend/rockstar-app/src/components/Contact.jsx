@@ -61,7 +61,7 @@ export default function Contact() {
       <Instagram/>
       {/* NEW: Admin Dashboard Link container, placed at the bottom of the section */}
         <div className="admin">
-            <button ><a href='http://localhost:5174/'><FontAwesomeIcon icon={faUsersGear} className="admin-dashboard-icon" />Admin Dashboard</a></button>
+            <button ><a href='https://rockstar-dashboard.onrender.com/admin/login'><FontAwesomeIcon icon={faUsersGear} className="admin-dashboard-icon" />Admin Dashboard</a></button>
           
         </div>
     </>
