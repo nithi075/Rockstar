@@ -3526,3 +3526,278 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Shadow-md */
   border-color: #2563eb; /* Blue-600 border */
 }
+/* General Styling for the entire Order List component */
+.Order-List-Details {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 20px auto; /* Centers the component on the page */
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Soft shadow for depth */
+}
+
+/* Heading for the Order List */
+.Order-List-info {
+  text-align: center;
+  color: #333;
+  margin-bottom: 30px;
+  font-size: 2.2em; /* Large, prominent heading */
+  font-weight: 700;
+  border-bottom: 2px solid #eee; /* Subtle separator line */
+  padding-bottom: 15px;
+}
+
+/* Styles for loading, error, and "no orders" messages */
+.Loading-Order,
+.Loading-error,
+.No-Order-Found {
+  text-align: center;
+  font-size: 1.2em;
+  color: #666;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 5px;
+  margin-top: 20px;
+  border: 1px solid #ddd; /* General border for these messages */
+}
+
+.Loading-error {
+  color: #d9534f; /* Red for error messages */
+  border-color: #d9534f;
+}
+
+.No-Order-Found {
+  color: #5bc0de; /* Blue for informational messages */
+  border-color: #5bc0de;
+}
+
+/* --- Order Table Styling --- */
+
+/* Wrapper to enable horizontal scrolling for the table on small screens */
+.order-details-list {
+  overflow-x: auto;
+}
+
+/* Main table styles */
+.order-list-table {
+  width: 100%;
+  border-collapse: collapse; /* Removes space between table cells */
+  margin-top: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden; /* Ensures border-radius applies to table content */
+}
+
+/* Table header styles */
+.order-list-table thead {
+  background-color: #007bff; /* Primary blue background */
+  color: white; /* White text for contrast */
+}
+
+/* Styles for table headers and data cells */
+.order-list-table th,
+.order-list-table td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd; /* Separator lines between rows */
+  white-space: nowrap; /* Prevents text wrapping by default */
+}
+
+.order-list-table th {
+  font-weight: 600;
+  text-transform: uppercase; /* Uppercase for column headers */
+  font-size: 0.9em;
+}
+
+/* Zebra striping for table rows for better readability */
+.order-list-table tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+/* Hover effect for table rows */
+.order-list-table tbody tr:hover {
+  background-color: #e9ecef;
+}
+
+/* Styles for the product image in the table */
+.orders-img img {
+  width: 50px; /* Fixed width as per your JSX */
+  height: 50px; /* Fixed height for consistency */
+  border: 1px solid #eee;
+  object-fit: cover; /* Ensures image covers the area without distortion */
+  border-radius: 4px; /* Slightly rounded corners for images */
+  display: block; /* Removes any extra space below the image */
+}
+
+/* Styles for product name and price */
+.order-item-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.order-item-price {
+  font-weight: 600;
+  color: #28a745; /* Green for price to stand out */
+}
+
+/* --- Status Styling --- */
+
+/* Base style for the status badge */
+.order-list-status .order-current-status {
+  padding: 5px 10px;
+  border-radius: 20px; /* Pill-shaped badge */
+  font-weight: 600;
+  font-size: 0.85em;
+  display: inline-block; /* Allows padding and border-radius */
+  min-width: 80px; /* Ensures consistent width for badges */
+  text-align: center;
+}
+
+/* Specific color for 'Delivered' status */
+.order-success-color {
+  background-color: #d4edda; /* Light green background */
+  color: #155724; /* Dark green text */
+}
+
+/* Specific color for 'Cancelled' status */
+.order-delivered-color { /* Renamed from original for clarity, as it's for cancelled */
+  background-color: #f8d7da; /* Light red background */
+  color: #721c24; /* Dark red text */
+}
+
+/* Default color for other statuses (e.g., Pending, Processing) */
+.order-current-status:not(.order-success-color):not(.order-delivered-color) {
+  background-color: #fff3cd; /* Light yellow background */
+  color: #856404; /* Dark yellow text */
+}
+
+/* --- Action Buttons Styling --- */
+
+/* Container for action buttons within a table cell */
+.table-items-of-order {
+  display: flex;
+  flex-direction: column; /* Buttons stack vertically by default */
+  gap: 8px; /* Space between buttons */
+}
+
+/* Base styles for View Details and Mark Delivered buttons */
+.view-details,
+.delivery-button {
+  padding: 8px 12px;
+  border-radius: 5px;
+  text-decoration: none; /* Removes underline from Link component */
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth hover effect */
+  text-align: center;
+  border: none;
+  font-size: 0.9em;
+  white-space: nowrap; /* Ensures button text doesn't wrap */
+}
+
+.view-details {
+  background-color: #6c757d; /* Grey button for details */
+  color: white;
+}
+
+.view-details:hover {
+  background-color: #5a6268;
+}
+
+.delivery-button {
+  background-color: #007bff; /* Primary blue button for delivery */
+  color: white;
+}
+
+.delivery-button:hover {
+  background-color: #0056b3;
+}
+
+/* --- Pagination Controls --- */
+
+.order-page {
+  display: flex;
+  justify-content: center; /* Center the pagination buttons */
+  margin-top: 30px;
+  gap: 10px; /* Space between pagination buttons */
+}
+
+/* Styles for individual pagination buttons */
+.current-page {
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f8f8f8;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  font-weight: 500;
+}
+
+.current-page:hover {
+  background-color: #e9ecef;
+  border-color: #bbb;
+}
+
+/* Active page styling */
+.more-than-one {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+  font-weight: 700;
+}
+
+.more-than-one:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
+/* --- Responsive Adjustments --- */
+
+/* Styles for screens 768px wide and above (e.g., tablets in landscape, desktops) */
+@media (min-width: 768px) {
+  .table-items-of-order {
+    flex-direction: row; /* Change buttons to display side-by-side */
+    justify-content: flex-start;
+  }
+
+  .order-list-table th,
+  .order-list-table td {
+    white-space: normal; /* Allow text wrapping in table cells on larger screens */
+  }
+}
+
+/* Styles for screens 600px wide and below (e.g., mobile phones) */
+@media (max-width: 600px) {
+  .Order-List-info {
+    font-size: 1.8em; /* Smaller heading for mobile */
+  }
+
+  .order-list-table th,
+  .order-list-table td {
+    padding: 10px 8px; /* Reduced padding for more space */
+    font-size: 0.9em; /* Smaller font size in table cells */
+  }
+
+  .view-details,
+  .delivery-button {
+    padding: 6px 10px; /* Smaller padding for buttons */
+    font-size: 0.8em; /* Smaller font size for buttons */
+  }
+
+  /* Adjustments for the status badge on very small screens */
+  .order-list-status .order-current-status {
+      padding: 4px 8px;
+      font-size: 0.75em;
+      min-width: 60px;
+  }
+}
+
+/* Even smaller screens (optional, if you want to push responsiveness further) */
+@media (max-width: 400px) {
+    .order-list-table th,
+    .order-list-table td {
+        padding: 8px 5px; /* Even less padding */
+        font-size: 0.8em;
+    }
+}
