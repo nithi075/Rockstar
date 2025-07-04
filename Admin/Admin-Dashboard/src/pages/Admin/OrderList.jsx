@@ -1,29 +1,51 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react"; // Added useCallback
 import { Link } from "react-router-dom";
 import api from "../../axios"; // Assuming this is your configured axios instance
+import './OrderList.css'; // Make sure you import your CSS file
 
 export default function OrderList() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [ordersPerPage] = useState(10); // Number of orders to display per page
+  const ordersPerPage = 10; // No need for useState if it's a constant
+
+  // Using useCallback for handleMarkAsDelivered to prevent unnecessary re-creations
+  // This is a minor optimization, mainly useful if this function was passed as a prop
+  // to a memoized child component. For this direct usage, it's not strictly necessary but good practice.
+  const handleMarkAsDelivered = useCallback(async (orderId) => {
+    if (!window.confirm("Are you sure you want to mark this order as Delivered?")) {
+      return;
+    }
+
+    try {
+      // Your API call logic remains correct
+      const res = await api.put(`/orders/${orderId}`, { status: 'Delivered' });
+
+      if (res.status === 200) {
+        // Update the local state
+        setOrders(prevOrders =>
+          prevOrders.map(order =>
+            order._id === orderId ? { ...order, orderStatus: 'Delivered' } : order
+          )
+        );
+        alert('Order marked as Delivered successfully!');
+      } else {
+        // More specific error message for unexpected status
+        alert(`Failed to mark order as Delivered. Server responded with status: ${res.status}`);
+      }
+    } catch (err) {
+      console.error("Error marking order as delivered: ", err);
+      const errorMessage = err.response?.data?.message || err.message || "An unknown error occurred.";
+      setError(`Failed to mark order as delivered. ${errorMessage}`);
+      alert(`Failed to mark order as delivered: ${errorMessage}`);
+    }
+  }, []); // Empty dependency array as it doesn't depend on any props or state outside its scope
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        // IMPORTANT: The path here depends on your backend's GET all orders route.
-        // If your routes/order.js has `router.get('/', isAuthenticatedUser, authorizeRoles('admin'), getAllOrders);`
-        // AND your app.js uses `app.use('/api/v1/orders', require('./routes/order'));`
-        // THEN the correct path for GETTING ALL orders is `/orders` (relative to your axios baseURL)
-        // If you have a separate route like `app.use('/api/v1/admin/orders', someAdminOrdersRouter);` for GET all,
-        // then `/admin/orders` might be correct.
-        // For consistency with `PUT /orders/:id`, I've adjusted this to `/orders`.
-        const res = await api.get("/orders"); // Changed from "/admin/orders" to "/orders"
-        // If this breaks fetching all orders, revert it to what was working for GET,
-        // but verify your backend's GET ALL orders route.
-
-        // Sort orders by creation date (assuming 'createdAt' field exists)
+        const res = await api.get("/orders");
         const sortedOrders = (res.data.orders || []).sort((a, b) =>
           new Date(b.createdAt) - new Date(a.createdAt)
         );
@@ -37,40 +59,9 @@ export default function OrderList() {
     };
 
     fetchOrders();
-  }, []);
+  }, []); // Empty dependency array, runs once on mount
 
-  const handleMarkAsDelivered = async (orderId) => {
-    // Confirmation dialog for better UX
-    if (!window.confirm("Are you sure you want to mark this order as Delivered?")) {
-      return;
-    }
-
-    try {
-      // *** THIS IS THE CRITICAL AND ONLY CHANGE FOR THE PUT REQUEST ***
-      // This path combines with your axios baseURL to form:
-      // https://admin-backend-x8of.onrender.com/api/v1/orders/YOUR_ORDER_ID
-      // This matches your backend: app.use('/api/v1/orders', ...) + router.put('/:id', ...)
-      const res = await api.put(`/orders/${orderId}`, { status: 'Delivered' });
-
-      if (res.status === 200) { // Check if the update was successful
-        // Update the local state to reflect the change
-        setOrders(prevOrders =>
-          prevOrders.map(order =>
-            order._id === orderId ? { ...order, orderStatus: 'Delivered' } : order
-          )
-        );
-        alert('Order marked as Delivered successfully!');
-      } else {
-        alert('Failed to mark order as Delivered. Server responded with an unexpected status.');
-      }
-    } catch (err) {
-      console.error("Error marking order as delivered: ", err);
-      setError("Failed to mark order as delivered. " + (err.response?.data?.message || err.message || "Please try again."));
-      alert("Failed to mark order as delivered: " + (err.response?.data?.message || err.message || "An unknown error occurred."));
-    }
-  };
-
-  // Logic for pagination
+  // Logic for pagination - these calculations are correct
   const indexOfLastOrder = currentPage * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
   const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
@@ -112,11 +103,14 @@ export default function OrderList() {
                     return (
                       <tr key={order._id + "-" + idx} className="orders-List-Img">
                         <td className="orders-img">
+                          {/* Removed the Tailwind classes (w-16 h-16 object-cover rounded-md shadow)
+                              as they should be handled by your CSS for consistency.
+                              If you are using Tailwind, you would keep them.
+                              Assuming you want all styling in the .css file. */}
                           <img
-                            width={50}
+                            width={50} // Keep width for initial sizing or if CSS fails
                             src={imageUrl}
                             alt={item.name}
-                            className="w-16 h-16 object-cover rounded-md shadow"
                           />
                         </td>
                         <td className="order-item-name">{item.name}</td>
@@ -125,7 +119,7 @@ export default function OrderList() {
                           <span className={`order-current-status ${
                               order.orderStatus === 'Delivered' ? 'order-success-color' :
                               order.orderStatus === 'Cancelled' ? 'order-delivered-color' :
-                              
+                              '' // Empty string if neither 'Delivered' nor 'Cancelled'
                           }`}>
                             {order.orderStatus}
                           </span>
